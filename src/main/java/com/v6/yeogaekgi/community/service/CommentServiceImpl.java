@@ -20,7 +20,7 @@ public class CommentServiceImpl {
 
     public List<CommentDTO> getListOfMovie(Long postNo) {
 
-        Post post = Post.builder().mno(mno).build();
+        Post post =
         List<Review> result = reviewRepository.findByMovie(movie);
         return result.stream().map(movieReview -> entityToDto(movieReview)).collect(Collectors.toList());
 

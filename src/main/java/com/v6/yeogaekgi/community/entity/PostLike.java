@@ -1,12 +1,13 @@
 package com.v6.yeogaekgi.community.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Table(name = "post_like")
 public class PostLike {
     @Id
