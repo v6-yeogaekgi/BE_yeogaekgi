@@ -14,16 +14,10 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="comment_no")
-    private Long id;
-
-    @Column(nullable=false)
+    private Long comment_no;
     private String comment;
 
-    public void changeComment(String comment) {this.comment = comment;}
-
     @ManyToOne
-    @JoinColumn(name = "post_no", nullable = false)
     private Post post;
 
 //    @ManyToOne
