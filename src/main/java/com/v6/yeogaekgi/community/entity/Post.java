@@ -17,14 +17,21 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long post_no;
+    @Column(name ="post_no")
+    private Long id;
+
+    @Column(nullable=false)
     private String title;
+
+    @Column(nullable=false)
     private String content;
+
     private String images;
+
     private String hashtag;
+
     private int like_cnt;
-//    private String filename_org;
-//    private String filename_real;
+
     private int comment_cnt;
 
 //    @ManyToOne
