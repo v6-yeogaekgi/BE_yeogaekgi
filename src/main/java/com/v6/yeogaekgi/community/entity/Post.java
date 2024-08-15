@@ -16,7 +16,7 @@ public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int post_no;
+    private Long post_no;
     private String title;
     private String content;
     private String images;
@@ -25,8 +25,6 @@ public class Post extends BaseEntity {
 //    private String filename_org;
 //    private String filename_real;
     private int comment_cnt;
-    private int gno;
-    private int ono;
-    private int nested;
+
 
 }

@@ -11,7 +11,7 @@ import lombok.Setter;
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int post_like_no;
+    private Long post_like_no;
 
     @ManyToOne
     private Post post;

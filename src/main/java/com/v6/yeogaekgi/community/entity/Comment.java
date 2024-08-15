@@ -13,7 +13,7 @@ public class Comment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int comment_no;
+    private Long comment_no;
     private String comment;
 
     @ManyToOne
