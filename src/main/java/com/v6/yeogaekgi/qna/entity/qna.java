@@ -14,13 +14,28 @@ import java.sql.Timestamp;
 public class qna {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int qna_no;
+    @Column(name ="qna_no")
+    private int id;
+
+    @Column(nullable=false)
     private String title;
+
+    @Column(nullable=false)
     private String content;
+
+    @Column
     private String img;
+
+    @Column(nullable=false)
     @CurrentTimestamp
     private Timestamp qna_date;
+
+    @Column
     private String reply;
+
+    @Column
     private Timestamp reply_date;
+
+    @Column(nullable=false)
     private int status;
 }
