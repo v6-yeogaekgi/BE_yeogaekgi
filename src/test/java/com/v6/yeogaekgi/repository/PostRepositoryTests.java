@@ -3,35 +3,34 @@ package com.v6.yeogaekgi.repository;
 import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.CommentRepository;
+import com.v6.yeogaekgi.community.repository.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @SpringBootTest
-public class CommentRepositoryTests {
+public class PostRepositoryTests {
 
     @Autowired
-    private CommentRepository repository;
+    private PostRepository repository;
 
 
     @Test
-    public void insertComments() {
+    public void insertPosts() {
 
-        //200개의 리뷰를 등록
-        IntStream.rangeClosed(1,200).forEach(i -> {
+        //100개의 리뷰를 등록
+        IntStream.rangeClosed(1,100).forEach(i -> {
 
-            //post 번호
-            Long postNo = (long)(Math.random()*100) + 1;
-
-            Comment comment = Comment.builder()
-                    .comment("댓글..." + i)
-                    .post(Post.builder().id(postNo).build())
+            Post post = Post.builder()
+                    .title("Post...." +i)
+                    .content("Content..."+i)
                     .build();
 
-            repository.save(comment);
+            repository.save(post);
+
         });
     }
 
