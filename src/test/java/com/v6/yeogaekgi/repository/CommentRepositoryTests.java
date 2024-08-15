@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.repository;
 
+import com.v6.yeogaekgi.community.repository.CommentRepository;
 import com.v6.yeogaekgi.community.repository.ReviewRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.stream.IntStream;
 public class CommentRepositoryTests {
 
     @Autowired
-    private ReviewRepository reviewRepository;
+    private CommentRepository reository;
 
 
     @Test

@@ -10,5 +10,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
+    @EntityGraph(attributePaths = {"member"})
+    List<Comment> findByPost(Post post);
 
 }
