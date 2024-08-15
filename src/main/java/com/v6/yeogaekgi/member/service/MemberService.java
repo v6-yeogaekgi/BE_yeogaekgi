@@ -1,10 +1,10 @@
-package com.v6.yeogaekgi.Member.service;
+package com.v6.yeogaekgi.member.service;
 
-import com.v6.yeogaekgi.Member.dto.MemberRequestDto;
-import com.v6.yeogaekgi.Member.entity.Country;
-import com.v6.yeogaekgi.Member.entity.Member;
-import com.v6.yeogaekgi.Member.repository.CountryRepository;
-import com.v6.yeogaekgi.Member.repository.MemberRepository;
+import com.v6.yeogaekgi.member.dto.MemberRequestDTO;
+import com.v6.yeogaekgi.member.entity.Country;
+import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.member.repository.CountryRepository;
+import com.v6.yeogaekgi.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class MemberService {
     private final CountryRepository countryRepository;
 
     @Transactional
-    public Member signUp(MemberRequestDto memberRequestDto){
+    public Member signUp(MemberRequestDTO memberRequestDto){
         if (!memberRequestDto.getPassword().equals(memberRequestDto.getConfirmPassword())) {
             throw new IllegalArgumentException("비밀번호를 다시 확인해주세요");
         }

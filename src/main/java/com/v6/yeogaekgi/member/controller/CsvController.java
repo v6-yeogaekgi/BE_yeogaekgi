@@ -1,6 +1,6 @@
-package com.v6.yeogaekgi.Member.controller;
+package com.v6.yeogaekgi.member.controller;
 
-import com.v6.yeogaekgi.Member.service.CsvService;
+import com.v6.yeogaekgi.member.service.CsvService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

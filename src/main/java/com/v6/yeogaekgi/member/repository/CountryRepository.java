@@ -1,6 +1,6 @@
-package com.v6.yeogaekgi.Member.repository;
+package com.v6.yeogaekgi.member.repository;
 
-import com.v6.yeogaekgi.Member.entity.Country;
+import com.v6.yeogaekgi.member.entity.Country;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
