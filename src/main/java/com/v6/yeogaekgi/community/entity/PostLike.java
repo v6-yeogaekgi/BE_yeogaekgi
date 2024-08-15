@@ -12,11 +12,9 @@ import lombok.*;
 public class PostLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name ="post_like_no")
-    private Long id;
+    private Long post_like_no;
 
     @ManyToOne
-    @JoinColumn(name = "post_no", nullable = false)
     private Post post;
 
 //    @ManyToOne

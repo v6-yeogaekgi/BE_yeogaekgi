@@ -19,9 +19,6 @@ public class CommentDTO {
     private String comment;
     private Timestamp regDate,modDate;
 
-    // post
-    private Long postNo;
-
     // member
     private Long memberNo;
     private String nickname;
