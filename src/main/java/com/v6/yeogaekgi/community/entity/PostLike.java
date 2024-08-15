@@ -15,4 +15,7 @@ public class PostLike {
 
     @ManyToOne
     private Post post;
+
+//    @ManyToOne
+//    private Member member;
 }

@@ -18,6 +18,9 @@ public class Comment extends BaseEntity {
 
     @ManyToOne
     private Post post;
+
+//    @ManyToOne
+//    private Member member;
 }
 
 

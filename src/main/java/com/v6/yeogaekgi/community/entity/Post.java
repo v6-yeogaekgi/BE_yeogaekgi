@@ -26,5 +26,8 @@ public class Post extends BaseEntity {
 //    private String filename_real;
     private int comment_cnt;
 
+//    @ManyToOne
+//    private Member member;
+
 
 }
