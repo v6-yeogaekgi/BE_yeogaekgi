@@ -1,6 +1,6 @@
 package com.v6.yeogaekgi.member.service;
 
-import com.v6.yeogaekgi.member.dto.MemberRequestDto;
+import com.v6.yeogaekgi.member.dto.MemberRequestDTO;
 import com.v6.yeogaekgi.member.entity.Country;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.member.repository.CountryRepository;
@@ -16,7 +16,7 @@ public class MemberService {
     private final CountryRepository countryRepository;
 
     @Transactional
-    public Member signUp(MemberRequestDto memberRequestDto){
+    public Member signUp(MemberRequestDTO memberRequestDto){
         if (!memberRequestDto.getPassword().equals(memberRequestDto.getConfirmPassword())) {
             throw new IllegalArgumentException("비밀번호를 다시 확인해주세요");
         }
