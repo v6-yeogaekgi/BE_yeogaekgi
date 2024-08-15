@@ -1,8 +1,8 @@
 package com.v6.yeogaekgi.community.repository;
 
-import com.v6.yeogaekgi.community.entity.Comment;
+import com.v6.yeogaekgi.community.entity.PostLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostLikeReopository extends JpaRepository<Comment, Long> {
+public interface PostLikeReopository extends JpaRepository<PostLike, Long> {
 
 }
