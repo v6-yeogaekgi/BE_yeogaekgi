@@ -2,12 +2,13 @@ package com.v6.yeogaekgi.community.entity;
 
 import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Table(name = "comment")
 public class Comment extends BaseEntity {
 
@@ -18,6 +19,9 @@ public class Comment extends BaseEntity {
 
     @ManyToOne
     private Post post;
+
+//    @ManyToOne
+//    private Member member;
 }
 
 
