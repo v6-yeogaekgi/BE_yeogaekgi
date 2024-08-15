@@ -14,4 +14,6 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_no")
     private Long id;
+
+
 }
