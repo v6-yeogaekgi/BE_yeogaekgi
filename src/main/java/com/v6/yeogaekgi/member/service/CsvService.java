@@ -1,7 +1,7 @@
-package com.v6.yeogaekgi.Member.service;
+package com.v6.yeogaekgi.member.service;
 
-import com.v6.yeogaekgi.Member.entity.Country;
-import com.v6.yeogaekgi.Member.repository.CountryRepository;
+import com.v6.yeogaekgi.member.entity.Country;
+import com.v6.yeogaekgi.member.repository.CountryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

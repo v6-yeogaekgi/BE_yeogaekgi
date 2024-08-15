@@ -1,4 +1,4 @@
-package com.v6.yeogaekgi.Member.entity;
+package com.v6.yeogaekgi.member.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
-package com.v6.yeogaekgi.Member.controller;
+package com.v6.yeogaekgi.member.controller;
 
-import com.v6.yeogaekgi.Member.dto.MemberRequestDto;
-import com.v6.yeogaekgi.Member.entity.Member;
-import com.v6.yeogaekgi.Member.service.MemberService;
+import com.v6.yeogaekgi.member.dto.MemberRequestDto;
+import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
