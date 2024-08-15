@@ -20,7 +20,7 @@ public class CommentRepositoryTests {
     @Test
     public void insertComments() {
 
-        //200개의 리뷰를 등록
+        //200개의 더미 등록
         IntStream.rangeClosed(1,200).forEach(i -> {
 
             //post 번호

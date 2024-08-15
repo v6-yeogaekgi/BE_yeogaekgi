@@ -21,7 +21,7 @@ public class PostRepositoryTests {
     @Test
     public void insertPosts() {
 
-        //100개의 리뷰를 등록
+        //100개 더미 등록
         IntStream.rangeClosed(1,100).forEach(i -> {
 
             Post post = Post.builder()

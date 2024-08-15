@@ -17,11 +17,11 @@ import java.sql.Timestamp;
 public abstract class BaseEntity {
 
     @CreatedDate
-    @Column(name = "regdate", updatable = false)
+    @Column(name = "reg_date", updatable = false)
     private Timestamp regDate;
 
     @LastModifiedDate
-    @Column(name ="moddate")
+    @Column(name ="mod_date")
     private Timestamp modDate;
 
 }
