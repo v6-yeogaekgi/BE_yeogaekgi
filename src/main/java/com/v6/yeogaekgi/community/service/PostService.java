@@ -7,6 +7,7 @@ import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.CommentRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
+import com.v6.yeogaekgi.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,22 @@ import java.util.stream.Collectors;
 
 public class PostService {
     private final PostRepository repository;
+
+    public List<PostDTO> getList(PostDTO dto) { //test 필요
+        List<Post> result;
+        if(dto.getHashtag() != null){
+            result = repository.findByHashtagOrderByIdDesc(dto.getHashtag());
+        } else if(dto.getContent() != null){
+            result = repository.findByContentLikeOrderByIdDesc("%"+dto.getContent()+"%");
+        } else if(dto.getMemberNo() > 0){
+            Member member = Member.builder().id(dto.getMemberNo()).build();
+            result = repository.findByMemberByIdDesc(member);
+        }else{
+            result = repository.findAllOrderByIdDesc();
+        }
+        return result.stream().map(Post -> entityToDto(Post)).collect(Collectors.toList());
+
+    }
 
     public Long register(PostDTO postDTO) {
         Post post = dtoToEntity(postDTO);
