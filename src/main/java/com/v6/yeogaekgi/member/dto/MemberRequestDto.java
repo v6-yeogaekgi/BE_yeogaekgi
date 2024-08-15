@@ -1,6 +1,6 @@
-package com.v6.yeogaekgi.Member.dto;
+package com.v6.yeogaekgi.member.dto;
 
-import com.v6.yeogaekgi.Member.entity.Gender;
+import com.v6.yeogaekgi.member.entity.Gender;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
