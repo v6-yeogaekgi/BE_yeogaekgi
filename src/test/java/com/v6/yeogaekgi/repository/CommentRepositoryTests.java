@@ -1,55 +1,63 @@
 package com.v6.yeogaekgi.repository;
 
-import com.v6.yeogaekgi.community.entity.Comment;
-import com.v6.yeogaekgi.community.entity.Post;
-import com.v6.yeogaekgi.community.repository.CommentRepository;
+import com.v6.yeogaekgi.community.repository.ReviewRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
+import org.zerock.mreview.entity.Member;
+import org.zerock.mreview.entity.Movie;
+import org.zerock.mreview.entity.Review;
 
-
+import java.util.List;
 import java.util.stream.IntStream;
 
 @SpringBootTest
 public class CommentRepositoryTests {
 
     @Autowired
-    private CommentRepository repository;
+    private ReviewRepository reviewRepository;
 
 
     @Test
-    public void insertComments() {
+    public void insertMoviewReviews() {
 
         //200개의 리뷰를 등록
         IntStream.rangeClosed(1,200).forEach(i -> {
 
-            //post 번호
-            Long postNo = (long)(Math.random()*100) + 1;
+            //영화 번호
+            Long mno = (long)(Math.random()*100) + 1;
 
-            Comment comment = Comment.builder()
-                    .comment("댓글..." + i)
-                    .post(Post.builder().id(postNo).build())
+            //리뷰어 번호
+            Long mid  =  ((long)(Math.random()*100) + 1 );
+            Member member = Member.builder().mid(mid).build();
+
+            Review movieReview = Review.builder()
+                    .member(member)
+                    .movie(Movie.builder().mno(mno).build())
+                    .grade((int)(Math.random()* 5) + 1)
+                    .text("이 영화에 대한 느낌..."+i)
                     .build();
 
-            repository.save(comment);
+            reviewRepository.save(movieReview);
         });
     }
 
-//    @Transactional
-//    @Test
-//    public void testGetMovieReviews() {
-//        Movie movie = Movie.builder().mno(92L).build();
-//        List<Review> result = reviewRepository.findByMovie(movie);
-//
-//        result.forEach(movieReview ->{
-//            System.out.println(movieReview.getReviewnum());
-//            System.out.println("\t"+movieReview.getGrade());
-//            System.out.println("\t"+movieReview.getText());
-//            System.out.println("\t"+movieReview.getMember().getEmail());
-//            System.out.println("------------------------------------------");
-//
-//        });
-//    }
+    @Transactional
+    @Test
+    public void testGetMovieReviews() {
+        Movie movie = Movie.builder().mno(92L).build();
+        List<Review> result = reviewRepository.findByMovie(movie);
+
+        result.forEach(movieReview ->{
+            System.out.println(movieReview.getReviewnum());
+            System.out.println("\t"+movieReview.getGrade());
+            System.out.println("\t"+movieReview.getText());
+            System.out.println("\t"+movieReview.getMember().getEmail());
+            System.out.println("------------------------------------------");
+
+        });
+    }
 
 
 
