@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
 
     // post
-    private Long postNo;
-    private String title;
+    private Long postId;
     private String content;
     private String images;
     private String hashtag;
@@ -25,6 +24,9 @@ public class PostDTO {
     private Timestamp regDate,modDate;
 
     // member
-    private Long memberNo;
+    private Long memberId;
     private String nickname;
+
+    // service
+    private Integer likeState; // 현재 접속한 유저가 좋아요한 게시글인지. 아니면0, 맞으면1
 }
