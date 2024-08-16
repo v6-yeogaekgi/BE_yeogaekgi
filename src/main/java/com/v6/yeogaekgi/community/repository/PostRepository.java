@@ -21,7 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM post p " +
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no "+
-            "JOIN member m ON m.member_no = p.member_no ",
+            "JOIN member m ON m.member_no = p.member_no "+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -35,7 +36,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.member_no = :memberNo",
+            "WHERE p.member_no = :memberNo"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no " +
@@ -50,7 +52,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no "+
             "JOIN member m ON m.member_no = p.member_no " +
-            "WHERE p.hashtag = :hashtag",
+            "WHERE p.hashtag = :hashtag"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -65,7 +68,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.content LIKE %:content%",
+            "WHERE p.content LIKE %:content%"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
