@@ -1,6 +1,5 @@
 package com.v6.yeogaekgi.review.entity;
 
-import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Review extends BaseEntity {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "review_no")
