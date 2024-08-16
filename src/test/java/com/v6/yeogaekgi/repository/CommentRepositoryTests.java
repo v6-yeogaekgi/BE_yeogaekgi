@@ -1,64 +1,61 @@
-//package com.v6.yeogaekgi.repository;
-//
-//import com.v6.yeogaekgi.community.repository.ReviewRepository;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.zerock.mreview.entity.Member;
-//import org.zerock.mreview.entity.Movie;
-//import org.zerock.mreview.entity.Review;
-//
-//import java.util.List;
-//import java.util.stream.IntStream;
-//
-//@SpringBootTest
-//public class CommentRepositoryTests {
-//
-//    @Autowired
-//    private ReviewRepository reviewRepository;
-//
-//
-//    @Test
-//    public void insertMoviewReviews() {
-//
-//        //200개의 리뷰를 등록
-//        IntStream.rangeClosed(1,200).forEach(i -> {
-//
-//            //영화 번호
-//            Long mno = (long)(Math.random()*100) + 1;
-//
-//            //리뷰어 번호
-//            Long mid  =  ((long)(Math.random()*100) + 1 );
-//            Member member = Member.builder().mid(mid).build();
-//
-//            Review movieReview = Review.builder()
-//                    .member(member)
-//                    .movie(Movie.builder().mno(mno).build())
-//                    .grade((int)(Math.random()* 5) + 1)
-//                    .text("이 영화에 대한 느낌..."+i)
-//                    .build();
-//
-//            reviewRepository.save(movieReview);
-//        });
-//    }
-//
-//    @Transactional
-//    @Test
-//    public void testGetMovieReviews() {
-//        Movie movie = Movie.builder().mno(92L).build();
-//        List<Review> result = reviewRepository.findByMovie(movie);
-//
-//        result.forEach(movieReview ->{
-//            System.out.println(movieReview.getReviewnum());
-//            System.out.println("\t"+movieReview.getGrade());
-//            System.out.println("\t"+movieReview.getText());
-//            System.out.println("\t"+movieReview.getMember().getEmail());
-//            System.out.println("------------------------------------------");
-//
-//        });
-//    }
-//
-//
-//
-//}
+package com.v6.yeogaekgi.repository;
+
+import com.v6.yeogaekgi.community.entity.Comment;
+import com.v6.yeogaekgi.community.entity.Post;
+import com.v6.yeogaekgi.community.repository.CommentRepository;
+import com.v6.yeogaekgi.community.repository.PostRepository;
+import com.v6.yeogaekgi.member.entity.Gender;
+import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.member.repository.CountryRepository;
+import com.v6.yeogaekgi.member.repository.MemberRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+
+
+import java.util.Optional;
+import java.util.stream.IntStream;
+
+
+@SpringBootTest
+public class CommentRepositoryTests {
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Test
+    public void insertComments() {
+
+        // 200개의 Comment 더미 데이터를 등록합니다.
+        IntStream.rangeClosed(1, 200).forEach(i -> {
+
+            // 회원 번호
+            Long memberId = (long) (Math.random() * 100) + 1;
+
+            // post 번호
+            Long postNo = (long) (Math.random() * 100) + 1;
+
+
+            // Comment 객체 생성
+            Comment comment = Comment.builder()
+                    .comment("댓글..." + i)
+                    .post(Post.builder().id(postNo).build())
+                    .member(Member.builder().id(memberId).build()) // Comment에 member 설정
+                    .build();
+
+            // Comment 저장
+            commentRepository.save(comment);
+
+        });
+    }
+}
