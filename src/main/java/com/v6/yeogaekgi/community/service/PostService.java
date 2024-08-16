@@ -51,7 +51,7 @@ public class PostService {
     public Post dtoToEntity(PostDTO postDTO){
 
         Post post = Post.builder()
-                .id(postDTO.getPostNo())
+                .id(postDTO.getPostId())
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
                 .commentCnt(postDTO.getCommentCnt())
@@ -65,7 +65,7 @@ public class PostService {
     public PostDTO entityToDto(Post post){
 
         PostDTO postDTO = PostDTO.builder()
-                .postNo(post.getId())
+                .postId(post.getId())
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
                 .commentCnt(post.getCommentCnt())
