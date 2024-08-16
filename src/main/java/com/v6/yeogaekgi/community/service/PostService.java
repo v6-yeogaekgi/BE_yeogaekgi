@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository repository;
 
-    public List<PostDTO> getList(PostDTO dto) { //test 필요
-        List<Post> result;
-        if(dto.getHashtag() != null){
-            result = repository.findByHashtagOrderByIdDesc(dto.getHashtag());
-        } else if(dto.getContent() != null){
-            result = repository.findByContentLikeOrderByIdDesc("%"+dto.getContent()+"%");
-        } else if(dto.getMemberNo() > 0){
-            Member member = Member.builder().id(dto.getMemberNo()).build();
-            result = repository.findByMemberByIdDesc(member);
-        }else{
-            result = repository.findAllOrderByIdDesc();
-        }
-        return result.stream().map(Post -> entityToDto(Post)).collect(Collectors.toList());
-
-    }
+//    public List<PostDTO> getList(PostDTO dto) { //test 필요
+//        List<Post> result;
+//        if(dto.getHashtag() != null){
+//            result = repository.findByHashtagOrderByIdDesc(dto.getHashtag());
+//        } else if(dto.getContent() != null){
+//            result = repository.findByContentLikeOrderByIdDesc("%"+dto.getContent()+"%");
+//        } else if(dto.getMemberNo() > 0){
+//            Member member = Member.builder().id(dto.getMemberNo()).build();
+//            result = repository.findByMemberByIdDesc(member);
+//        }else{
+//            result = repository.findAllOrderByIdDesc();
+//        }
+//        return result.stream().map(Post -> entityToDto(Post)).collect(Collectors.toList());
+//
+//    }
 
     public Long register(PostDTO postDTO) {
         Post post = dtoToEntity(postDTO);
@@ -51,7 +51,7 @@ public class PostService {
     public Post dtoToEntity(PostDTO postDTO){
 
         Post post = Post.builder()
-                .id(postDTO.getPostNo())
+                .id(postDTO.getPostId())
                 .title(postDTO.getTitle())
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
@@ -66,7 +66,7 @@ public class PostService {
     public PostDTO entityToDto(Post post){
 
         PostDTO postDTO = PostDTO.builder()
-                .postNo(post.getId())
+                .postId(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .hashtag(post.getHashtag())

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class PostDTO {
 
     // post
-    private Long postNo;
+    private Long postId;
     private String title;
     private String content;
     private String images;
@@ -25,6 +25,6 @@ public class PostDTO {
     private Timestamp regDate,modDate;
 
     // member
-    private Long memberNo;
+    private Long memberId;
     private String nickname;
 }
