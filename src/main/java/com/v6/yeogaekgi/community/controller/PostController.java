@@ -32,4 +32,35 @@ public class PostController {
 
         return new ResponseEntity<>(postService.getList(dto, null) ,HttpStatus.OK);
     }
+
+    @PostMapping("/register")
+    public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO){
+        log.info("----------------register Post-------------------");
+        log.info("postDTO : "+postDTO);
+        Long postId = postService.register(postDTO);
+        return new ResponseEntity<>(postId,HttpStatus.OK);
+
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<Long> modifyComment(@PathVariable("postId") Long postId,
+                                              @RequestBody PostDTO postDTO){
+        postDTO.setPostId(postId);
+        log.info("---------------modify post--------------" + postId);
+        log.info("postDTO: " + postDTO);
+
+        postService.modify(postDTO);
+
+        return new ResponseEntity<>(postId, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Long> removeComment(@PathVariable Long postId){
+        log.info("---------------remove post--------------");
+        log.info("postId: " + postId);
+
+        postService.remove(postId);
+
+        return new ResponseEntity<>(postId, HttpStatus.OK);
+    }
 }

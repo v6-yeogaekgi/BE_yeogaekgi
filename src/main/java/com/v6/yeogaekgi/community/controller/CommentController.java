@@ -28,7 +28,7 @@ public class CommentController {
     }
 
     @PostMapping("/{postId}")
-    public ResponseEntity<Long> registerCommnet(@PathVariable("postId") Long postId, @RequestBody CommentDTO commentDTO){
+    public ResponseEntity<Long> registerComment(@PathVariable("postId") Long postId, @RequestBody CommentDTO commentDTO){
         commentDTO.setPostId(postId);
         log.info("----------------register commnet-------------------");
         log.info("commentDTO : "+commentDTO);

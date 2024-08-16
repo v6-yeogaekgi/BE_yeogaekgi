@@ -6,6 +6,7 @@ import com.v6.yeogaekgi.community.dto.PostRequestDTO;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,6 +73,7 @@ public class PostService {
                 .commentCnt(postDTO.getCommentCnt())
                 .images(postDTO.getImages())
                 .likeCnt(postDTO.getLikeCnt())
+                .member(Member.builder().id(postDTO.getMemberId()).build())
                 .build();
 
         return post;
@@ -108,4 +111,22 @@ public class PostService {
     }
 
 
+    public void modify(PostDTO postDTO) {
+
+        Optional<Post> result = repository.findById(postDTO.getPostId());
+        if(result.isPresent()){
+            Post post = result.get();
+            post.changeContent(postDTO.getContent());
+            post.changeImages(postDTO.getImages());
+            post.changeHashtag(postDTO.getHashtag());
+
+            repository.save(post);
+        }
+
+    }
+
+    public void remove(Long postId) {
+        repository.deleteById(postId);
+
+    }
 }

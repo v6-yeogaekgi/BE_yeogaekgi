@@ -41,5 +41,8 @@ public class Post extends BaseEntity {
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
+    public void changeContent(String comment) {this.content = comment;}
+    public void changeImages(String comment) {this.images = images;}
+    public void changeHashtag(String comment) {this.hashtag = hashtag;}
 
 }
