@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Builder
 @Entity
@@ -44,7 +45,8 @@ public class Member {
     @Column
     private String bank;
 
-    private Boolean isDeleted = false;
+    @ColumnDefault("false")
+    private Boolean isDeleted;
 
     @ManyToOne
     @JoinColumn(name = "code", nullable = false)

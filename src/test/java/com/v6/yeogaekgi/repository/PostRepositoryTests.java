@@ -6,15 +6,23 @@ import com.v6.yeogaekgi.community.repository.CommentRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
 @SpringBootTest
 public class PostRepositoryTests {
 
+    private static final Logger log = LoggerFactory.getLogger(PostRepositoryTests.class);
     @Autowired
     private PostRepository repository;
     @Autowired
@@ -38,7 +46,55 @@ public class PostRepositoryTests {
             postRepository.save(post);
         });
     }
+    @Test // ==================전체 게시글 조회 ==================
+    public void getAllPostsTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Object[]> resultPage = postRepository.getAllPosts(1L, pageable);
+        log.info("==================전체 게시글 조회==================");
+        for (Object[] row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", Arrays.toString(row));
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
 
+    @Test // ==================내용 검색 게시글 조회 ==================
+    public void getfindPostsByContentTest(){
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Object[]> resultPage = postRepository.getfindPostsByContent(1L, "1", pageable);
+        log.info("==================내용 검색 게시글 조회 ==================");
+        for (Object[] row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", Arrays.toString(row));
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test // ==================해시태그 검색 게시글 조회 ==================
+    public void getfindPostsByHashtagTest(){
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Object[]> resultPage = postRepository.getfindPostsByHashtag(1L, "test", pageable);
+        log.info("==================해시태그 검색 게시글 조회 ==================");
+        for (Object[] row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", Arrays.toString(row));
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+
+
+    }
+
+    @Test // ==================내가 쓴 게시글 조회 ==================
+    public void getMemberPostsTest(){
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Object[]> resultPage = postRepository.getMemberPosts(1L, pageable);
+        log.info("==================내가 쓴 게시글 조회 ==================");
+        for (Object[] row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", Arrays.toString(row));
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
 //    @Transactional
 //    @Test
 //    public void testGetMovieReviews() {
