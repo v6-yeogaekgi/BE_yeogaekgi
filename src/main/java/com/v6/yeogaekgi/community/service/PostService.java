@@ -51,13 +51,12 @@ public class PostService {
     public Post dtoToEntity(PostDTO postDTO){
 
         Post post = Post.builder()
-                .id(postDTO.getPostId())
-                .title(postDTO.getTitle())
+                .id(postDTO.getPostNo())
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
-                .comment_cnt(postDTO.getCommentCnt())
+                .commentCnt(postDTO.getCommentCnt())
                 .images(postDTO.getImages())
-                .like_cnt(postDTO.getLikeCnt())
+                .likeCnt(postDTO.getLikeCnt())
                 .build();
 
         return post;
@@ -66,13 +65,12 @@ public class PostService {
     public PostDTO entityToDto(Post post){
 
         PostDTO postDTO = PostDTO.builder()
-                .postId(post.getId())
-                .title(post.getTitle())
+                .postNo(post.getId())
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
-                .commentCnt(post.getComment_cnt())
+                .commentCnt(post.getCommentCnt())
                 .images(post.getImages())
-                .likeCnt(post.getLike_cnt())
+                .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
                 .build();
