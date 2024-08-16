@@ -30,4 +30,11 @@ public class Kiosk extends BaseEntity {
     @Column(nullable = false)
     @ColumnDefault("0")
     private int amount;
+
+    public Kiosk(String location, String address, int balance, int amount) {
+        this.location = location;
+        this.address = address;
+        this.balance = balance;
+        this.amount = amount;
+    }
 }

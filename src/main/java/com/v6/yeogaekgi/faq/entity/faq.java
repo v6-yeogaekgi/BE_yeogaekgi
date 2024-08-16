@@ -16,8 +16,13 @@ import java.sql.Timestamp;
 public class faq extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int faq_no;
+    @Column(name ="faq_no")
+    private Long id;
+
+    @Column(nullable=false)
     private String title;
+
+    @Column(nullable=false)
     private String content;
 
 
