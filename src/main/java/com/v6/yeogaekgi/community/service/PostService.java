@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository repository;
 
-    public List<PostDTO> getList(PostDTO dto) { //test 필요
-        List<Post> result;
-        if(dto.getHashtag() != null){
-            result = repository.findByHashtagOrderByIdDesc(dto.getHashtag());
-        } else if(dto.getContent() != null){
-            result = repository.findByContentLikeOrderByIdDesc("%"+dto.getContent()+"%");
-        } else if(dto.getMemberNo() > 0){
-            Member member = Member.builder().id(dto.getMemberNo()).build();
-            result = repository.findByMemberByIdDesc(member);
-        }else{
-            result = repository.findAllOrderByIdDesc();
-        }
-        return result.stream().map(Post -> entityToDto(Post)).collect(Collectors.toList());
-
-    }
+//    public List<PostDTO> getList(PostDTO dto) { //test 필요
+//        List<Post> result;
+//        if(dto.getHashtag() != null){
+//            result = repository.findByHashtagOrderByIdDesc(dto.getHashtag());
+//        } else if(dto.getContent() != null){
+//            result = repository.findByContentLikeOrderByIdDesc("%"+dto.getContent()+"%");
+//        } else if(dto.getMemberNo() > 0){
+//            Member member = Member.builder().id(dto.getMemberNo()).build();
+//            result = repository.findByMemberByIdDesc(member);
+//        }else{
+//            result = repository.findAllOrderByIdDesc();
+//        }
+//        return result.stream().map(Post -> entityToDto(Post)).collect(Collectors.toList());
+//
+//    }
 
     public Long register(PostDTO postDTO) {
         Post post = dtoToEntity(postDTO);
@@ -52,12 +52,11 @@ public class PostService {
 
         Post post = Post.builder()
                 .id(postDTO.getPostNo())
-                .title(postDTO.getTitle())
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
-                .comment_cnt(postDTO.getCommentCnt())
+                .commentCnt(postDTO.getCommentCnt())
                 .images(postDTO.getImages())
-                .like_cnt(postDTO.getLikeCnt())
+                .likeCnt(postDTO.getLikeCnt())
                 .build();
 
         return post;
@@ -67,12 +66,11 @@ public class PostService {
 
         PostDTO postDTO = PostDTO.builder()
                 .postNo(post.getId())
-                .title(post.getTitle())
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
-                .commentCnt(post.getComment_cnt())
+                .commentCnt(post.getCommentCnt())
                 .images(post.getImages())
-                .likeCnt(post.getLike_cnt())
+                .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
                 .build();

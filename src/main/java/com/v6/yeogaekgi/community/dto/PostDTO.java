@@ -27,4 +27,7 @@ public class PostDTO {
     // member
     private Long memberNo;
     private String nickname;
+
+    // service
+    private int likeState; // 현재 접속한 유저가 좋아요한 게시글인지. 아니면0, 맞으면1
 }

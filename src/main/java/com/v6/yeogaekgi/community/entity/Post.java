@@ -4,6 +4,7 @@ import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
@@ -22,18 +23,19 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Column(nullable=false)
-    private String title;
-
-    @Column(nullable=false)
     private String content;
 
     private String images;
 
     private String hashtag;
 
-    private int like_cnt;
+    @Column(name="like_cnt", nullable = false)
+    @ColumnDefault("0")
+    private int likeCnt;
 
-    private int comment_cnt;
+    @Column(name="comment_cnt",nullable = false)
+    @ColumnDefault("0")
+    private int commentCnt;
 
     @ManyToOne
     @JoinColumn(name = "member_no", nullable = false)
