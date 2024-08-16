@@ -1,9 +1,9 @@
 package com.v6.yeogaekgi.community.controller;
 
-import com.v6.yeogaekgi.community.dto.CommentDTO;
+import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
-import com.v6.yeogaekgi.community.dto.PostRequestDTO;
-import com.v6.yeogaekgi.community.service.CommentService;
+import com.v6.yeogaekgi.community.dto.SearchDTO;
+import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.community.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,9 +20,10 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final PostRepository postRepository;
 
     @GetMapping("/list")
-    public ResponseEntity<List<PostDTO>> get(PostRequestDTO dto) {
+    public ResponseEntity<List<PostDTO>> get(SearchDTO dto) {
         // @RequestHeader("Authorization") String token
         // 인증 헤더에서 JWT 토큰 추출
         // String jwtToken = token.replace("Bearer ", "");
@@ -42,8 +43,9 @@ public class PostController {
 
     }
 
+
     @PutMapping("/{postId}")
-    public ResponseEntity<Long> modifyComment(@PathVariable("postId") Long postId,
+    public ResponseEntity<Long> modifyPost(@PathVariable("postId") Long postId,
                                               @RequestBody PostDTO postDTO){
         postDTO.setPostId(postId);
         log.info("---------------modify post--------------" + postId);
@@ -55,7 +57,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Long> removeComment(@PathVariable Long postId){
+    public ResponseEntity<Long> removePost(@PathVariable Long postId){
         log.info("---------------remove post--------------");
         log.info("postId: " + postId);
 
@@ -63,4 +65,19 @@ public class PostController {
 
         return new ResponseEntity<>(postId, HttpStatus.OK);
     }
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDTO> getPost(@PathVariable Long postId){
+        log.info("--------------get post--------------");
+        log.info("postId: " + postId);
+        return new ResponseEntity<>(postService.getPost(postId, ""), HttpStatus.OK);
+    }
+
+    @GetMapping("/hashtag/{hashtag}")
+    public ResponseEntity<List<HashtagDTO>> searchHashtag(@PathVariable String hashtag){
+        log.info("--------------get hashtag list--------------");
+        log.info("hashtag keyword: " + hashtag);
+        return new ResponseEntity<>(postService.searchHashtag(hashtag), HttpStatus.OK);
+    }
+
+
 }

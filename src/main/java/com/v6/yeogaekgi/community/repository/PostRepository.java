@@ -1,6 +1,7 @@
 package com.v6.yeogaekgi.community.repository;
 
 
+import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
@@ -13,6 +14,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // list
@@ -21,7 +23,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "FROM post p " +
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no "+
-            "JOIN member m ON m.member_no = p.member_no ",
+            "JOIN member m ON m.member_no = p.member_no "+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -35,7 +38,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.member_no = :memberNo",
+            "WHERE p.member_no = :memberNo"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no " +
@@ -50,7 +54,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no "+
             "JOIN member m ON m.member_no = p.member_no " +
-            "WHERE p.hashtag = :hashtag",
+            "WHERE p.hashtag = :hashtag"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -65,7 +70,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.content LIKE %:content%",
+            "WHERE p.content LIKE %:content%"+
+            " ORDER BY p.postno DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -74,4 +80,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             nativeQuery = true)
     Page<Object[]> getfindPostsByContent(@Param("memberNo") Long memberNo, @Param("content") String content, Pageable pageable);
 
+
+    @EntityGraph(attributePaths = {"member"})
+    Optional<Post> findById(Long postId);
+
+    @Query(value = "SELECT p.hashtag, COUNT(p.hashtag) count FROM post p WHERE p.hashtag LIKE CONCAT(:hashtag, '%') GROUP BY p.hashtag ORDER BY count DESC limit 10", nativeQuery = true)
+    List<Object[]> getHashtag(String hashtag);
 }

@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.repository;
 
+import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.CommentRepository;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -95,6 +97,16 @@ public class PostRepositoryTests {
         log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
         log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
     }
+
+    @Test
+    public void searchHashtag(){
+        log.info("================== 해시태그 검색 ==================");
+        List<HashtagDTO> results = postRepository.getHashtag("test");
+
+        log.info("ㄴTotal elements: {}", results);
+        log.info("ㄴTotal pages: {}", results);
+    }
+
 //    @Transactional
 //    @Test
 //    public void testGetMovieReviews() {
