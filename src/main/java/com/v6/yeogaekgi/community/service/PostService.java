@@ -1,12 +1,14 @@
 package com.v6.yeogaekgi.community.service;
 
 
+import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
-import com.v6.yeogaekgi.community.dto.PostRequestDTO;
+import com.v6.yeogaekgi.community.dto.SearchDTO;
 import com.v6.yeogaekgi.community.entity.Post;
+import com.v6.yeogaekgi.community.entity.PostLike;
+import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -14,9 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +29,16 @@ import java.util.stream.Collectors;
 
 public class PostService {
     private final PostRepository repository;
+    private final PostLikeRepository plRepository;
 
-    public List<PostDTO> getList(PostRequestDTO dto, String jwt) { //test 필요
+
+    // 게시글 리스트 (검색/필터 포함) [settong]
+    public List<PostDTO> getList(SearchDTO dto, String jwt) {
         Pageable pageable = PageRequest.of(dto.getPage(), 10);
         Page<Object[]> result;
 
-        // 토큰에서 유저 id 가져옴
-        Long memberId = 1L; // 일단은 고정..
+
+        Long memberId = 1L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
 
 
         if(dto.getHashtag() != null && !dto.getHashtag().isEmpty()){
@@ -56,14 +60,68 @@ public class PostService {
 
     }
 
+    // 게시글 상세 [settong]
+    public PostDTO getPost(Long postId, String jwt) {
+
+        Long memberId = 1L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
+
+        Optional<Post> post = repository.findById(postId);
+        PostDTO postDto = null;
+        if(post.isPresent()){
+            postDto = entityToDto(post.get());
+            Optional<PostLike> like = plRepository.findByPost_IdAndMember_Id(postId, memberId);
+            if(like.isPresent()){
+                postDto.setLikeState(1);
+            }else{
+                postDto.setLikeState(0);
+            }
+
+        }
+        return postDto;
+    }
+
+    // 게시글 등록 [bongbong]
     public Long register(PostDTO postDTO) {
         Post post = dtoToEntity(postDTO);
         repository.save(post);
         return post.getId();
     }
 
+    // 게시글 수정 [bongbong]
+    public void modify(PostDTO postDTO) {
 
+        Optional<Post> result = repository.findById(postDTO.getPostId());
+        if(result.isPresent()){
+            Post post = result.get();
+            post.changeContent(postDTO.getContent());
+            post.changeImages(postDTO.getImages());
+            post.changeHashtag(postDTO.getHashtag());
 
+            repository.save(post);
+        }
+
+    }
+
+    // 게시글 삭제 [bongbong]
+    public void remove(Long postId) {
+        repository.deleteById(postId);
+
+    }
+
+    // 해시태그 검색 list [settong]
+    public List<HashtagDTO> searchHashtag(String keyword) {
+        List<Object[]> results = repository.getHashtag(keyword);
+        List<HashtagDTO> hashtags = new ArrayList<>();
+
+        for (Object[] result : results) {
+            String hashtag = (String) result[0];
+            int count = ((Number) result[1]).intValue();
+            hashtags.add(new HashtagDTO(hashtag, count));
+        }
+        return hashtags;
+    }
+
+    // ============================= convert type =============================
     public Post dtoToEntity(PostDTO postDTO){
 
         Post post = Post.builder()
@@ -78,7 +136,6 @@ public class PostService {
 
         return post;
     }
-
     public PostDTO entityToDto(Post post){
 
         PostDTO postDTO = PostDTO.builder()
@@ -90,6 +147,8 @@ public class PostService {
                 .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
+                .memberId(post.getMember().getId())
+                .nickname(post.getMember().getNickname())
                 .build();
 
         return postDTO;
@@ -111,22 +170,4 @@ public class PostService {
     }
 
 
-    public void modify(PostDTO postDTO) {
-
-        Optional<Post> result = repository.findById(postDTO.getPostId());
-        if(result.isPresent()){
-            Post post = result.get();
-            post.changeContent(postDTO.getContent());
-            post.changeImages(postDTO.getImages());
-            post.changeHashtag(postDTO.getHashtag());
-
-            repository.save(post);
-        }
-
-    }
-
-    public void remove(Long postId) {
-        repository.deleteById(postId);
-
-    }
 }
