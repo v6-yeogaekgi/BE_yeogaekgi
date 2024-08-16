@@ -23,11 +23,11 @@ public class Kiosk extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
-    @Column
+    @Column(nullable = false)
     @ColumnDefault("0")
     private int balance;
 
-    @Column
+    @Column(nullable = false)
     @ColumnDefault("0")
     private int amount;
 }
