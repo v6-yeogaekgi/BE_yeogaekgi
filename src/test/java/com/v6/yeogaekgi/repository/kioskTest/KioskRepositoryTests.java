@@ -14,17 +14,17 @@ public class KioskRepositoryTests {
     private KioskRepository kioskRepository;
 
     @Test
-    void testKioskRepository() {
+    void testKioskCreate() {
         Kiosk kiosk1 = new Kiosk("홍대입구역 4번출구", "서울시 마포구", 0, 0);
         Kiosk kiosk2 = new Kiosk("홍대입구역 1번출구", "서울시 마포구", 0, 0);
         Kiosk kiosk3 = new Kiosk("홍대입구역 8번출구", "서울시 마포구", 0, 0);
         Kiosk kiosk4 = new Kiosk("홍대입구역 9번출구", "서울시 마포구", 0, 0);
         Kiosk kiosk5 = new Kiosk("홍대입구역 11번출구", "서울시 마포구", 0, 0);
-        Kiosk kiosk6 = new Kiosk("이태원역 2번출구", "서울시 용산구",0, 0);
-        Kiosk kiosk7 = new Kiosk("이태원역 3번출구", "서울시 용산구",0, 0);
-        Kiosk kiosk8 = new Kiosk("이태원역 4번출구", "서울시 용산구",0, 0);
-        Kiosk kiosk9 = new Kiosk("이태원역 5번출구", "서울시 용산구",0, 0);
-        Kiosk kiosk10 = new Kiosk("이태원역 6번출구", "서울시 용산구",0, 0);
+        Kiosk kiosk6 = new Kiosk("이태원역 2번출구", "서울시 용산구", 0, 0);
+        Kiosk kiosk7 = new Kiosk("이태원역 3번출구", "서울시 용산구", 0, 0);
+        Kiosk kiosk8 = new Kiosk("이태원역 4번출구", "서울시 용산구", 0, 0);
+        Kiosk kiosk9 = new Kiosk("이태원역 5번출구", "서울시 용산구", 0, 0);
+        Kiosk kiosk10 = new Kiosk("이태원역 6번출구", "서울시 용산구", 0, 0);
         kioskRepository.save(kiosk1);
         kioskRepository.save(kiosk2);
         kioskRepository.save(kiosk3);
@@ -35,8 +35,13 @@ public class KioskRepositoryTests {
         kioskRepository.save(kiosk8);
         kioskRepository.save(kiosk9);
         kioskRepository.save(kiosk10);
-
-        List<Kiosk> kiosks = kioskRepository.findAll();
-
     }
+
+    @Test
+    void testKioskLists(){
+        List<Kiosk> kiosks = kioskRepository.findAll();
+    }
+
+
+
 }
