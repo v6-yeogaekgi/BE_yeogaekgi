@@ -17,9 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,11 +28,12 @@ public class S3Service {
 
     private final AmazonS3 amazonS3;
 
-    public List<String> uploadImage(List<MultipartFile> multipartFile) {
-        List<String> fileNameList = new ArrayList<>();
+    public List<Map<String, String>> uploadImage(List<MultipartFile> multipartFiles) {
+        List<Map<String, String>> fileUrlList = new ArrayList<>();
 
-        multipartFile.forEach(file -> {
-            String fileName = createFileName(file.getOriginalFilename());
+        multipartFiles.forEach(file -> {
+            String originalFileName = file.getOriginalFilename();
+            String fileName = createFileName(originalFileName);
             String thumbnailFileName = createThumbnailFileName(fileName);
 
             // 원본 파일 메타데이터 설정
@@ -47,6 +46,9 @@ public class S3Service {
                 amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
 
+                // 업로드한 원본 파일의 URL 가져오기
+                String fileUrl = amazonS3.getUrl(bucket, fileName).toString();
+
                 // 썸네일 생성 및 업로드
                 byte[] thumbnailBytes = createThumbnail(file.getInputStream());
                 ObjectMetadata thumbnailMetadata = new ObjectMetadata();
@@ -57,15 +59,27 @@ public class S3Service {
                         new ByteArrayInputStream(thumbnailBytes), thumbnailMetadata)
                         .withCannedAcl(CannedAccessControlList.PublicRead));
 
+                // 업로드한 썸네일 파일의 URL 가져오기
+                String thumbnailUrl = amazonS3.getUrl(bucket, thumbnailFileName).toString();
+
+                // 원본 파일 이름, 이미지 URL, 썸네일 URL을 Map에 추가
+                Map<String, String> fileUrlMap = new HashMap<>();
+                fileUrlMap.put("originalFileName", originalFileName);  // 파일 이름 추가
+                fileUrlMap.put("imageUrl", fileUrl);
+                fileUrlMap.put("thumbnailUrl", thumbnailUrl);
+
+                // 리스트에 추가
+                fileUrlList.add(fileUrlMap);
+
             } catch (IOException e) {
                 throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미지 업로드에 실패했습니다.");
             }
-
-            fileNameList.add(fileName);
         });
 
-        return fileNameList;
+        return fileUrlList;
     }
+
+
 
     public void deleteImage(String fileName) {
         // 원본 이미지 삭제
