@@ -14,13 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 
 public class ReviewRequestDTO {
-
-    private String images;
+    private Long reviewId;
+    private List<String> images;
+    private List<String> thumbnail;
     private int score;
     private String content;
     private int status;
 
     private Long serviceId;  // 서비스 no
-    private Long memberId;   // 멤버 no
 
+    private Long memberId;   // 멤버 no
+    private String nickname;
 }

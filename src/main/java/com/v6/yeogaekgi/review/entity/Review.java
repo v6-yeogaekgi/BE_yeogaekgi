@@ -1,21 +1,19 @@
 package com.v6.yeogaekgi.review.entity;
 
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.service.entity.Service;
+import com.v6.yeogaekgi.payment.entity.Payment;
+import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@ToString(exclude = {"service","member"})
+@ToString(exclude = {"services","member","payment"})
 public class Review extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,6 +22,8 @@ public class Review extends BaseEntity {
 
     private String images;
 
+    private String thumbnail;
+
     @Column(nullable=false)
     private int score;
 
@@ -31,16 +31,19 @@ public class Review extends BaseEntity {
     private String content;
 
     @Column(nullable=false)
-    private int status=0;
+    @ColumnDefault("0")
+    private int status;
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_no", nullable = false)
-    private Service service;
+    private Services services;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
-
-
+    @OneToOne(fetch = FetchType.LAZY,optional = true)
+    @JoinColumn(name = "pay_no")
+    private Payment payment;
 }

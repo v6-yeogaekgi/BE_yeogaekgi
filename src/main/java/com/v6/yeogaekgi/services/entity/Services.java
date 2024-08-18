@@ -1,11 +1,7 @@
-package com.v6.yeogaekgi.service.entity;
+package com.v6.yeogaekgi.services.entity;
 
-import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,14 +11,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @ToString
-public class Service {
+@Builder
+public class Services {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "service_no")
     private Long id;
 
     @Column(nullable = false)
-    private ServiceType type;
+    private ServicesType type;
 
     @Column(nullable = false)
     private String name;
