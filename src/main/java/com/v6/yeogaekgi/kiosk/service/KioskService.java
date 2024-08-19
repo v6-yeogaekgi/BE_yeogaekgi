@@ -1,7 +1,10 @@
 package com.v6.yeogaekgi.kiosk.service;
 
+import com.v6.yeogaekgi.kiosk.dto.KioskRequestDTO;
+import com.v6.yeogaekgi.kiosk.dto.KioskResponseDTO;
 import com.v6.yeogaekgi.kiosk.entity.Kiosk;
 import com.v6.yeogaekgi.kiosk.repository.KioskRepository;
+import com.v6.yeogaekgi.member.entity.Member;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,19 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KioskService {
     private final KioskRepository kioskRepository;
+
+    @Transactional
+    public KioskResponseDTO addKiosk(KioskRequestDTO kioskRequestDTO, Member member){
+        Kiosk kiosk = new Kiosk(
+                kioskRequestDTO.getLocation(),
+                kioskRequestDTO.getAddress(),
+                kioskRequestDTO.getBalance(),
+                kioskRequestDTO.getAmount(),
+                member
+        );
+        kioskRepository.save(kiosk);
+        return new KioskResponseDTO(kiosk);
+    }
 
     @Transactional
     public List<String> getKioskLists(){
