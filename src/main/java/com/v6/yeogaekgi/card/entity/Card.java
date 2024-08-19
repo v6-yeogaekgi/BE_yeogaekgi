@@ -19,7 +19,7 @@ public class Card {
     @Column(name ="card_no")
     private Long id;
 
-    @Column(nullable=false)
+    @Column
     private String design;
 
     @Column(name="card_name", nullable=false)

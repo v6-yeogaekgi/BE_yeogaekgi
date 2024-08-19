@@ -1,5 +1,6 @@
-package com.v6.yeogaekgi.card.entity;
+package com.v6.yeogaekgi.payTrack.entity;
 
+import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
