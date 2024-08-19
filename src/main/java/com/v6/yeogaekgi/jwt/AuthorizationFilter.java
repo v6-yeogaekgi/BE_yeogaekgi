@@ -5,6 +5,7 @@ import com.v6.yeogaekgi.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +15,12 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
 
 @RequiredArgsConstructor
-public class AuthorizationFilter {
+public class AuthorizationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final MemberDetailsServiceImpl memberDetailsService;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -37,8 +41,8 @@ public class AuthorizationFilter {
                 }
 
                 Claims info = tokenProvider.getUserInfoFromToken(refreshToken);
-                String username = info.getSubject();
-                accessToken = tokenProvider.createToken(username);
+                String email = info.getSubject();
+                accessToken = tokenProvider.createToken(email);
                 res.addHeader(TokenProvider.AUTHORIZATION_HEADER, accessToken);
                 accessToken = tokenProvider.substringToken(accessToken);
             }
@@ -53,16 +57,16 @@ public class AuthorizationFilter {
         filterChain.doFilter(req, res);
     }
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String email) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
+        Authentication authentication = createAuthentication(email);
         context.setAuthentication(authentication);
 
         SecurityContextHolder.setContext(context);
     }
 
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = memberDetailsService.loadUserByUsername(username);
+    private Authentication createAuthentication(String email) {
+        UserDetails userDetails = memberDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

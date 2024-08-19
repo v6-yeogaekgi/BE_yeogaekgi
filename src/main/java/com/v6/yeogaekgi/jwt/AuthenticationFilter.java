@@ -1,21 +1,24 @@
 package com.v6.yeogaekgi.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v6.yeogaekgi.member.dto.LoginRequestDTO;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.member.entity.RefreshToken;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class AuthenticationFilter {
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider tokenProvider;
     private final RefreshTokenRepository refreshTokenRepository;
     private final MemberRepository memberRepository;
@@ -30,7 +33,7 @@ public class AuthenticationFilter {
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            LoginRequestDTO requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
+            LoginRequestDTO requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDTO.class);
 
             Member member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
             if(member != null && !member.getIsDeleted()){
@@ -54,15 +57,15 @@ public class AuthenticationFilter {
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult){
-        String username = ((MemberDetailsImpl) authResult.getPrincipal()).getUsername();
+        String email = ((MemberDetailsImpl) authResult.getPrincipal()).getUsername();
 
-        String token = tokenProvider.createToken(username);
-        String refresh = tokenProvider.createRefreshToken(username);
+        String token = tokenProvider.createToken(email);
+        String refresh = tokenProvider.createRefreshToken(email);
 
 
-        RefreshToken refreshToken = refreshTokenRepository.findByUsername(email).orElse(null);
+        RefreshToken refreshToken = refreshTokenRepository.findByEmail(email).orElse(null);
         if (refreshToken == null) {
-            refreshToken = new RefreshToken(refresh, username);
+            refreshToken = new RefreshToken(refresh, email);
         } else {
             refreshToken.updateToken(refresh);
         }

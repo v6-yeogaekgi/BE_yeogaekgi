@@ -1,5 +1,7 @@
 package com.v6.yeogaekgi.config;
 
+import com.v6.yeogaekgi.jwt.AuthenticationFilter;
+import com.v6.yeogaekgi.jwt.AuthorizationFilter;
 import com.v6.yeogaekgi.jwt.TokenProvider;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
@@ -17,8 +19,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.intercept.AuthorizationFilter;
-import org.springframework.security.web.authentication.AuthenticationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -50,7 +50,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Bean
     public AuthenticationFilter authenticationFilter() throws Exception {
         AuthenticationFilter filter = new AuthenticationFilter(tokenProvider,refreshTokenRepository,memberRepository);
-        filter.setAuthenticationManagerResolver(authenticationManager(authenticationConfiguration));
+        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
 

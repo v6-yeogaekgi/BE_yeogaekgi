@@ -14,11 +14,11 @@ public class RefreshToken {
     @Column(name = "refreshtoken_id")
     private Long id;
     private String token;
-    private String username;
+    private String email;
 
-    public RefreshToken(String token,String username){
+    public RefreshToken(String token,String email){
         this.token = token;
-        this.username = username;
+        this.email = email;
     }
 
     public void updateToken(String token) {
