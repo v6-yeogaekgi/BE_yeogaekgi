@@ -3,10 +3,8 @@ package com.v6.yeogaekgi.review.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPQLQuery;
-import com.v6.yeogaekgi.member.entity.QMember;
 import com.v6.yeogaekgi.review.entity.QReview;
 import com.v6.yeogaekgi.review.entity.Review;
-import com.v6.yeogaekgi.services.entity.QServices;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
