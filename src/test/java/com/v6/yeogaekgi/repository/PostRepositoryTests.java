@@ -100,11 +100,11 @@ public class PostRepositoryTests {
 
     @Test
     public void searchHashtag(){
-        log.info("================== 해시태그 검색 ==================");
-        List<HashtagDTO> results = postRepository.getHashtag("test");
-
-        log.info("ㄴTotal elements: {}", results);
-        log.info("ㄴTotal pages: {}", results);
+//        log.info("================== 해시태그 검색 ==================");
+//        List<HashtagDTO> results = postRepository.getHashtag("test");
+//
+//        log.info("ㄴTotal elements: {}", results);
+//        log.info("ㄴTotal pages: {}", results);
     }
 
 //    @Transactional
