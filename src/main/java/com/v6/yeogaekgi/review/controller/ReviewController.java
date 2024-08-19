@@ -2,6 +2,8 @@ package com.v6.yeogaekgi.review.controller;
 
 
 import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
+import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
+import com.v6.yeogaekgi.review.dto.SliceResponse;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.service.ReviewService;
 import com.v6.yeogaekgi.services.entity.Services;
@@ -40,15 +42,15 @@ public class ReviewController {
     }
 
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
-//    @GetMapping("/api/reviews")
-//    public ResponseEntity<> getReviews(
-//            @RequestParam Long serviceId,
-//            Pageable pageable,
-//            @RequestParam(required = false) int payStatus
-//    ) {
-//        Slice<Review> reviews =  reviewService.reviewList(serviceId, pageable, payStatus);
-//        return ResponseEntity.ok(reviews);
-//    }
+    @GetMapping("/api/reviews")
+    public SliceResponse getReviews(
+            @RequestParam Long serviceId,
+            Pageable pageable,
+            @RequestParam(required = false) int payStatus
+    ) {
+        SliceResponse reviews = reviewService.reviewList(serviceId, pageable, payStatus);
+        return reviews;
+    }
 
 
 

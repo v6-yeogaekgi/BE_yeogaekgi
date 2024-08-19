@@ -1,7 +1,7 @@
 package com.v6.yeogaekgi.review.entity;
 
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.payment.entity.Payment;
+import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.util.BaseEntity;
 import jakarta.persistence.*;
