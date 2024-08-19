@@ -1,10 +1,15 @@
 package com.v6.yeogaekgi.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.v6.yeogaekgi.member.dto.LoginRequestDTO;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.member.entity.RefreshToken;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
+import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import java.io.IOException;
@@ -19,20 +24,19 @@ public class AuthenticationFilter {
         this.tokenProvider = tokenProvider;
         this.refreshTokenRepository = refreshTokenRepository;
         this.memberRepository = memberRepository;
-        setFilterProcessesUrl("/api/members/login");
+        setFilterProcessesUrl("/members/login");
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         try {
-            LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
+            LoginRequestDTO requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
 
-            // 사용자를 데이터베이스에서 찾아올 때 isDeleted 필드를 함께 확인하여 탈퇴한 회원인지 확인
-            Member member = memberRepository.findByUsername(requestDto.getUsername()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
+            Member member = memberRepository.findByEmail(requestDto.getEmail()).orElseThrow(() -> new RuntimeException("존재하지 않는 회원입니다."));
             if(member != null && !member.getIsDeleted()){
                 return getAuthenticationManager().authenticate(
                         new UsernamePasswordAuthenticationToken(
-                                requestDto.getUsername(),
+                                requestDto.getEmail(),
                                 requestDto.getPassword(),
                                 null
                         )
@@ -56,7 +60,7 @@ public class AuthenticationFilter {
         String refresh = tokenProvider.createRefreshToken(username);
 
 
-        RefreshToken refreshToken = refreshTokenRepository.findByUsername(username).orElse(null);
+        RefreshToken refreshToken = refreshTokenRepository.findByUsername(email).orElse(null);
         if (refreshToken == null) {
             refreshToken = new RefreshToken(refresh, username);
         } else {

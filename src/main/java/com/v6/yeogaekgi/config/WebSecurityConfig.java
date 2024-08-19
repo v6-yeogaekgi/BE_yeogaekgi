@@ -1,6 +1,8 @@
 package com.v6.yeogaekgi.config;
 
+import com.v6.yeogaekgi.jwt.TokenProvider;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
+import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
 import com.v6.yeogaekgi.security.MemberDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

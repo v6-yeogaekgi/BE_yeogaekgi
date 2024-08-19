@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.jwt;
 
+import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
 import com.v6.yeogaekgi.security.MemberDetailsServiceImpl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
