@@ -5,21 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Timestamp;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostLikeDTO {
-
-    // comment
-    private Long postLikeId;
-
-    // post
-    private Long postId;
-
-    // member
-    private Long memberId;
-
+public class HashtagDTO {
+    private String hashtag; // 해시태그
+    private int count; // 해시태그별 게시글 수
 }

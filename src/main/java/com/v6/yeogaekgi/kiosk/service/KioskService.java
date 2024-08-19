@@ -1,4 +1,5 @@
 package com.v6.yeogaekgi.kiosk.service;
+
 import com.v6.yeogaekgi.kiosk.entity.Kiosk;
 import com.v6.yeogaekgi.kiosk.repository.KioskRepository;
 import jakarta.transaction.Transactional;

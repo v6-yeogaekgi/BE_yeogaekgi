@@ -9,4 +9,3 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class KioskResponseDTO {
     private String location;
-}

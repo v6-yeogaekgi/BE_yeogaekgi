@@ -5,6 +5,7 @@ import com.v6.yeogaekgi.community.dto.CommentDTO;
 import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.CommentRepository;
+import com.v6.yeogaekgi.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final CommentRepository repository;
 
-    public List<CommentDTO> getListOfMovie(Long postNo) {
+    public List<CommentDTO> getListOfComment(Long postNo) {
 
         Post post = Post.builder().id(postNo).build();
         List<Comment> result = repository.findByPost(post);
@@ -36,7 +37,7 @@ public class CommentService {
 
     public void modify(CommentDTO commentDTO) {
 
-        Optional<Comment> result = repository.findById(commentDTO.getCommentNo());
+        Optional<Comment> result = repository.findById(commentDTO.getCommentId());
         if(result.isPresent()){
             Comment comment = result.get();
             comment.changeComment(commentDTO.getComment());
@@ -55,9 +56,10 @@ public class CommentService {
     public Comment dtoToEntity(CommentDTO commentDTO){
 
         Comment comment = Comment.builder()
-                .id(commentDTO.getCommentNo())
+                .id(commentDTO.getCommentId())
                 .comment(commentDTO.getComment())
-                .post(Post.builder().id(commentDTO.getPostNo()).build())
+                .post(Post.builder().id(commentDTO.getPostId()).build())
+                .member(Member.builder().id(commentDTO.getMemberId()).build())
                 .build();
 
         return comment;
@@ -66,11 +68,13 @@ public class CommentService {
     public CommentDTO entityToDto(Comment comment){
 
         CommentDTO commentDTO = CommentDTO.builder()
-                .commentNo(comment.getId())
+                .commentId(comment.getId())
                 .comment(comment.getComment())
                 .regDate(comment.getRegDate())
                 .modDate(comment.getModDate())
-                .postNo(comment.getPost().getId())
+                .postId(comment.getPost().getId())
+                .memberId(comment.getMember().getId())
+                .nickname(comment.getMember().getNickname())
                 .build();
 
         return commentDTO;
