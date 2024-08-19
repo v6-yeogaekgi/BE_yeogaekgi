@@ -1,6 +1,5 @@
 package com.v6.yeogaekgi.review.service;
 
-
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
@@ -16,9 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
 import org.springframework.data.domain.Pageable;
-
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
@@ -87,5 +84,10 @@ public class ReviewService {
         // SliceResponse 객체 생성
         return new SliceResponse<>(dtoList, pageable, result.hasNext());
     }
-
+  
+    public void deleteReview(Long reviewNo) {
+        Review review = reviewRepository.findById(reviewNo)
+                .orElseThrow(()->new IllegalArgumentException("리뷰가 존재하지 않습니다."));
+        reviewRepository.delete(review);
+    }
 }

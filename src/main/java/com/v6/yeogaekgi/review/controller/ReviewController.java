@@ -1,6 +1,10 @@
 package com.v6.yeogaekgi.review.controller;
 
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
 import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
 import com.v6.yeogaekgi.review.dto.SliceResponse;
@@ -51,8 +55,10 @@ public class ReviewController {
         SliceResponse reviews = reviewService.reviewList(serviceId, pageable, payStatus);
         return reviews;
     }
-
-
-
-
+  
+    @DeleteMapping("/review/{reviewNo}")
+    public ResponseEntity<?>deleteReview(@PathVariable Long reviewNo){
+        reviewService.deleteReview(reviewNo);
+        return ResponseEntity.ok().body("리뷰가 삭제되었습니다");
+    }
 }
