@@ -33,7 +33,7 @@ public class Kiosk extends BaseEntity {
     private int amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
     public Kiosk(String location, String address, int balance, int amount, Member member) {

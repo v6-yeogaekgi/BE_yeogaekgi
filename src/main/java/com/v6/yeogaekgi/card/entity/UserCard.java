@@ -37,7 +37,7 @@ public class UserCard {
     private Card card;
 
     @ManyToOne
-    @JoinColumn(name = "memeber_no", nullable = false)
+    @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
     @Column(nullable=false)
@@ -48,4 +48,6 @@ public class UserCard {
     //0: 주카드 X 1:주카드 O
     //0: 주카드 X 1:주카드 O
     private int starred;
+
+    public void updatePayBalance(int payBalance) {this.payBalance = payBalance;}
 }
