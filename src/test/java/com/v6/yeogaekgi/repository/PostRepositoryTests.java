@@ -98,31 +98,48 @@ public class PostRepositoryTests {
         log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
     }
 
-//    @Test
-//    public void searchHashtag(){
+    @Test
+    public void searchHashtag(){
 //        log.info("================== 해시태그 검색 ==================");
 //        List<HashtagDTO> results = postRepository.getHashtag("test");
 //
 //        log.info("ㄴTotal elements: {}", results);
 //        log.info("ㄴTotal pages: {}", results);
-//    }
+    }
 
 //    @Transactional
 //    @Test
-//    public void testGetMovieReviews() {
-//        Movie movie = Movie.builder().mno(92L).build();
-//        List<Review> result = reviewRepository.findByMovie(movie);
+//    public void insertPosts() {
 //
-//        result.forEach(movieReview ->{
-//            System.out.println(movieReview.getReviewnum());
-//            System.out.println("\t"+movieReview.getGrade());
-//            System.out.println("\t"+movieReview.getText());
-//            System.out.println("\t"+movieReview.getMember().getEmail());
-//            System.out.println("------------------------------------------");
+//        //100개 더미 등록
+//        IntStream.rangeClosed(1,100).forEach(i -> {
+//
+//            Post post = Post.builder()
+//                    .title("Post...." +i)
+//                    .content("Content..."+i)
+//                    .build();
+//
+//            repository.save(post);
 //
 //        });
 //    }
-
-
-
-}
+//
+////    @Transactional
+////    @Test
+////    public void testGetMovieReviews() {
+////        Movie movie = Movie.builder().mno(92L).build();
+////        List<Review> result = reviewRepository.findByMovie(movie);
+////
+////        result.forEach(movieReview ->{
+////            System.out.println(movieReview.getReviewnum());
+////            System.out.println("\t"+movieReview.getGrade());
+////            System.out.println("\t"+movieReview.getText());
+////            System.out.println("\t"+movieReview.getMember().getEmail());
+////            System.out.println("------------------------------------------");
+////
+////        });
+////    }
+//
+//
+//
+//}
