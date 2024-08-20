@@ -8,6 +8,8 @@ import com.v6.yeogaekgi.community.repository.CommentRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +24,7 @@ public class CommentService {
     private final CommentRepository repository;
 
     public List<CommentDTO> getListOfComment(Long postNo) {
+
 
         Post post = Post.builder().id(postNo).build();
         List<Comment> result = repository.findByPost(post);

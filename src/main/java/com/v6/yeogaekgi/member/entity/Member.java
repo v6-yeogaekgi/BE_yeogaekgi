@@ -45,8 +45,7 @@ public class Member {
     @Column
     private String bank;
 
-    @ColumnDefault("false")
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     @ManyToOne
     @JoinColumn(name = "code", nullable = false)

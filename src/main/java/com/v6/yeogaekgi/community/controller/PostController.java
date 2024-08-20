@@ -17,6 +17,8 @@ import java.util.List;
 @RequestMapping("/community")
 @Log4j2
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"*"})
+
 public class PostController {
 
     private final PostService postService;

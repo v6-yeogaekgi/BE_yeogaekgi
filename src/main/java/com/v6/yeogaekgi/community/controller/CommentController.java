@@ -14,6 +14,7 @@ import java.util.List;
 @RequestMapping("/community/comment")
 @Log4j2
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"*"})
 public class CommentController {
 
     private final CommentService commentService;
