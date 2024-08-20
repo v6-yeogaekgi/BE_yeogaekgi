@@ -44,11 +44,11 @@ public class Payment {
     @Column(name = "service_name")
     private String serviceName;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_card_no", nullable = false)
     private UserCard userCard;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 

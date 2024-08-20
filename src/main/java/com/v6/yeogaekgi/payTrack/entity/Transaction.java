@@ -48,11 +48,11 @@ public class Transaction {
     @Column(name = "currency_type", nullable = false)
     private int currencyType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_card_no", nullable = false)
     private UserCard userCard;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 }
