@@ -17,11 +17,6 @@ import java.util.stream.Collectors;
 public class CardService {
     private final CardRepository cardRepository;
 
-//    public List<CardDTO> getCardListByUserId(Long memberNo) {
-//        List<Object[]> result = cardRepository.findCardByMemerNo(memberNo);
-//        return result.stream().map(Card -> entityToDto(Card)).collect(Collectors.toList());
-//    }
-
     public Card dtoToEntity(CardDTO cardDTO) {
         Card card = Card.builder()
                 .id(cardDTO.getCardId())
