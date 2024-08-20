@@ -6,17 +6,11 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
-import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
 import com.v6.yeogaekgi.review.dto.SliceResponse;
-import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.service.ReviewService;
-import com.v6.yeogaekgi.services.entity.Services;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
