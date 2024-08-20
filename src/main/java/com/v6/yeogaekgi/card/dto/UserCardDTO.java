@@ -21,6 +21,9 @@ public class UserCardDTO {
     private int status;
     // Card
     private Long cardId;
+    private String design;
+    private String area;
+    private String cardName;
     // Member
     private Long memberId;
 }

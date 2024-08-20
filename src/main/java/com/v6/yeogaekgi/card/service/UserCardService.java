@@ -3,12 +3,15 @@ package com.v6.yeogaekgi.card.service;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
+import com.v6.yeogaekgi.card.repository.CardRepository;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.awt.geom.Area;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,8 +22,26 @@ import java.util.stream.Collectors;
 public class UserCardService {
     private final UserCardRepository userCardRepository;
 
+    private final CardRepository cardRepository;
+
     public List<UserCardDTO> getUserCardByUserId(Long userId) {
         List<UserCard> result = userCardRepository.findByMember_Id(userId);
+        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+    }
+
+    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
+        log.info("==================");
+        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
+        ArrayList<UserCard> result = new ArrayList<>();
+        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
+        for(UserCard uc : find) {
+            log.info(uc.toString());
+            log.info(uc.getCard().toString());
+            log.info(uc.getCard().getArea());
+            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
+                result.add(uc);
+            }
+        }
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
@@ -46,6 +67,9 @@ public class UserCardService {
                 .status(userCard.getStatus())
                 .cardId(userCard.getCard().getId())
                 .memberId(userCard.getMember().getId())
+                .design(userCard.getCard().getDesign())
+                .area(userCard.getCard().getArea())
+                .cardName(userCard.getCard().getCardName())
                 .build();
         return userCardDTO;
     };

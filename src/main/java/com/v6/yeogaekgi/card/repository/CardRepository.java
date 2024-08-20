@@ -9,12 +9,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
-    @Query("""
-    SELECT c
-    FROM UserCard u
-    INNER JOIN Card c
-    ON c.id = u.id
-    WHERE u.member.id = :memberNo
-    """)
-    List<Card> findCardByMemberNo(@Param("memberNo") Long memberNo);
+
 }
