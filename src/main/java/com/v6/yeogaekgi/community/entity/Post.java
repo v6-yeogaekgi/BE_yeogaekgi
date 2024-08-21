@@ -8,7 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
-
+@ToString
 @Entity
 @Builder
 @AllArgsConstructor

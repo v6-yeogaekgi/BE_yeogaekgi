@@ -87,6 +87,26 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p.hashtag, COUNT(p.hashtag) count FROM post p WHERE p.hashtag LIKE CONCAT(:hashtag, '%') GROUP BY p.hashtag ORDER BY count DESC limit 10", nativeQuery = true)
     List<Object[]> getHashtag(String hashtag);
 
-    Page<Object[]> findByContentContainingAndMemberMemberNoOrderByPostNoDesc(String content, Long memberNo, Pageable pageable);
+//    @EntityGraph(attributePaths = {"member"})
+//    Page<Object[]> findByContentContainingAndMemberMember_IdOrderByIdDesc(String content, Long memberId, Pageable pageable);
+
+    // 전체 리스트 조회
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findAll(Pageable pageable);
+
+
+    // 내용 검색 리스트 조회
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findByContentContaining(String content, Pageable pageable);
+
+    // 해시 검색 리스트 조회
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findByHashtag(String hashtag, Pageable pageable);
+
+    // 해시 검색 리스트 조회
+    @EntityGraph(attributePaths = {"member"})
+    Page<Post> findByMember_Email(String email, Pageable pageable);
+
+
 
 }

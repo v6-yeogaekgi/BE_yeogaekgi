@@ -22,17 +22,17 @@ public class PostController {
     private final PostService postService;
     private final PostRepository postRepository;
 
-    @GetMapping("/list")
-    public ResponseEntity<List<PostDTO>> get(SearchDTO dto) {
-        // @RequestHeader("Authorization") String token
-        // 인증 헤더에서 JWT 토큰 추출
-        // String jwtToken = token.replace("Bearer ", "");
-        log.info("--------list--------");
-        log.info("request search [Hashtag/Content] = ["+dto.getHashtag()+"/"+dto.getContent()+"] My Posts Filter = "+dto.getMyPost());
-        // String jwtToken = token.replace("Bearer ", "");
-
-        return new ResponseEntity<>(postService.getList(dto, null) ,HttpStatus.OK);
-    }
+//    @GetMapping("/list")
+//    public ResponseEntity<List<PostDTO>> get(SearchDTO dto) {
+//        // @RequestHeader("Authorization") String token
+//        // 인증 헤더에서 JWT 토큰 추출
+//        // String jwtToken = token.replace("Bearer ", "");
+//        log.info("--------list--------");
+//        log.info("request search [Hashtag/Content] = ["+dto.getHashtag()+"/"+dto.getContent()+"] My Posts Filter = "+dto.getMyPost());
+//        // String jwtToken = token.replace("Bearer ", "");
+//
+//        return new ResponseEntity<>(postService.getList(dto, null) ,HttpStatus.OK);
+//    }
 
     @PostMapping("/register")
     public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO){

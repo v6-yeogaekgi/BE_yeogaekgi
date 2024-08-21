@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,8 +26,8 @@ import java.util.stream.IntStream;
 public class PostRepositoryTests {
 
     private static final Logger log = LoggerFactory.getLogger(PostRepositoryTests.class);
-    @Autowired
-    private PostRepository repository;
+//    @Autowired
+//    private PostRepository repository;
     @Autowired
     private PostRepository postRepository;
 
@@ -108,9 +109,51 @@ public class PostRepositoryTests {
     }
 
     @Test
-    public void newGetlist(){
+    public void GetAllList(){
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Post> resultPage = postRepository.findAll(pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetSearchContentList(){
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> postRepository.findByContentContainingAndMemberMemberNoOrderByPostNoDesc("1", 1L, pageable);
+
+        Page<Post> resultPage = postRepository.findByContentContaining("1" ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetSearchHashtaglist(){
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Post> resultPage = postRepository.findByHashtag("test" ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetMyPostlist(){
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Post> resultPage = postRepository.findByMember_Id(1L ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
     }
 
 //    @Transactional
