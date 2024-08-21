@@ -27,11 +27,18 @@ public class UserCardController {
         log.info("list userCardDTO: " + userCardDTO);
         return new ResponseEntity<>(userCardService.getUserCardByUserId(userCardDTO.getMemberId()), HttpStatus.OK);
     }
+    @PostMapping("/list")
+    public ResponseEntity<List<UserCardDTO>> postList(@RequestBody UserCardDTO userCardDTO) { // 사용자카드 리스트 가져오기
+        log.info("list userCardDTO: " + userCardDTO);
+        return new ResponseEntity<>(userCardService.getUserCardByUserId(userCardDTO.getMemberId()), HttpStatus.OK);
+    }
 
     //카드, 사용자카드 리스트 가져오기
     @PostMapping("/list2")
-    public ResponseEntity<List<UserCardDTO>> list2(@RequestBody UserCardDTO userCardDTO) {
+    public ResponseEntity<List<UserCardDTO>> list3(@RequestBody UserCardDTO userCardDTO) {
         log.info("list2 userCardDTO: " + userCardDTO);
+        List<UserCardDTO> all = userCardService.getAll(userCardDTO);
+        log.info("all : " + all);
         return new ResponseEntity<>(userCardService.getAll(userCardDTO), HttpStatus.OK);
     }
 }

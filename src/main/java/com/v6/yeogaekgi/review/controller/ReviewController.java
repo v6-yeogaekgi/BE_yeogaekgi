@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/review")
@@ -40,8 +41,8 @@ public class ReviewController {
     }
 
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
-    @GetMapping("/api/reviews")
-    public SliceResponse getReviews(
+    @GetMapping("/api/reviewList")
+    public SliceResponse reviewList(
             @RequestParam Long serviceId,
             Pageable pageable,
             @RequestParam(required = false) int payStatus
@@ -49,7 +50,7 @@ public class ReviewController {
         SliceResponse reviews = reviewService.reviewList(serviceId, pageable, payStatus);
         return reviews;
     }
-  
+
     @DeleteMapping("/review/{reviewNo}")
     public ResponseEntity<?>deleteReview(@PathVariable Long reviewNo){
         reviewService.deleteReview(reviewNo);
