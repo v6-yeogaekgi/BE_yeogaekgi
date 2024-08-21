@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/wallet/detail")
+@RequestMapping("/payTrack")
 @RequiredArgsConstructor
 public class PayTrackController {
 
     private final PayTrackService payTrackService;
 
-    @PostMapping("/getPayTrack")
+    @PostMapping("/list")
     public ResponseEntity<List<PayTrackDTO>> getPayTrackList(@RequestBody PayTrackRequestDTO requestDTO){
         List<PayTrackDTO> payTrackByUserCardNo = payTrackService.findPayTrackByUserCardNo(requestDTO.getUserCardNo(), requestDTO.getYear(), requestDTO.getMonth());
         return new ResponseEntity<>(payTrackByUserCardNo, HttpStatus.OK);
