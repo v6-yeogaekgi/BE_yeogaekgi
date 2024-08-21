@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -37,8 +38,8 @@ public class PostService {
         Pageable pageable = PageRequest.of(dto.getPage(), 10);
         Page<Object[]> result;
 
-
-        Long memberId = 1L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
+        // jwt
+        Long memberId = 0L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
 
 
         if(dto.getHashtag() != null && !dto.getHashtag().isEmpty()){
@@ -94,7 +95,7 @@ public class PostService {
         if(result.isPresent()){
             Post post = result.get();
             post.changeContent(postDTO.getContent());
-            post.changeImages(postDTO.getImages());
+            post.changeImages(postDTO.getImages()!= null && postDTO.getImages().length > 0 ? String.join(" ", postDTO.getImages()): null);
             post.changeHashtag(postDTO.getHashtag());
 
             repository.save(post);
@@ -129,7 +130,7 @@ public class PostService {
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
                 .commentCnt(postDTO.getCommentCnt())
-                .images(postDTO.getImages())
+                .images(String.join(" ", postDTO.getImages()))
                 .likeCnt(postDTO.getLikeCnt())
                 .member(Member.builder().id(postDTO.getMemberId()).build())
                 .build();
@@ -143,7 +144,7 @@ public class PostService {
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
                 .commentCnt(post.getCommentCnt())
-                .images(post.getImages())
+                .images(post.getImages() != null ? (post.getImages()).split(" ") : new String[] {}  )
                 .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
@@ -155,10 +156,11 @@ public class PostService {
     }
     private PostDTO objectToDto(Object[] objects) {
         PostDTO postDto = new PostDTO();
+
         postDto.setPostId((Long) objects[0]);
         postDto.setMemberId((Long) objects[1]);
         postDto.setContent((String) objects[2]);
-        postDto.setImages((String) objects[3]);
+        postDto.setImages((objects[3] != null ? ((String)objects[3]).split(" ") : new String[] {} ));
         postDto.setHashtag((String) objects[4]);
         postDto.setLikeCnt((Integer) objects[5]);
         postDto.setCommentCnt((Integer) objects[6]);

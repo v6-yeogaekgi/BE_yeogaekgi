@@ -24,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
             "ON p.post_no = pl.post_no "+
             "JOIN member m ON m.member_no = p.member_no "+
-            " ORDER BY p.postno DESC",
+            " ORDER BY p.post_no DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -39,7 +39,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
             "WHERE p.member_no = :memberNo"+
-            " ORDER BY p.postno DESC",
+            " ORDER BY p.post_no DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no " +
@@ -55,7 +55,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ON p.post_no = pl.post_no "+
             "JOIN member m ON m.member_no = p.member_no " +
             "WHERE p.hashtag = :hashtag"+
-            " ORDER BY p.postno DESC",
+            " ORDER BY p.post_no DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -71,7 +71,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "ON p.post_no = pl.post_no " +
             "JOIN member m ON m.member_no = p.member_no "+
             "WHERE p.content LIKE %:content%"+
-            " ORDER BY p.postno DESC",
+            " ORDER BY p.post_no DESC",
             countQuery = "SELECT COUNT(*) FROM post p " +
                     "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
                     "ON p.post_no = pl.post_no "+
@@ -86,4 +86,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query(value = "SELECT p.hashtag, COUNT(p.hashtag) count FROM post p WHERE p.hashtag LIKE CONCAT(:hashtag, '%') GROUP BY p.hashtag ORDER BY count DESC limit 10", nativeQuery = true)
     List<Object[]> getHashtag(String hashtag);
+
+    Page<Object[]> findByContentContainingAndMemberMemberNoOrderByPostNoDesc(String content, Long memberNo, Pageable pageable);
+
 }

@@ -107,6 +107,12 @@ public class PostRepositoryTests {
 //        log.info("ㄴTotal pages: {}", results);
     }
 
+    @Test
+    public void newGetlist(){
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Object[]> postRepository.findByContentContainingAndMemberMemberNoOrderByPostNoDesc("1", 1L, pageable);
+    }
+
 //    @Transactional
 //    @Test
 //    public void insertPosts() {
