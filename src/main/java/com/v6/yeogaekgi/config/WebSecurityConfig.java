@@ -49,7 +49,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public AuthenticationFilter authenticationFilter() throws Exception {
-        AuthenticationFilter filter = new AuthenticationFilter(tokenProvider,refreshTokenRepository,memberRepository);
+        AuthenticationFilter filter = new AuthenticationFilter(tokenProvider, refreshTokenRepository, memberRepository);
         filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
         return filter;
     }
@@ -59,8 +59,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Origin","Refresh"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization","Refresh"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Origin", "Refresh"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Refresh"));
         configuration.setMaxAge(1800L);
         configuration.setAllowCredentials(true);
 
@@ -71,13 +71,16 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
     @Bean
     public AuthorizationFilter authorizationFilter() {
-        return new AuthorizationFilter(tokenProvider, memberDetailsService,refreshTokenRepository);
+        return new AuthorizationFilter(tokenProvider, memberDetailsService, refreshTokenRepository);
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.cors((cors) -> cors.configurationSource(configurationSource()));
+//        http.cors((cors) -> cors.configurationSource(configurationSource()));
+        http.cors((cors) -> {
+            cors.configure(http);
+        });
 
         http.csrf((csrf) -> csrf.disable());
 
@@ -86,11 +89,14 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         );
 
         http.authorizeHttpRequests((authorizeHttpRequests) ->
+
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers("/members/**").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.GET).permitAll()
                                 .anyRequest().authenticated()
+
         );
 
         http.addFilterBefore(authorizationFilter(), AuthenticationFilter.class);
