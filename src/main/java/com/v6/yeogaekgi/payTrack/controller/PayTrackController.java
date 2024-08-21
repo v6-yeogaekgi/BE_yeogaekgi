@@ -1,6 +1,7 @@
 package com.v6.yeogaekgi.payTrack.controller;
 
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
+import com.v6.yeogaekgi.payTrack.dto.PayTrackRequestDTO;
 import com.v6.yeogaekgi.payTrack.service.PayTrackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -11,18 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/wallet/card-detail")
+@RequestMapping("/payTrack")
 @RequiredArgsConstructor
 public class PayTrackController {
 
     private final PayTrackService payTrackService;
 
-    @PostMapping("/getPayTrack")
-    public ResponseEntity<List<PayTrackDTO>> getPayTrackList(@RequestBody Map<String, String> request){
-        long userCardNo = Long.parseLong(request.get("userCardNo"));
-        int year = Integer.parseInt(request.get("year"));
-        int month = Integer.parseInt(request.get("month"));
-        List<PayTrackDTO> payTrackByUserCardNo = payTrackService.findPayTrackByUserCardNo(userCardNo, year, month);
+    @PostMapping("/list")
+    public ResponseEntity<List<PayTrackDTO>> getPayTrackList(@RequestBody PayTrackRequestDTO requestDTO){
+        List<PayTrackDTO> payTrackByUserCardNo = payTrackService.findPayTrackByUserCardNo(requestDTO.getUserCardNo(), requestDTO.getYear(), requestDTO.getMonth());
         return new ResponseEntity<>(payTrackByUserCardNo, HttpStatus.OK);
     }
 }
