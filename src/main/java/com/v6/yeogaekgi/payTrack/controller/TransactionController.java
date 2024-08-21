@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequestMapping("/transaction")
@@ -22,5 +20,16 @@ public class TransactionController {
     public ResponseEntity<TransactionDTO> getTransaction(@PathVariable("tranId") Long tranId) {
         log.info("tranId: " + tranId);
         return new ResponseEntity<>(transactionService.getTransactionById(tranId), HttpStatus.OK);
+    }
+
+    @PostMapping("refund")
+    public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO) {
+        // in transactionD
+
+        if(false){
+            return new ResponseEntity<>("false", HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>("success", HttpStatus.OK);
     }
 }
