@@ -2,10 +2,12 @@ package com.v6.yeogaekgi.payTrack.controller;
 
 import com.v6.yeogaekgi.payTrack.dto.TransactionDTO;
 import com.v6.yeogaekgi.payTrack.service.TransactionService;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,11 +24,11 @@ public class TransactionController {
         return new ResponseEntity<>(transactionService.getTransactionById(tranId), HttpStatus.OK);
     }
 
-    @PostMapping("refund")
-    public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO) {
-        // in transactionD
+    @PostMapping("/refund")
+    public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        boolean result = transactionService.refundTransaction(transactionDTO, memberDetails);
 
-        if(false){
+        if(!result){
             return new ResponseEntity<>("false", HttpStatus.OK);
         }
 

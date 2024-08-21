@@ -13,10 +13,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,6 +36,7 @@ public class TransactionService {
         return resultDTO;
     }
 
+    @Transactional
     public boolean refundTransaction(TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         Member member = memberDetails.getMember();
         String bank = member.getBank();
@@ -57,15 +58,13 @@ public class TransactionService {
             if(optionalUserCard.isPresent()){
                 UserCard userCard = optionalUserCard.get();
 
-                int payBalance = userCard.getPayBalance();
-
-                Transaction save = transactionRepository.save(
+                Transaction savedTransaction = transactionRepository.save(
                         Transaction
                                 .builder()
                                 .tranType(2) // 환급 타입
                                 .currencyType(currency_type)
-                                .krwAmount(BigDecimal.valueOf(userCard.getPayBalance()))
-                                .foreignAmount(BigDecimal.valueOf(userCard.getPayBalance()/100)) // todo 번역 API 연동 시 userCard.getPayBalance 를 currency_type 에 따라 환율 적용
+                                .krwAmount(BigDecimal.valueOf(userCard.getPayBalance() - 3000)) // 수수료 3,000원
+                                .foreignAmount(BigDecimal.valueOf(userCard.getPayBalance() / 100)) // todo 번역 API 연동 시 userCard.getPayBalance 를 currency_type 에 따라 환율 적용
                                 .tranDate(new Timestamp(System.currentTimeMillis()))
                                 .payBalanceSnap(0)
                                 .transitBalanceSnap(userCard.getTransitBalance())
@@ -75,6 +74,15 @@ public class TransactionService {
                                 .userCard(userCard)
                                 .build()
                 );
+
+                // userCard pay 잔액 0원으로 변경
+                if(savedTransaction!=null){
+                    userCard.updatePayBalance(0);
+                    UserCard savedUserCard = userCardRepository.save(userCard);
+                    if(savedUserCard !=null){
+                        return true;
+                    }
+                }
             }
         }
         return false;
