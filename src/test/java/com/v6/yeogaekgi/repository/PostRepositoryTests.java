@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,78 +26,30 @@ import java.util.stream.IntStream;
 public class PostRepositoryTests {
 
     private static final Logger log = LoggerFactory.getLogger(PostRepositoryTests.class);
-    @Autowired
-    private PostRepository repository;
+//    @Autowired
+//    private PostRepository repository;
     @Autowired
     private PostRepository postRepository;
 
 
 
-    @Test
-    // 더미 등록
-    public void insertPosts() {
-        int number = 10; // 더미 등록할 개수
-        int max_member_no = 2; // member_no 1에서 몇 까지 등록할 건지
-        IntStream.rangeClosed(1,number).forEach(i->{
-            long mno = (long)(Math.random()*max_member_no)+1; // member
-            Member member = Member.builder().id(mno).build();
-            Post post = Post.builder()
-                    .content("Post content......"+i)
-                    .member(member)
-                    .build();
+//    @Test
+//    // 더미 등록
+//    public void insertPosts() {
+//        int number = 10; // 더미 등록할 개수
+//        int max_member_no = 2; // member_no 1에서 몇 까지 등록할 건지
+//        IntStream.rangeClosed(1,number).forEach(i->{
+//            long mno = (long)(Math.random()*max_member_no)+1; // member
+//            Member member = Member.builder().id(mno).build();
+//            Post post = Post.builder()
+//                    .content("Post content......"+i)
+//                    .member(member)
+//                    .build();
+//
+//            postRepository.save(post);
+//        });
+//    }
 
-            postRepository.save(post);
-        });
-    }
-    @Test // ==================전체 게시글 조회 ==================
-    public void getAllPostsTest() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getAllPosts(1L, pageable);
-        log.info("==================전체 게시글 조회==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
-
-    @Test // ==================내용 검색 게시글 조회 ==================
-    public void getfindPostsByContentTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getfindPostsByContent(1L, "1", pageable);
-        log.info("==================내용 검색 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
-
-    @Test // ==================해시태그 검색 게시글 조회 ==================
-    public void getfindPostsByHashtagTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getfindPostsByHashtag(1L, "test", pageable);
-        log.info("==================해시태그 검색 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-
-
-    }
-
-    @Test // ==================내가 쓴 게시글 조회 ==================
-    public void getMemberPostsTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getMemberPosts(1L, pageable);
-        log.info("==================내가 쓴 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
 
     @Test
     public void searchHashtag(){
@@ -105,6 +58,54 @@ public class PostRepositoryTests {
 //
 //        log.info("ㄴTotal elements: {}", results);
 //        log.info("ㄴTotal pages: {}", results);
+    }
+
+    @Test
+    public void GetAllList(){
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+
+        Page<Post> resultPage = postRepository.findAll(pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetSearchContentList(){
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Post> resultPage = postRepository.findByContentContaining("1" ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetSearchHashtaglist(){
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Post> resultPage = postRepository.findByHashtag("test" ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+
+    @Test
+    public void GetMyPostlist(){
+        Pageable pageable = PageRequest.of(0, 10);
+
+        Page<Post> resultPage = postRepository.findByMember_Id(1L ,pageable);
+        for (Post row : resultPage.getContent()) {
+            log.info("ㄴRow data: {}", row.toString());
+        }
+        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
+        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
     }
 
 //    @Transactional

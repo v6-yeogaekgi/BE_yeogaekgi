@@ -9,11 +9,14 @@ import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -32,50 +35,38 @@ public class PostService {
     private final PostLikeRepository plRepository;
 
 
-    // 게시글 리스트 (검색/필터 포함) [settong]
-    public List<PostDTO> getList(SearchDTO dto, String jwt) {
-        Pageable pageable = PageRequest.of(dto.getPage(), 10);
-        Page<Object[]> result;
+    // 게시글 리스트 (내용/해시태그 검색 포함)
+    public List<PostDTO> getPostList(SearchDTO search, MemberDetailsImpl memberDetails) {
+        // memberId 불러옴
+        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
 
-
-        Long memberId = 1L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
-
-
-        if(dto.getHashtag() != null && !dto.getHashtag().isEmpty()){
-            result = repository.getfindPostsByHashtag(memberId, dto.getHashtag(), pageable);
-        } else if(dto.getContent() != null && !dto.getContent().isEmpty()){
-            result = repository.getfindPostsByContent(memberId, dto.getContent(), pageable);
-        } else if(dto.getMyPost() == 1 && memberId != null && memberId > 0 ){
-            result = repository.getMemberPosts(memberId, pageable);
+        Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
+        Page<Post> result;
+        if(search.getHashtag() != null && !search.getHashtag().isEmpty()){
+            result = repository.findByHashtag(search.getHashtag(), pageable);
+        }else if(search.getContent() != null && !search.getContent().isEmpty()){
+            result = repository.findByContentContaining(search.getContent(), pageable);
+        }else if(search.getMyPost()){
+            result = repository.findByMember_Id(memberId, pageable);
         }else{
-            result = repository.getAllPosts(memberId, pageable);
-        }
-        for (Object[] row : result.getContent()) {
-            System.out.println("ㄴRow data: "+ Arrays.toString(row));
+            result = repository.findAll(pageable);
         }
 
         return result.getContent().stream()
-                .map(Post -> objectToDto(Post))
+                .map(Post -> entityToDto(Post))
                 .collect(Collectors.toList());
-
     }
 
-    // 게시글 상세 [settong]
-    public PostDTO getPost(Long postId, String jwt) {
-
-        Long memberId = 1L; // 일단은 고정.. // 토큰에서 유저 id 가져옴
+    // 게시글 상세
+    public PostDTO getPost(Long postId, MemberDetailsImpl memberDetails) {
+        // memberId 불러옴
+        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
 
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
             postDto = entityToDto(post.get());
-            Optional<PostLike> like = plRepository.findByPost_IdAndMember_Id(postId, memberId);
-            if(like.isPresent()){
-                postDto.setLikeState(1);
-            }else{
-                postDto.setLikeState(0);
-            }
-
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
         }
         return postDto;
     }
@@ -108,7 +99,7 @@ public class PostService {
 
     }
 
-    // 해시태그 검색 list [settong]
+    // 해시태그 검색 list
     public List<HashtagDTO> searchHashtag(String keyword) {
         List<Object[]> results = repository.getHashtag(keyword);
         List<HashtagDTO> hashtags = new ArrayList<>();
@@ -120,6 +111,11 @@ public class PostService {
         }
         return hashtags;
     }
+
+
+
+
+
 
     // ============================= convert type =============================
     public Post dtoToEntity(PostDTO postDTO){
@@ -153,21 +149,7 @@ public class PostService {
 
         return postDTO;
     }
-    private PostDTO objectToDto(Object[] objects) {
-        PostDTO postDto = new PostDTO();
-        postDto.setPostId((Long) objects[0]);
-        postDto.setMemberId((Long) objects[1]);
-        postDto.setContent((String) objects[2]);
-        postDto.setImages((String) objects[3]);
-        postDto.setHashtag((String) objects[4]);
-        postDto.setLikeCnt((Integer) objects[5]);
-        postDto.setCommentCnt((Integer) objects[6]);
-        postDto.setModDate((Timestamp) objects[7]);
-        postDto.setRegDate((Timestamp) objects[8]);
-        postDto.setLikeState(((Long)objects[9]).intValue());
-        postDto.setNickname((String) objects[10]);
-        return postDto;
-    }
+
 
 
 }
