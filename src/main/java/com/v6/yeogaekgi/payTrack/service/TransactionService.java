@@ -40,46 +40,43 @@ public class TransactionService {
     @Transactional
     public boolean topupTransaction(TransactionDTO transactionDTO, Member member) {
         try {
+            Optional<UserCard> optionalUserCard = userCardRepository.findById(transactionDTO.getUserCardNo());
+            if (!optionalUserCard.isPresent()) {
+                return false;
+            }
+
+            UserCard existedUserCard = optionalUserCard.get();
+
             int krw = transactionDTO.getKrwAmount().intValue();
-            int newPayBal = transactionDTO.getPayBalanceSnap() + krw;
+
+            int afterPayBalance = existedUserCard.getPayBalance() + krw;
+
             Transaction transaction = Transaction.builder()
-                    .tranType(transactionDTO.getTranType())
-                    .payBalanceSnap(newPayBal)
-                    .transitBalanceSnap(transactionDTO.getTransitBalanceSnap())
+                    .tranType(1)
+                    // 잔액 충전
+                    .payBalanceSnap(afterPayBalance)
+                    .transitBalanceSnap(existedUserCard.getTransitBalance())
                     .krwAmount(transactionDTO.getKrwAmount())
-                    .foreignAmount(transactionDTO.getForeignAmount())
+                    //환율 API 적용
+                    .foreignAmount(BigDecimal.valueOf(krw / 1000))
                     .currencyType(transactionDTO.getCurrencyType())
-                    .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
+                    .userCard(existedUserCard)
                     .member(member)
                     .build();
-//                    dtoToEntity(transactionDTO);
-//            transaction.updatePayBalanceSnap(newPayBal);
-            log.info("new payBal: " + transaction.getPayBalanceSnap());
+
             Transaction savedTransaction = transactionRepository.save(transaction);
+
             if (savedTransaction != null) {
                 // 유저 카드 잔액 업데이트
-                Optional<UserCard> userCardOptional = userCardRepository.findById(transactionDTO.getUserCardNo());
-                if(userCardOptional.isPresent()) {
-                    UserCard userCard = userCardOptional.get();
-                    userCard.updatePayBalance(newPayBal);
-//                UserCard newUserCard = UserCard.builder()
-//                        .id(userCard.getId())
-//                        .expDate(userCard.getExpDate())
-//                        .payBalance(userCard.getPayBalance())
-//                        .transitBalance(userCard.getTransitBalance())
-//                        .card(userCard.getCard())
-//                        .member(Member.builder().id(transactionDTO.getMemberNo()).build())
-//                        .status(userCard.getStatus())
-//                        .starred(userCard.getStarred())
-//                        .build();
-                userCardRepository.save(userCard);
+                existedUserCard.updatePayBalance(afterPayBalance);
+                userCardRepository.save(existedUserCard);
                 return true;
-                }
             }
-            return false;
         } catch (IOException e) {
             throw new RuntimeException("error", e);
         }
+        return false;
+
     }
 
     @Transactional
@@ -99,12 +96,12 @@ public class TransactionService {
 //        int currency_type = "US".equals(code)?0: ("JP".equals(code)?1: ("CN".equals(code)?2:3));
         int currency_type = transactionDTO.getCurrencyType();
 
-        if(access){
+        if (access) {
             Optional<UserCard> optionalUserCard = userCardRepository.findById(transactionDTO.getUserCardNo());
-            if(optionalUserCard.isPresent()){
+            if (optionalUserCard.isPresent()) {
                 UserCard userCard = optionalUserCard.get();
 
-                if(userCard.getPayBalance() < 3000){
+                if (userCard.getPayBalance() < 3000) {
                     return false;
                 }
 
@@ -126,10 +123,10 @@ public class TransactionService {
                 );
 
                 // userCard pay 잔액 0원으로 변경
-                if(savedTransaction!=null){
+                if (savedTransaction != null) {
                     userCard.updatePayBalance(0);
                     UserCard savedUserCard = userCardRepository.save(userCard);
-                    if(savedUserCard !=null){
+                    if (savedUserCard != null) {
                         return true;
                     }
                 }
@@ -138,7 +135,7 @@ public class TransactionService {
         return false;
     }
 
-    public boolean apiAccess(String bank, String name, String accountNumber){
+    public boolean apiAccess(String bank, String name, String accountNumber) {
         return true;
     }
 
