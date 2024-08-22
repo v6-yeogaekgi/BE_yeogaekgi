@@ -26,7 +26,9 @@ public class CommonTests {
                 Gender.MALE,
                 "010-1234-5678",
                 "12345678910",
-                country
+                country,
+                "testBank",
+                "1111-1111-1111"
         );
         memberRepository.save(member);
     }
