@@ -28,7 +28,7 @@ public class Transaction {
     @Column(name = "tran_type", nullable = false)
     private int tranType; // 0: 전환 | 1: 충전 | 2: 환급
 
-//    @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "tran_date", nullable = false)
     private Timestamp tranDate;
 
@@ -57,4 +57,6 @@ public class Transaction {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
+
+    public void updatePayBalanceSnap(int payBalanceSnap) {this.payBalanceSnap = payBalanceSnap;}
 }

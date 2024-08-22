@@ -52,8 +52,10 @@ public class TransactionService {
                     .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
                     .member(member)
                     .build();
+//                    dtoToEntity(transactionDTO);
+//            transaction.updatePayBalanceSnap(newPayBal);
             log.info("new payBal: " + transaction.getPayBalanceSnap());
-            Transaction savedTransaction = transactionRepository.save(dtoToEntity(transactionDTO));
+            Transaction savedTransaction = transactionRepository.save(transaction);
             if (savedTransaction != null) {
                 // 유저 카드 잔액 업데이트
                 Optional<UserCard> userCardOptional = userCardRepository.findById(transactionDTO.getUserCardNo());
