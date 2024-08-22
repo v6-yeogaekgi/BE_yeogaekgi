@@ -58,7 +58,7 @@ public class TransactionService {
                     .transitBalanceSnap(existedUserCard.getTransitBalance())
                     .krwAmount(transactionDTO.getKrwAmount())
                     //환율 API 적용
-                    .foreignAmount(BigDecimal.valueOf(krw / 1000))
+                    .foreignAmount(transactionDTO.getForeignAmount())
                     .currencyType(transactionDTO.getCurrencyType())
                     .userCard(existedUserCard)
                     .member(member)
