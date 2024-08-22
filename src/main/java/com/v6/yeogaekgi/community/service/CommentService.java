@@ -32,7 +32,8 @@ public class CommentService {
 
     }
 
-    public Long register(CommentDTO commentDTO) {
+    public Long register(CommentDTO commentDTO,Member member) {
+        commentDTO.setMemberId(member.getId());
         Comment comment = dtoToEntity(commentDTO);
         repository.save(comment);
         return comment.getId();
@@ -43,7 +44,7 @@ public class CommentService {
         Optional<Comment> result = repository.findById(commentDTO.getCommentId());
         if(result.isPresent()){
             Comment comment = result.get();
-            comment.changeComment(commentDTO.getComment());
+            comment.changeComment(commentDTO.getContent());
             repository.save(comment);
         }
 
@@ -60,7 +61,7 @@ public class CommentService {
 
         Comment comment = Comment.builder()
                 .id(commentDTO.getCommentId())
-                .comment(commentDTO.getComment())
+                .content(commentDTO.getContent())
                 .post(Post.builder().id(commentDTO.getPostId()).build())
                 .member(Member.builder().id(commentDTO.getMemberId()).build())
                 .build();
@@ -72,7 +73,7 @@ public class CommentService {
 
         CommentDTO commentDTO = CommentDTO.builder()
                 .commentId(comment.getId())
-                .comment(comment.getComment())
+                .content(comment.getContent())
                 .regDate(comment.getRegDate())
                 .modDate(comment.getModDate())
                 .postId(comment.getPost().getId())
