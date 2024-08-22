@@ -8,10 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequestMapping("/transaction")
 @Log4j2
 public class TransactionController {
@@ -26,7 +25,7 @@ public class TransactionController {
 
     @PostMapping("/refund")
     public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boolean result = transactionService.refundTransaction(transactionDTO, memberDetails);
+        boolean result = transactionService.refundTransaction(transactionDTO, memberDetails.getMember());
 
         if(!result){
             return new ResponseEntity<>("false", HttpStatus.OK);
