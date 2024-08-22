@@ -105,7 +105,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 해시 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Page<Post> findByMember_Email(String email, Pageable pageable);
+    Page<Post> findByMember_Id(Long memberId, Pageable pageable);
 
 
 

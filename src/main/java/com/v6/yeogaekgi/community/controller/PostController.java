@@ -5,10 +5,12 @@ import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.community.service.PostService;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,6 +35,11 @@ public class PostController {
 //
 //        return new ResponseEntity<>(postService.getList(dto, null) ,HttpStatus.OK);
 //    }
+    @GetMapping("/list")
+    public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("-------- post list -------- search [Hashtag/Content] = ["+dto.getHashtag()+"/"+dto.getContent()+"]");
+        return new ResponseEntity<>(postService.getPostList(dto, memberDetails) ,HttpStatus.OK);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<Long> registerPost(@RequestBody PostDTO postDTO){
@@ -66,10 +73,10 @@ public class PostController {
         return new ResponseEntity<>(postId, HttpStatus.OK);
     }
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDTO> getPost(@PathVariable Long postId){
+    public ResponseEntity<PostDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         log.info("--------------get post--------------");
         log.info("postId: " + postId);
-        return new ResponseEntity<>(postService.getPost(postId, ""), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPost(postId, memberDetails), HttpStatus.OK);
     }
 
     @GetMapping("/hashtag/{hashtag}")

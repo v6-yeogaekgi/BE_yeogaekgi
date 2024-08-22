@@ -10,10 +10,10 @@ import java.util.Optional;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
-    Optional<PostLike> findByPost_IdAndMember_Email(Long postId, String memberEmail); // member가 post에 좋아요를 누른것만
+    Optional<PostLike> findByPost_IdAndMember_Id(Long postId, Long member_Id); // member가 post에 좋아요를 누른것만
 //
 //    @EntityGraph(attributePaths = {"member"})
 //    List<Long> findPost_IdByMember_Email(String memberEmail); // member가 좋아요 누른 postId 리스트
 //
-//    boolean existsPost_IdAndMember_Email(Long postId, String memberEmail); // member가 post에 좋아요를 누른것만
+    boolean existsPost_IdAndMember_Id(Long postId, Long member_Id); // member가 post에 좋아요를 누른것만
 }
