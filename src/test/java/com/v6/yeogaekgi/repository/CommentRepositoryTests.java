@@ -48,7 +48,7 @@ public class CommentRepositoryTests {
 
             // Comment 객체 생성
             Comment comment = Comment.builder()
-                    .comment("댓글..." + i)
+                    .content("댓글..." + i)
                     .post(Post.builder().id(postNo).build())
                     .member(Member.builder().id(memberId).build()) // Comment에 member 설정
                     .build();
