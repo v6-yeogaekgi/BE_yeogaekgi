@@ -61,4 +61,16 @@ public class Member {
         this.passport = passport;
         this.country = country;
     }
+    public Member(String email,String password, String name, String nickname, Gender gender, String phoneNumber, String passport, Country country, String bank, String accountNumber){
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.nickname = nickname;
+        this.gender = gender;
+        this.phoneNumber = phoneNumber;
+        this.passport = passport;
+        this.country = country;
+        this.bank = bank;
+        this.accountNumber = accountNumber;
+    }
 }
