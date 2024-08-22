@@ -82,12 +82,24 @@ public class S3Service {
 
 
     public void deleteImage(String fileName) {
+        System.out.println("Deleting file: " + fileName);
         // 원본 이미지 삭제
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, fileName));
+        String objectKey = extractObjectKeyFromUrl(fileName);
+        amazonS3.deleteObject(new DeleteObjectRequest(bucket, objectKey));
 
         // 썸네일 삭제
-        String thumbnailFileName = createThumbnailFileName(fileName);
+//        String thumbnailFileName = createThumbnailFileName(fileName);
+        String thumbnailFileName = createThumbnailFileName(objectKey);
+        System.out.println("Deleting thumbnail: " + thumbnailFileName);
         amazonS3.deleteObject(new DeleteObjectRequest(bucket, thumbnailFileName));
+    }
+
+    private String extractObjectKeyFromUrl(String url){
+        try {
+            return new java.net.URL(url).getPath().substring(1);
+        } catch (Exception e) {
+            throw new RuntimeException("객체 키 추출 오류: " + url, e);
+        }
     }
 
     private String createFileName(String fileName) {
