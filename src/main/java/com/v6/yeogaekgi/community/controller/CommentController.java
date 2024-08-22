@@ -24,13 +24,22 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("/{postId}")
+    @GetMapping("all/{postId}")
     public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("postId") Long postId) {
         log.info("--------list--------");
         log.info("postNo : "+postId);
 
         List<CommentDTO> commentDTOList = commentService.getListOfComment(postId);
         return new ResponseEntity<>(commentDTOList, HttpStatus.OK);
+    }
+
+    @GetMapping("/{commentId}")
+    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentId") Long commentId) {
+        log.info("--------one comment--------");
+        log.info("commentNo : "+commentId);
+
+        CommentDTO commentDTO = commentService.getComment(commentId);
+        return new ResponseEntity<>(commentDTO, HttpStatus.OK);
     }
 
     @PostMapping("/{postId}")
@@ -43,7 +52,7 @@ public class CommentController {
 
     }
 
-    @PutMapping("/{postId}/{commentId}")
+    @PutMapping("/{commentId}")
     public ResponseEntity<Long> modifyComment(@PathVariable("commentId") Long commentId,
                                              @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         commentDTO.setCommentId(commentId);
