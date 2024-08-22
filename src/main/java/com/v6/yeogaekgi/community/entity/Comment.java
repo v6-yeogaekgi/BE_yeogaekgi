@@ -19,9 +19,9 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @Column(nullable=false)
-    private String comment;
+    private String content;
 
-    public void changeComment(String comment) {this.comment = comment;}
+    public void changeComment(String content) {this.content = content;}
 
     @ManyToOne
     @JoinColumn(name = "post_no", nullable = false)

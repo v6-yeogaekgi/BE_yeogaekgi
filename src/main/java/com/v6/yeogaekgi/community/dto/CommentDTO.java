@@ -16,7 +16,7 @@ public class CommentDTO {
 
     // comment
     private Long commentId;
-    private String comment;
+    private String content;
     private Timestamp regDate,modDate;
 
     // post
@@ -25,5 +25,8 @@ public class CommentDTO {
     // member
     private Long memberId;
     private String nickname;
+
+    // country
+    private String code;
 
 }
