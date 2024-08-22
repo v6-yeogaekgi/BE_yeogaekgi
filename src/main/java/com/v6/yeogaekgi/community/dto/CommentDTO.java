@@ -16,7 +16,7 @@ public class CommentDTO {
 
     // comment
     private Long commentId;
-    private String comment;
+    private String content;
     private Timestamp regDate,modDate;
 
     // post
