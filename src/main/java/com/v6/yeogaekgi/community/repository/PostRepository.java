@@ -17,79 +17,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    // list
-    @Query(value = "SELECT p.post_no, p.member_no, p.content, p.images, p.hashtag, p.like_cnt, p.comment_cnt, p.mod_date, p.reg_date," +
-            "IF(pl.post_no IS NULL, 0, 1) AS like_state, m.nickname " +
-            "FROM post p " +
-            "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-            "ON p.post_no = pl.post_no "+
-            "JOIN member m ON m.member_no = p.member_no "+
-            " ORDER BY p.post_no DESC",
-            countQuery = "SELECT COUNT(*) FROM post p " +
-                    "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-                    "ON p.post_no = pl.post_no "+
-                    "JOIN member m ON m.member_no = p.member_no ",
-            nativeQuery = true)
-    Page<Object[]> getAllPosts(@Param("memberNo") Long memberNo, Pageable pageable);
-
-    @Query(value = "SELECT p.post_no, p.member_no, p.content, p.images, p.hashtag, p.like_cnt, p.comment_cnt, p.mod_date, p.reg_date," +
-            "IF(pl.post_no IS NULL, 0, 1) AS like_state, m.nickname " +
-            "FROM post p " +
-            "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-            "ON p.post_no = pl.post_no " +
-            "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.member_no = :memberNo"+
-            " ORDER BY p.post_no DESC",
-            countQuery = "SELECT COUNT(*) FROM post p " +
-                    "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-                    "ON p.post_no = pl.post_no " +
-                    "JOIN member m ON m.member_no = p.member_no "+
-                    "WHERE p.member_no = :memberNo",
-            nativeQuery = true)
-    Page<Object[]> getMemberPosts(@Param("memberNo") Long memberNo, Pageable pageable);
-
-    @Query(value = "SELECT p.post_no, p.member_no, p.content, p.images, p.hashtag, p.like_cnt, p.comment_cnt, p.mod_date, p.reg_date," +
-            "IF(pl.post_no IS NULL, 0, 1) AS like_state, m.nickname " +
-            "FROM post p " +
-            "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-            "ON p.post_no = pl.post_no "+
-            "JOIN member m ON m.member_no = p.member_no " +
-            "WHERE p.hashtag = :hashtag"+
-            " ORDER BY p.post_no DESC",
-            countQuery = "SELECT COUNT(*) FROM post p " +
-                    "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-                    "ON p.post_no = pl.post_no "+
-                    "JOIN member m ON m.member_no = p.member_no " +
-                    "WHERE p.hashtag = :hashtag",
-            nativeQuery = true)
-    Page<Object[]> getfindPostsByHashtag(@Param("memberNo") Long memberNo, @Param("hashtag") String hashtag, Pageable pageable);
-
-    @Query(value = "SELECT p.post_no, p.member_no, p.content, p.images, p.hashtag, p.like_cnt, p.comment_cnt, p.mod_date, p.reg_date," +
-            "IF(pl.post_no IS NULL, 0, 1) AS like_state, m.nickname " +
-            "FROM post p " +
-            "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-            "ON p.post_no = pl.post_no " +
-            "JOIN member m ON m.member_no = p.member_no "+
-            "WHERE p.content LIKE %:content%"+
-            " ORDER BY p.post_no DESC",
-            countQuery = "SELECT COUNT(*) FROM post p " +
-                    "LEFT JOIN (SELECT post_no FROM post_like WHERE member_no = :memberNo) pl " +
-                    "ON p.post_no = pl.post_no "+
-                    "JOIN member m ON m.member_no = p.member_no " +
-                    "WHERE p.content LIKE %:content%",
-            nativeQuery = true)
-    Page<Object[]> getfindPostsByContent(@Param("memberNo") Long memberNo, @Param("content") String content, Pageable pageable);
-
-
-    @EntityGraph(attributePaths = {"member"})
-    Optional<Post> findById(Long postId);
-
+    // 해시태그 검색
     @Query(value = "SELECT p.hashtag, COUNT(p.hashtag) count FROM post p WHERE p.hashtag LIKE CONCAT(:hashtag, '%') GROUP BY p.hashtag ORDER BY count DESC limit 10", nativeQuery = true)
     List<Object[]> getHashtag(String hashtag);
-
-//    @EntityGraph(attributePaths = {"member"})
-//    Page<Object[]> findByContentContainingAndMemberMember_IdOrderByIdDesc(String content, Long memberId, Pageable pageable);
-
+    
     // 전체 리스트 조회
     @EntityGraph(attributePaths = {"member"})
     Page<Post> findAll(Pageable pageable);

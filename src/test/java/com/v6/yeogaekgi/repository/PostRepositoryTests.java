@@ -33,71 +33,23 @@ public class PostRepositoryTests {
 
 
 
-    @Test
-    // 더미 등록
-    public void insertPosts() {
-        int number = 10; // 더미 등록할 개수
-        int max_member_no = 2; // member_no 1에서 몇 까지 등록할 건지
-        IntStream.rangeClosed(1,number).forEach(i->{
-            long mno = (long)(Math.random()*max_member_no)+1; // member
-            Member member = Member.builder().id(mno).build();
-            Post post = Post.builder()
-                    .content("Post content......"+i)
-                    .member(member)
-                    .build();
+//    @Test
+//    // 더미 등록
+//    public void insertPosts() {
+//        int number = 10; // 더미 등록할 개수
+//        int max_member_no = 2; // member_no 1에서 몇 까지 등록할 건지
+//        IntStream.rangeClosed(1,number).forEach(i->{
+//            long mno = (long)(Math.random()*max_member_no)+1; // member
+//            Member member = Member.builder().id(mno).build();
+//            Post post = Post.builder()
+//                    .content("Post content......"+i)
+//                    .member(member)
+//                    .build();
+//
+//            postRepository.save(post);
+//        });
+//    }
 
-            postRepository.save(post);
-        });
-    }
-    @Test // ==================전체 게시글 조회 ==================
-    public void getAllPostsTest() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getAllPosts(1L, pageable);
-        log.info("==================전체 게시글 조회==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
-
-    @Test // ==================내용 검색 게시글 조회 ==================
-    public void getfindPostsByContentTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getfindPostsByContent(1L, "1", pageable);
-        log.info("==================내용 검색 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
-
-    @Test // ==================해시태그 검색 게시글 조회 ==================
-    public void getfindPostsByHashtagTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getfindPostsByHashtag(1L, "test", pageable);
-        log.info("==================해시태그 검색 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-
-
-    }
-
-    @Test // ==================내가 쓴 게시글 조회 ==================
-    public void getMemberPostsTest(){
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Object[]> resultPage = postRepository.getMemberPosts(1L, pageable);
-        log.info("==================내가 쓴 게시글 조회 ==================");
-        for (Object[] row : resultPage.getContent()) {
-            log.info("ㄴRow data: {}", Arrays.toString(row));
-        }
-        log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
-        log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
-    }
 
     @Test
     public void searchHashtag(){

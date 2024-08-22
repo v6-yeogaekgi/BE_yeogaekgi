@@ -77,5 +77,10 @@ public class PostController {
         return new ResponseEntity<>(postService.searchHashtag(hashtag), HttpStatus.OK);
     }
 
+    @GetMapping("/like")
+    public ResponseEntity<List<Long>> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("--------------get Post Like list--------------");
+        return new ResponseEntity<>(postService.getLikeList(memberDetails), HttpStatus.OK);
+    }
 
 }
