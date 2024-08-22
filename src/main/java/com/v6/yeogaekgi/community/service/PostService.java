@@ -66,7 +66,7 @@ public class PostService {
         PostDTO postDto = null;
         if(post.isPresent()){
             postDto = entityToDto(post.get());
-            postDto.setLikeState(plRepository.existsPost_IdAndMember_Id(postId, memberId));
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
         }
         return postDto;
     }
@@ -112,11 +112,8 @@ public class PostService {
         return hashtags;
     }
 
-    // 내가 좋아요한 POST의 ID list
-    public List<Long> getLikeList(MemberDetailsImpl memberDetails) {
-        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
-        return plRepository.findPost_IdByMember_Id(memberId);
-    }
+
+
 
 
 

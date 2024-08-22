@@ -3,7 +3,9 @@ package com.v6.yeogaekgi.community.controller;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
+import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
+import com.v6.yeogaekgi.community.service.PostLikeService;
 import com.v6.yeogaekgi.community.service.PostService;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/community")
@@ -25,6 +28,8 @@ public class PostController {
 
     private final PostService postService;
     private final PostRepository postRepository;
+    private final PostLikeService postLikeService;
+    private final PostLikeRepository postLikeRepository;
 
     @GetMapping("/list")
     public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
@@ -77,10 +82,17 @@ public class PostController {
         return new ResponseEntity<>(postService.searchHashtag(hashtag), HttpStatus.OK);
     }
 
-    @GetMapping("/like")
+    @GetMapping("/likeList")
     public ResponseEntity<List<Long>> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
         log.info("--------------get Post Like list--------------");
-        return new ResponseEntity<>(postService.getLikeList(memberDetails), HttpStatus.OK);
+        return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
+    }
+
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<Map<String,Object>> postLikeActive(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("-------------- post like on/off --------------");
+
+        return new ResponseEntity<>(postLikeService.postLikeActive(postId, memberDetails), HttpStatus.OK);
     }
 
 }
