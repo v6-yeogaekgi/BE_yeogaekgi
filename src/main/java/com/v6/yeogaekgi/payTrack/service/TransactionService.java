@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.payTrack.dto.TransactionDTO;
 import com.v6.yeogaekgi.payTrack.entity.Transaction;
 import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import io.jsonwebtoken.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,6 +35,49 @@ public class TransactionService {
                 .orElse(null);
 
         return resultDTO;
+    }
+
+    @Transactional
+    public boolean topupTransaction(TransactionDTO transactionDTO, Member member) {
+        try {
+            int krw = transactionDTO.getKrwAmount().intValue();
+            int newPayBal = transactionDTO.getPayBalanceSnap() + krw;
+            Transaction transaction = Transaction.builder()
+                    .tranType(transactionDTO.getTranType())
+                    .payBalanceSnap(newPayBal)
+                    .transitBalanceSnap(transactionDTO.getTransitBalanceSnap())
+                    .krwAmount(transactionDTO.getKrwAmount())
+                    .foreignAmount(transactionDTO.getForeignAmount())
+                    .currencyType(transactionDTO.getCurrencyType())
+                    .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
+                    .member(member)
+                    .build();
+            log.info("new payBal: " + transaction.getPayBalanceSnap());
+            Transaction savedTransaction = transactionRepository.save(dtoToEntity(transactionDTO));
+            if (savedTransaction != null) {
+                // 유저 카드 잔액 업데이트
+                Optional<UserCard> userCardOptional = userCardRepository.findById(transactionDTO.getUserCardNo());
+                if(userCardOptional.isPresent()) {
+                    UserCard userCard = userCardOptional.get();
+                    userCard.updatePayBalance(newPayBal);
+//                UserCard newUserCard = UserCard.builder()
+//                        .id(userCard.getId())
+//                        .expDate(userCard.getExpDate())
+//                        .payBalance(userCard.getPayBalance())
+//                        .transitBalance(userCard.getTransitBalance())
+//                        .card(userCard.getCard())
+//                        .member(Member.builder().id(transactionDTO.getMemberNo()).build())
+//                        .status(userCard.getStatus())
+//                        .starred(userCard.getStarred())
+//                        .build();
+                userCardRepository.save(userCard);
+                return true;
+                }
+            }
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException("error", e);
+        }
     }
 
     @Transactional

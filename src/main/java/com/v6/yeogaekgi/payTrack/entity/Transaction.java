@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -27,6 +28,7 @@ public class Transaction {
     @Column(name = "tran_type", nullable = false)
     private int tranType; // 0: 전환 | 1: 충전 | 2: 환급
 
+//    @CreationTimestamp
     @Column(name = "tran_date", nullable = false)
     private Timestamp tranDate;
 
