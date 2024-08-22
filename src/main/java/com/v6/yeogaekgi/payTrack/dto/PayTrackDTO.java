@@ -42,6 +42,8 @@ public class PayTrackDTO {
 
     private Integer foreignAmount; //foreign_amount
 
+    private Integer currencyType; //currencyType
+
     // 결제인지 거래인지
     private boolean isPayment;
 
