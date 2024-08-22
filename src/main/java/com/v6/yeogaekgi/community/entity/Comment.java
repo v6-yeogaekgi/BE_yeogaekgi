@@ -21,7 +21,7 @@ public class Comment extends BaseEntity {
     @Column(nullable=false)
     private String content;
 
-    public void changeComment(String comment) {this.content = comment;}
+    public void changeComment(String content) {this.content = content;}
 
     @ManyToOne
     @JoinColumn(name = "post_no", nullable = false)
