@@ -9,10 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/payTrack")
+@CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
 public class PayTrackController {
 
@@ -20,6 +20,9 @@ public class PayTrackController {
 
     @PostMapping("/list")
     public ResponseEntity<List<PayTrackDTO>> getPayTrackList(@RequestBody PayTrackRequestDTO requestDTO){
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.println("DTO : " + requestDTO);
+        System.out.println("--------------------------------------------------------------------------------");
         List<PayTrackDTO> payTrackByUserCardNo = payTrackService.findPayTrackByUserCardNo(requestDTO.getUserCardNo(), requestDTO.getYear(), requestDTO.getMonth());
         return new ResponseEntity<>(payTrackByUserCardNo, HttpStatus.OK);
     }

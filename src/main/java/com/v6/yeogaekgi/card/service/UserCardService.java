@@ -6,13 +6,16 @@ import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.repository.CardRepository;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import io.jsonwebtoken.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,11 +25,24 @@ import java.util.stream.Collectors;
 public class UserCardService {
     private final UserCardRepository userCardRepository;
 
-    private final CardRepository cardRepository;
+//    public UserCardDTO getUserCardById(UserCardDTO userCardDTO) {
+//        UserCard uc = userCardRepository.findById(userCardDTO.getUserCardId()).orElse(null);
+//        return entityToDto(uc);
+//    }
 
     public List<UserCardDTO> getUserCardByUserId(Long userId) {
         List<UserCard> result = userCardRepository.findByMember_Id(userId);
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void updateBalance(UserCardDTO userCardDTO) {
+        try {
+            UserCard userCard = dtoToEntity(userCardDTO);
+            userCardRepository.save(userCard);
+        } catch (IOException e) {
+            throw new RuntimeException("error", e);
+        }
     }
 
     public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {

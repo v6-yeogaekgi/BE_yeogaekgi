@@ -26,7 +26,7 @@ public class TransactionRepositoryTests {
 
     @Test
     public void insertTransaction() {
-        IntStream.rangeClosed(20, 41).forEach(i -> {
+        IntStream.rangeClosed(1, 30).forEach(i -> {
             Long memberId = (long) (Math.random() * 100) + 1;
             Long userCardId = (long) (Math.random() * 100) + 1;
 
