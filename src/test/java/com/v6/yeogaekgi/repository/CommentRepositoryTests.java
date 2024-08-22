@@ -40,10 +40,10 @@ public class CommentRepositoryTests {
         IntStream.rangeClosed(1, 200).forEach(i -> {
 
             // 회원 번호
-            Long memberId = (long) (Math.random() * 100) + 1;
+            Long memberId = (long) (Math.random() * 10) + 1;
 
             // post 번호
-            Long postNo = (long) (Math.random() * 100) + 1;
+            Long postNo = (long) (Math.random() * 10) + 1;
 
 
             // Comment 객체 생성
