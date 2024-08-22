@@ -3,15 +3,20 @@ package com.v6.yeogaekgi.community.controller;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
+import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
+import com.v6.yeogaekgi.community.service.PostLikeService;
 import com.v6.yeogaekgi.community.service.PostService;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/community")
@@ -23,17 +28,13 @@ public class PostController {
 
     private final PostService postService;
     private final PostRepository postRepository;
+    private final PostLikeService postLikeService;
+    private final PostLikeRepository postLikeRepository;
 
     @GetMapping("/list")
-    public ResponseEntity<List<PostDTO>> get(SearchDTO dto) {
-        // @RequestHeader("Authorization") String token
-        // 인증 헤더에서 JWT 토큰 추출
-        // String jwtToken = token.replace("Bearer ", "");
-        log.info("--------list--------");
-        log.info("request search [Hashtag/Content] = ["+dto.getHashtag()+"/"+dto.getContent()+"] My Posts Filter = "+dto.getMyPost());
-        // String jwtToken = token.replace("Bearer ", "");
-
-        return new ResponseEntity<>(postService.getList(dto, null) ,HttpStatus.OK);
+    public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("-------- post list -------- search [Hashtag/Content] = ["+dto.getHashtag()+"/"+dto.getContent()+"]");
+        return new ResponseEntity<>(postService.getPostList(dto, memberDetails) ,HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -68,10 +69,10 @@ public class PostController {
         return new ResponseEntity<>(postId, HttpStatus.OK);
     }
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDTO> getPost(@PathVariable Long postId){
+    public ResponseEntity<PostDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         log.info("--------------get post--------------");
         log.info("postId: " + postId);
-        return new ResponseEntity<>(postService.getPost(postId, ""), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPost(postId, memberDetails), HttpStatus.OK);
     }
 
     @GetMapping("/hashtag/{hashtag}")
@@ -81,5 +82,17 @@ public class PostController {
         return new ResponseEntity<>(postService.searchHashtag(hashtag), HttpStatus.OK);
     }
 
+    @GetMapping("/likeList")
+    public ResponseEntity<List<Long>> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("--------------get Post Like list--------------");
+        return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
+    }
+
+    @PostMapping("/like/{postId}")
+    public ResponseEntity<Map<String,Object>> postLikeActive(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        log.info("-------------- post like on/off --------------");
+
+        return new ResponseEntity<>(postLikeService.postLikeActive(postId, memberDetails), HttpStatus.OK);
+    }
 
 }
