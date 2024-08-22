@@ -81,8 +81,7 @@ public class TransactionService {
     }
 
     @Transactional
-    public boolean refundTransaction(TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        Member member = memberDetails.getMember();
+    public boolean refundTransaction(TransactionDTO transactionDTO, Member member) {
         String bank = member.getBank();
         String name = member.getName();
         String accountNumber = member.getAccountNumber();
@@ -92,15 +91,20 @@ public class TransactionService {
         boolean access = apiAccess(bank, name, accountNumber);
         // ----------------------------------
 
-        String code = member.getCountry().getCode();
+//        String code = member.getCountry().getCode();
 
         // 0: USD | 1: JPY | 2: CNY | 3: KRW
-        int currency_type = "US".equals(code)?0: ("JP".equals(code)?1: ("CN".equals(code)?2:3));
+//        int currency_type = "US".equals(code)?0: ("JP".equals(code)?1: ("CN".equals(code)?2:3));
+        int currency_type = transactionDTO.getCurrencyType();
 
         if(access){
             Optional<UserCard> optionalUserCard = userCardRepository.findById(transactionDTO.getUserCardNo());
             if(optionalUserCard.isPresent()){
                 UserCard userCard = optionalUserCard.get();
+
+                if(userCard.getPayBalance() < 3000){
+                    return false;
+                }
 
                 Transaction savedTransaction = transactionRepository.save(
                         Transaction
@@ -108,7 +112,7 @@ public class TransactionService {
                                 .tranType(2) // 환급 타입
                                 .currencyType(currency_type)
                                 .krwAmount(BigDecimal.valueOf(userCard.getPayBalance() - 3000)) // 수수료 3,000원
-                                .foreignAmount(BigDecimal.valueOf(userCard.getPayBalance() / 100)) // todo 번역 API 연동 시 userCard.getPayBalance 를 currency_type 에 따라 환율 적용
+                                .foreignAmount(BigDecimal.valueOf((userCard.getPayBalance() - 3000) / 100)) // todo 번역 API 연동 시 userCard.getPayBalance 를 currency_type 에 따라 환율 적용
                                 .tranDate(new Timestamp(System.currentTimeMillis()))
                                 .payBalanceSnap(0)
                                 .transitBalanceSnap(userCard.getTransitBalance())
