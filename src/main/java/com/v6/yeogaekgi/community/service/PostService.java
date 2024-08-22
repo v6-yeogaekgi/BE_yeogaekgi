@@ -57,7 +57,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    // 게시글 상세 [settong]
+    // 게시글 상세
     public PostDTO getPost(Long postId, MemberDetailsImpl memberDetails) {
         // memberId 불러옴
         Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
@@ -99,7 +99,7 @@ public class PostService {
 
     }
 
-    // 해시태그 검색 list [settong]
+    // 해시태그 검색 list
     public List<HashtagDTO> searchHashtag(String keyword) {
         List<Object[]> results = repository.getHashtag(keyword);
         List<HashtagDTO> hashtags = new ArrayList<>();
