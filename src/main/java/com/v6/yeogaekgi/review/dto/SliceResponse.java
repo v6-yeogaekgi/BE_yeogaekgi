@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatusCode;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Builder
@@ -22,10 +19,10 @@ public class SliceResponse<T>{
 
     public SliceResponse(List<T> content, Pageable pageable, boolean hasNext) {
         this.content = content;
-        //0부터 보여지므로
-        this.page = pageable.getPageNumber() + 1;
+        this.page = pageable.getPageNumber();
         this.size = pageable.getPageSize();
         this.hasNext = hasNext;
+
     }
 
 }

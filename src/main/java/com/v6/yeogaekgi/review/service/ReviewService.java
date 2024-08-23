@@ -1,24 +1,20 @@
 package com.v6.yeogaekgi.review.service;
 
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
 import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
 import com.v6.yeogaekgi.review.dto.SliceResponse;
 import com.v6.yeogaekgi.review.entity.Review;
-import com.v6.yeogaekgi.review.repository.ReviewListRepositoryImpl;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
-import com.v6.yeogaekgi.services.repository.ServicesRepository;
+import com.v6.yeogaekgi.util.S3.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
-import java.sql.Timestamp;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,9 +22,9 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final S3Service awsS3Service;
 
-
-    public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO) {
+    public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO,Member member) {
         String image = String.join(" ",reviewRequestDTO.getImages());
         String thumbnail = String.join(" ",reviewRequestDTO.getThumbnail());
         //url들을 프론트에서 배열로 보내줄 예정
@@ -39,7 +35,7 @@ public class ReviewService {
                 .images(image)
                 .thumbnail(thumbnail)
                 .content(reviewRequestDTO.getContent())
-                .member(Member.builder().id(reviewRequestDTO.getMemberId()).build())
+                .member(member)
                 .services(Services.builder().id(reviewRequestDTO.getServiceId()).build())
                 .build();
         return review;
@@ -62,8 +58,17 @@ public class ReviewService {
            return responseDTO;
     }
 
-    public Long register(ReviewRequestDTO reviewRequestDTO) {
-        Review review = dtoToEntity(reviewRequestDTO);
+    public Long register(ReviewRequestDTO reviewRequestDTO, Member member, List<MultipartFile> multipartFile) {
+        Review review = dtoToEntity(reviewRequestDTO,member);
+        List<Map<String, String>> uploadImage = awsS3Service.uploadImage(multipartFile);
+        StringBuilder imageBuilder = new StringBuilder();
+        StringBuilder thumbnailBuilder = new StringBuilder();
+
+        uploadImage.forEach(image ->{
+            imageBuilder.append(image.get("imageUrl") + " ");
+            thumbnailBuilder.append(image.get("thumbnailUrl"+ " "));
+        });
+
         reviewRepository.save(review);
         return review.getId();
     }
@@ -80,8 +85,9 @@ public class ReviewService {
         List<ReviewResponseDTO> dtoList = result.getContent().stream()
                 .map(review -> entityToDto(review))
                 .collect(Collectors.toList());
-
         // SliceResponse 객체 생성
+        System.out.println("dtoList" + dtoList);
+        System.out.println("result" + result);
         return new SliceResponse<>(dtoList, pageable, result.hasNext());
     }
   

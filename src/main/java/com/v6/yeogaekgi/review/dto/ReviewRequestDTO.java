@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -20,9 +19,7 @@ public class ReviewRequestDTO {
     private int score;
     private String content;
     private int status;
-
     private Long serviceId;  // 서비스 no
-
     private Long memberId;   // 멤버 no
     private String nickname;
 }

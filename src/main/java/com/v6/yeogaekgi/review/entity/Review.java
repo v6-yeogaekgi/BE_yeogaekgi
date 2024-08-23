@@ -43,6 +43,7 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
+
     @OneToOne(fetch = FetchType.LAZY,optional = true)
     @JoinColumn(name = "pay_no")
     private Payment payment;
