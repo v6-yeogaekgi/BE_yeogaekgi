@@ -1,13 +1,12 @@
 package com.v6.yeogaekgi.community.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-
+import java.util.List;
+@ToString
 @Data
 @Builder
 @NoArgsConstructor

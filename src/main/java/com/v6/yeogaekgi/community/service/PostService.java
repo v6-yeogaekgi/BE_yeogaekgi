@@ -72,8 +72,8 @@ public class PostService {
     }
 
     // 게시글 등록 [bongbong]
-    public Long register(PostDTO postDTO) {
-        Post post = dtoToEntity(postDTO);
+    public Long register(PostDTO postDTO,Member member) {
+        Post post = dtoToEntity(postDTO,member);
         repository.save(post);
         return post.getId();
     }
@@ -118,7 +118,7 @@ public class PostService {
 
 
     // ============================= convert type =============================
-    public Post dtoToEntity(PostDTO postDTO){
+    public Post dtoToEntity(PostDTO postDTO, Member member){
 
         Post post = Post.builder()
                 .id(postDTO.getPostId())
@@ -127,7 +127,8 @@ public class PostService {
                 .commentCnt(postDTO.getCommentCnt())
                 .images(postDTO.getImages())
                 .likeCnt(postDTO.getLikeCnt())
-                .member(Member.builder().id(postDTO.getMemberId()).build())
+//                .member(Member.builder().id(postDTO.getMemberId()).build())
+                .member(member)
                 .build();
 
         return post;
