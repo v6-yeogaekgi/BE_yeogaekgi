@@ -36,13 +36,13 @@ public class PayTrackDTO {
 
     private Integer tranType; // 0전환 | 1충전 | 2환급
 
-    private Integer transferType; // 0페이 -> 교통 | 교통 -> 페이 // transfer_type
+    private Integer transferType; // 0페이 -> 교통 | 교통 -> 페이
 
-    private Integer krwAmount; //krw_amount
+    private Integer krwAmount;
 
-    private Integer foreignAmount; //foreign_amount
+    private Integer foreignAmount;
 
-    private Integer currencyType; //currencyType
+    private Integer currencyType;
 
     // 결제인지 거래인지
     private boolean isPayment;
