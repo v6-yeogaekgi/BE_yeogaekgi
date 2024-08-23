@@ -92,7 +92,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
                         authorizeHttpRequests
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("**").permitAll()
+                                .requestMatchers("/members/**").permitAll()
+//                                .requestMatchers("**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.GET).permitAll()
                                 .anyRequest().authenticated()
