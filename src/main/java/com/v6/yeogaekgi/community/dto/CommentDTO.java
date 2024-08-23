@@ -26,4 +26,7 @@ public class CommentDTO {
     private Long memberId;
     private String nickname;
 
+    // country
+    private String code;
+
 }
