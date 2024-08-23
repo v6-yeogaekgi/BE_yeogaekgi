@@ -29,7 +29,7 @@ public class TransactionController {
     public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         boolean result = transactionService.refundTransaction(transactionDTO, memberDetails.getMember());
 
-        if(!result){
+        if (!result) {
             return new ResponseEntity<>("false", HttpStatus.OK);
         }
 
@@ -39,10 +39,19 @@ public class TransactionController {
     @PostMapping("/toptup")
     public ResponseEntity<String> topup(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         boolean result = transactionService.topupTransaction(transactionDTO, memberDetails.getMember());
-        if(result) {
+        if (result) {
             return new ResponseEntity<>("success", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("false", HttpStatus.OK);
         }
+    }
+
+    @PostMapping("/conversion")
+    public ResponseEntity<String> conversion(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        boolean result = transactionService.conversionAmount(transactionDTO, memberDetails.getMember());
+        if (result) {
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("false", HttpStatus.OK);
     }
 }

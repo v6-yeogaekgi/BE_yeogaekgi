@@ -135,12 +135,88 @@ public class TransactionService {
         return false;
     }
 
-    public boolean apiAccess(String bank, String name, String accountNumber) {
+    @Transactional
+    public boolean conversionAmount(TransactionDTO transactionDTO, Member member) {
+        int transferAmount = transactionDTO.getKrwAmount().intValue();
+
+        if (transferAmount == 0) return false;
+
+        int transferType = transactionDTO.getTransferType();
+
+        Optional<UserCard> optionalUserCard = userCardRepository.findById(transactionDTO.getUserCardNo());
+
+        if (optionalUserCard.isPresent()) {
+            UserCard userCard = optionalUserCard.get();
+
+            log.info("------------------------------------------------------------------------------------------");
+            log.info("< Before > userCard.getPayBalance() :  " + userCard.getPayBalance());
+            log.info("< Before > userCard.getTransitBalance() :  " + userCard.getTransitBalance());
+            log.info("------------------------------------------------------------------------------------------");
+
+            boolean updateStatus = updateCardBalance(userCard, transferAmount, transferType);
+            UserCard savedUserCard = userCardRepository.save(userCard);
+
+            if (!updateStatus){
+                throw new RuntimeException("update balance failed");
+            }
+
+            log.info("------------------------------------------------------------------------------------------");
+            log.info("< After > userCard.getPayBalance() :  " + savedUserCard.getPayBalance());
+            log.info("< After > userCard.getTransitBalance() :  " + savedUserCard.getTransitBalance());
+            log.info("------------------------------------------------------------------------------------------");
+
+            if (updateStatus) {
+                boolean saveResult = saveTransaction(savedUserCard, member, transferAmount, transferType);
+                if(!saveResult){
+                    throw new RuntimeException("save transaction failed");
+                }
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean updateCardBalance(UserCard userCard, int transferAmount, int transferType) {
+        int payBalance = userCard.getPayBalance();
+        int transitBalance = userCard.getTransitBalance();
+
+        if (transferType == 0) {
+            if(payBalance - transferAmount < 0) return false;
+            userCard.updatePayBalance(payBalance - transferAmount);
+            userCard.updateTransitBalance(transitBalance + transferAmount);
+        } else {
+            if(transitBalance - transferAmount < 0) return false;
+            userCard.updatePayBalance(payBalance + transferAmount);
+            userCard.updateTransitBalance(transitBalance - transferAmount);
+        }
+
+        return true;
+    }
+
+    private boolean saveTransaction(UserCard userCard, Member member, int transferAmount, int transferType) {
+        Transaction build = Transaction.builder()
+                .tranType(0)
+                .transferType((byte) transferType)
+                .tranDate(new Timestamp(System.currentTimeMillis()))
+                .payBalanceSnap(userCard.getPayBalance())
+                .transitBalanceSnap(userCard.getTransitBalance())
+                .krwAmount(BigDecimal.valueOf(transferAmount))
+                .currencyType(3) //KRW
+                .userCard(userCard)
+                .member(member)
+                .build();
+
+        Transaction savedTransaction = transactionRepository.save(build);
+        return savedTransaction != null;
+    }
+
+    private boolean apiAccess(String bank, String name, String accountNumber) {
         return true;
     }
 
     public Transaction dtoToEntity(TransactionDTO transactionDTO) {
-        Transaction transaction = Transaction.builder()
+        return Transaction.builder()
                 .id(transactionDTO.getTranNo())
                 .tranType(transactionDTO.getTranType())
                 .tranDate(transactionDTO.getTranDate())
@@ -153,11 +229,10 @@ public class TransactionService {
                 .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
                 .member(Member.builder().id(transactionDTO.getMemberNo()).build())
                 .build();
-        return transaction;
     }
 
     public TransactionDTO entityToDto(Transaction transaction) {
-        TransactionDTO transactionDTO = TransactionDTO.builder()
+        return TransactionDTO.builder()
                 .tranNo(transaction.getId())
                 .tranType(transaction.getTranType())
                 .tranDate(transaction.getTranDate())
@@ -170,6 +245,5 @@ public class TransactionService {
                 .userCardNo(transaction.getUserCard().getId())
                 .memberNo(transaction.getMember().getId())
                 .build();
-        return transactionDTO;
     }
 }
