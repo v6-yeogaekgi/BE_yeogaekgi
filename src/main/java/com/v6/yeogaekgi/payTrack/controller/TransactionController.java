@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/transaction")
 @Log4j2
+@CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
 public class TransactionController {
     @Autowired
