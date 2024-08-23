@@ -20,7 +20,8 @@ public class PayTrackQueryRepositoryImpl implements PayTrackQueryRepository {
                 "p.pay_no, p.pay_type, p.pay_price, p.status, p.service_name, " +
                 "COALESCE(p.transit_balance_snap, t.transit_balance_snap) AS transit_balance_snap, " +
                 "COALESCE(p.pay_balance_snap, t.pay_balance_snap) AS pay_balance_snap, " +
-                "t.tran_no, t.tran_type, t.transfer_type, t.krw_amount, t.foreign_amount " +
+                "t.tran_no, t.tran_type, t.transfer_type, t.krw_amount, t.foreign_amount, " +
+                "t.currency_type " +
                 "FROM (SELECT * FROM payment WHERE user_card_no = :userCardNo AND " +
                 "YEAR(pay_date) =:year AND MONTH(pay_date) = :month) p " +
                 "LEFT JOIN (SELECT * FROM transaction WHERE user_card_no = :userCardNo AND " +
@@ -32,7 +33,8 @@ public class PayTrackQueryRepositoryImpl implements PayTrackQueryRepository {
                 "p.pay_no, p.pay_type, p.pay_price, p.status, p.service_name, " +
                 "COALESCE(p.transit_balance_snap, t.transit_balance_snap) AS transit_balance_snap, " +
                 "COALESCE(p.pay_balance_snap, t.pay_balance_snap) AS pay_balance_snap, " +
-                "t.tran_no, t.tran_type, t.transfer_type, t.krw_amount, t.foreign_amount " +
+                "t.tran_no, t.tran_type, t.transfer_type, t.krw_amount, t.foreign_amount, " +
+                "t.currency_type " +
                 "FROM (SELECT * FROM payment WHERE user_card_no = :userCardNo AND " +
                 "YEAR(pay_date) =:year AND MONTH(pay_date) = :month) p " +
                 "RIGHT JOIN (SELECT * FROM transaction WHERE user_card_no = :userCardNo AND " +

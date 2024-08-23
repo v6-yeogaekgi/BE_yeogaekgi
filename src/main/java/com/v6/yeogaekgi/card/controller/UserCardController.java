@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/usercard")
 @CrossOrigin(origins = {"*"})
 @Log4j2
@@ -27,9 +27,9 @@ public class UserCardController {
         log.info("list userCardDTO: " + userCardDTO);
         return new ResponseEntity<>(userCardService.getUserCardByUserId(userCardDTO.getMemberId()), HttpStatus.OK);
     }
+
     @PostMapping("/list")
-    public ResponseEntity<List<UserCardDTO>> postList(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
-        log.info("list userCardDTO: " + userCardDTO);
+    public ResponseEntity<List<UserCardDTO>> postList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
         return new ResponseEntity<>(userCardService.getUserCardByUserId(memberDetails.getMember().getId()), HttpStatus.OK);
     }
 
