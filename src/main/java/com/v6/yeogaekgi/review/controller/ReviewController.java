@@ -1,7 +1,7 @@
 package com.v6.yeogaekgi.review.controller;
 
 
-import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
+import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,9 +55,22 @@ public class ReviewController {
         return new ResponseEntity<>(reviewService.reviewList(serviceId, pageable, payStatus),HttpStatus.OK);
     }
 
-    @DeleteMapping("/review/{reviewNo}")
-    public ResponseEntity<?>deleteReview(@PathVariable Long reviewNo){
-        reviewService.deleteReview(reviewNo);
+    @PutMapping("/{servicesId}/{reviewId}")
+    public ResponseEntity<ReviewUpdateResponseDTO>updateReview(@RequestPart (value = "images", required = false) List<MultipartFile> images,
+                                                               @RequestParam (required = false) List<Integer> chooseImages,
+                                                               @RequestParam (required = false) Integer score,
+                                                               @RequestParam (required = false) String content,
+                                                               @PathVariable Long servicesId,
+                                                               @PathVariable Long reviewId,
+                                                               @AuthenticationPrincipal MemberDetailsImpl MemberDetails){
+        ReviewUpdateDTO reviewUpdateDTO = new ReviewUpdateDTO(chooseImages, score, content);
+        ReviewUpdateResponseDTO reviewUpdateResponseDTO = reviewService.updateReview(images, servicesId,reviewId,reviewUpdateDTO,MemberDetails.getMember());
+        return ResponseEntity.ok().body(reviewUpdateResponseDTO);
+    }
+
+    @DeleteMapping("/{servicesId}/{reviewId}")
+    public ResponseEntity<?>deleteReview(@PathVariable  Long servicesId, @PathVariable Long reviewId, @AuthenticationPrincipal MemberDetailsImpl MemberDetails){
+        reviewService.deleteReview(servicesId,reviewId, MemberDetails.getMember());
         return ResponseEntity.ok().body("리뷰가 삭제되었습니다");
     }
 }

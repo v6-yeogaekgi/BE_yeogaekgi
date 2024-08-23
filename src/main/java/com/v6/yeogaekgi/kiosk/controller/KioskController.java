@@ -29,4 +29,12 @@ public class KioskController {
         List<String> kioskLists = kioskService.getKioskLists();
         return ResponseEntity.ok(kioskLists);
     }
+
+    @GetMapping("/kiosk/test1")
+    public ResponseEntity<List<String>> kioskListTest1(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        System.out.print("-----------------"+memberDetails);
+
+        List<String> kioskLists = kioskService.getKioskLists();
+        return ResponseEntity.ok(kioskLists);
+    }
 }

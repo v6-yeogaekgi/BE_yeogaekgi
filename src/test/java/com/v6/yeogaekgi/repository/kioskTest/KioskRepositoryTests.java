@@ -2,12 +2,7 @@ package com.v6.yeogaekgi.repository.kioskTest;
 
 import com.v6.yeogaekgi.kiosk.entity.Kiosk;
 import com.v6.yeogaekgi.kiosk.repository.KioskRepository;
-import com.v6.yeogaekgi.member.entity.Country;
-import com.v6.yeogaekgi.member.entity.Gender;
-import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.repository.CommonTest.CommonTests;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,7 +42,4 @@ public class KioskRepositoryTests extends CommonTests {
     void testKioskLists(){
         List<Kiosk> kiosks = kioskRepository.findAll();
     }
-
-
-
 }

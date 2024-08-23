@@ -8,7 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
-
+@ToString
 @Entity
 @Builder
 @AllArgsConstructor
@@ -42,7 +42,8 @@ public class Post extends BaseEntity {
     private Member member;
 
     public void changeContent(String comment) {this.content = comment;}
-    public void changeImages(String comment) {this.images = images;}
-    public void changeHashtag(String comment) {this.hashtag = hashtag;}
+    public void changeImages(String images) {this.images = images;}
+    public void changeHashtag(String hashtag) {this.hashtag = hashtag;}
+    public void changeLikeCnt(int likeCnt) {this.likeCnt = likeCnt;}
 
 }

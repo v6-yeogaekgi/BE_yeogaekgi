@@ -17,5 +17,5 @@ public class SearchDTO {
     @Builder.Default
     private int page = 0; // 몇 page인지 요청
     @Builder.Default
-    private int myPost = 0; // 1이면 내 게시글만 보기
+    private Boolean myPost = false; // 1이면 내 게시글만 보기
 }
