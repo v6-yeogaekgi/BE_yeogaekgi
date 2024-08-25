@@ -1,13 +1,12 @@
 package com.v6.yeogaekgi.community.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-
+import java.util.List;
+@ToString
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,4 +28,5 @@ public class PostDTO {
 
     // service
     private boolean likeState; // 현재 접속한 유저가 좋아요한 게시글인지. 아니면0, 맞으면1
+    private Long currentMemberId;
 }
