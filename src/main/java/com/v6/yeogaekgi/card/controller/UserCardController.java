@@ -41,4 +41,9 @@ public class UserCardController {
         log.info("all : " + all);
         return new ResponseEntity<>(userCardService.getAll(userCardDTO), HttpStatus.OK);
     }
+
+    @PostMapping("/detail")
+    public ResponseEntity<UserCardDTO> getDetail(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
+        return new ResponseEntity<>(userCardService.getUserCardByCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
+    }
 }
