@@ -37,10 +37,10 @@ public class PostLikeService {
 
     // Like 버튼 눌렀을 때
     @Transactional
-    public Map<String, Object> postLikeActive(Long postId, MemberDetailsImpl memberDetails){
+    public Map<String, Object> postLikeActive(Long postId, Member member){
         Map<String, Object> data = new HashMap<>();
 
-        Long memberId =  memberDetails.getMember().getId();
+        Long memberId =  member.getId();
         boolean likeState = false;
         int likeCnt = 0;
 
