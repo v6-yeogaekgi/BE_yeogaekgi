@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.community.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
@@ -20,8 +21,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/community")
@@ -66,16 +69,58 @@ public class PostController {
 
 
     @PutMapping("/{postId}")
-    public ResponseEntity<Long> modifyPost(@PathVariable("postId") Long postId,
-                                           @RequestBody PostDTO postDTO) {
-        postDTO.setPostId(postId);
-        log.info("---------------modify post--------------" + postId);
+    public ResponseEntity<Long> modifyPost(@PathVariable Long postId,
+                                           @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
+                                           @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
+                                           @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
+                                           @RequestPart(value = "hashtag", required = false) String hashtag,
+                                           @RequestPart("content") String content) {
+
+        // 새 이미지 업로드 -> url 리스트로 반환
+        List<String> newImageUrls = new ArrayList<>();
+        if (multipartFiles != null && !multipartFiles.isEmpty()) {
+            newImageUrls.addAll(s3Service.uploadImage(multipartFiles).stream()
+                    .map(map -> map.get("imageUrl"))
+                    .toList());
+        }
+
+        // 삭제할 이미지 처리
+        if (deleteImages != null) {
+            for (String imageUrl : deleteImages) {
+                s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
+            }
+        }
+
+        // 기존 이미지와 새 이미지 URL 합치기
+        if (existingImages != null) {
+            newImageUrls.addAll(existingImages);
+        }
+
+        // 이미지 URL 리스트를 JSON 문자열로 변환
+        ObjectMapper objectMapper = new ObjectMapper();
+        String imageUrls = "[]"; // 빈 리스트로 초기화
+        try {
+            imageUrls = objectMapper.writeValueAsString(newImageUrls);
+        } catch (Exception e) {
+            log.error("Error converting image URLs to JSON string", e);
+        }
+
+        PostDTO postDTO = PostDTO.builder()
+                .images(imageUrls)
+                .hashtag(hashtag)
+                .content(content)
+                .postId(postId)
+                .build();
+
+        log.info("---------------modify post--------------" + postDTO.getPostId());
         log.info("postDTO: " + postDTO);
 
         postService.modify(postDTO);
 
-        return new ResponseEntity<>(postId, HttpStatus.OK);
+        return new ResponseEntity<>(postDTO.getPostId(), HttpStatus.OK);
     }
+
+
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Long> removePost(@PathVariable Long postId) {
