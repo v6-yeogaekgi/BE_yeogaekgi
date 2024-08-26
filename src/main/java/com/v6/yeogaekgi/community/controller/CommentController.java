@@ -54,7 +54,7 @@ public class CommentController {
 
     @PutMapping("/{commentId}")
     public ResponseEntity<Long> modifyComment(@PathVariable("commentId") Long commentId,
-                                             @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+                                             @RequestBody CommentDTO commentDTO){
         commentDTO.setCommentId(commentId);
         log.info("---------------modify Comment--------------" + commentId);
         log.info("commentDTO: " + commentDTO);
