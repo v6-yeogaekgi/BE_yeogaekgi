@@ -1,11 +1,16 @@
 package com.v6.yeogaekgi.review.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import com.v6.yeogaekgi.review.entity.QReview;
 import com.v6.yeogaekgi.review.entity.Review;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
@@ -15,24 +20,14 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
         super(Review.class);
     }
 
-    public Slice<Review> listPage(Long serviceId,Pageable pageable,Integer payStatus) {
+    public Slice<Review> listPage(Long servicesId, Pageable pageable, Integer payStatus) {
         QReview review = QReview.review;
-//        QMember member = QMember.member;
-//        QServices services = QServices.services;
-//        QPayment payment = QPayment.payment;
+
         JPQLQuery<Review> jpqlQuery = this.from(review);
-//        jpqlQuery.leftJoin(member).on(review.member.eq(member)); 내가 쓴 리뷰 보기 설정 할떄 사용할 수 있을뜻
-//        jpqlQuery.leftJoin(services).on(review.services.eq(services));
-//        jpqlQuery.leftJoin(payment).on(review.payment.eq(payment));
-
-        jpqlQuery.orderBy(review.modDate.desc());
-
-
-        JPQLQuery<Review> tuple = jpqlQuery.select(review);
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
-        BooleanExpression expression = review.status.eq(1)
-                .and(review.services.id.eq(serviceId));
+        BooleanExpression expression = review.status.eq(0)
+                .and(review.services.id.eq(servicesId));
 
         booleanBuilder.and(expression);
 
@@ -41,18 +36,24 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
             booleanBuilder.and(condition);
         }
 
-        tuple.where(booleanBuilder);
+        pageable.getSort().forEach(sortOrder -> {
+            Order order = sortOrder.isAscending() ? Order.ASC : Order.DESC;
+            PathBuilder<?> entityPath = new PathBuilder<>(Review.class, "review");
+            jpqlQuery.orderBy(new OrderSpecifier(order, entityPath.get(sortOrder.getProperty())));
+        });
 
-        jpqlQuery.limit(pageable.getPageSize());
-        List<Review> result = tuple.fetch();
+        jpqlQuery.where(booleanBuilder);
 
-        boolean hasNext = result.size() > pageable.getPageSize();
+        jpqlQuery.limit(pageable.getPageSize() + 1);
+
+        List<Review> reviewList = jpqlQuery.fetch();
+        boolean hasNext = reviewList.size() > pageable.getPageSize();
 
         if (hasNext) {
-            result.remove(pageable.getPageSize());
+            reviewList.remove(pageable.getPageSize());
         }
 
-        return new SliceImpl<>(result, pageable, hasNext);
+        return new SliceImpl<>(reviewList, pageable, hasNext);
     }
 
 }
