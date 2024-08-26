@@ -4,15 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @Data
-public class SliceResponse<T> {
+public class SliceResponse<T>{
 
     private List<T> content;
     private int page;
@@ -21,9 +19,10 @@ public class SliceResponse<T> {
 
     public SliceResponse(List<T> content, Pageable pageable, boolean hasNext) {
         this.content = content;
-        this.page = pageable.getPageNumber() + 1;
+        this.page = pageable.getPageNumber();
         this.size = pageable.getPageSize();
         this.hasNext = hasNext;
+
     }
 
 }

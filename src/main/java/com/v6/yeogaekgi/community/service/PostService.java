@@ -53,7 +53,7 @@ public class PostService {
         }
 
         return result.getContent().stream()
-                .map(Post -> entityToDto(Post))
+                .map(Post -> entityToDto(Post, memberId))
                 .collect(Collectors.toList());
     }
 
@@ -65,15 +65,15 @@ public class PostService {
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
-            postDto = entityToDto(post.get());
+            postDto = entityToDto(post.get(), memberId);
             postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
         }
         return postDto;
     }
 
     // 게시글 등록 [bongbong]
-    public Long register(PostDTO postDTO) {
-        Post post = dtoToEntity(postDTO);
+    public Long register(PostDTO postDTO,Member member) {
+        Post post = dtoToEntity(postDTO,member);
         repository.save(post);
         return post.getId();
     }
@@ -118,8 +118,7 @@ public class PostService {
 
 
     // ============================= convert type =============================
-    public Post dtoToEntity(PostDTO postDTO){
-
+    public Post dtoToEntity(PostDTO postDTO, Member member){
         Post post = Post.builder()
                 .id(postDTO.getPostId())
                 .content(postDTO.getContent())
@@ -127,12 +126,11 @@ public class PostService {
                 .commentCnt(postDTO.getCommentCnt())
                 .images(postDTO.getImages())
                 .likeCnt(postDTO.getLikeCnt())
-                .member(Member.builder().id(postDTO.getMemberId()).build())
+                .member(member)
                 .build();
-
         return post;
     }
-    public PostDTO entityToDto(Post post){
+    public PostDTO entityToDto(Post post, Long currentMemberId){
 
         PostDTO postDTO = PostDTO.builder()
                 .postId(post.getId())
@@ -145,6 +143,8 @@ public class PostService {
                 .modDate(post.getModDate())
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
+                .code(post.getMember().getCountry().getCode())
+                .currentMemberId(currentMemberId)
                 .build();
 
         return postDTO;

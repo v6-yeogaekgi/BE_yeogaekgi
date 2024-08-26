@@ -1,26 +1,18 @@
 package com.v6.yeogaekgi.review.service;
-
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.review.entity.Review;
-import com.v6.yeogaekgi.review.repository.ReviewListRepositoryImpl;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
-import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,62 +23,89 @@ public class ReviewService {
     private final S3Service s3Service;
 
 
-    public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO) {
-        String image = String.join(" ",reviewRequestDTO.getImages());
-        String thumbnails = String.join(" ",reviewRequestDTO.getThumbnail());
+    public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO,Member member,Long servicesId) {
         //url들을 프론트에서 배열로 보내줄 예정
-
         Review review = Review.builder()
-                .id(reviewRequestDTO.getReviewId())
                 .score(reviewRequestDTO.getScore())
-                .images(image)
-                .thumbnails(thumbnails)
                 .content(reviewRequestDTO.getContent())
-                .member(Member.builder().id(reviewRequestDTO.getMemberId()).build())
-                .services(Services.builder().id(reviewRequestDTO.getServiceId()).build())
+                .member(member)
+                .services(Services.builder().id(servicesId).build())
                 .build();
         return review;
     }
 
     public ReviewResponseDTO entityToDto(Review review) {
-//        List<String> images = Arrays.stream(review.getImages().split(" ")).toList();
         List<String> images = review.getImages();
         List<String> thumbnails = review.getThumbnails();
-//        List<String> thumbnails = Arrays.stream(review.getThumbnail().split(" ")).toList();
         ReviewResponseDTO responseDTO = ReviewResponseDTO.builder()
                    .reviewId(review.getId())
                    .score(review.getScore())
                    .images(images)
                    .thumbnail(thumbnails)
                    .content(review.getContent())
+                   .regDate(review.getRegDate())
                    .modDate(review.getModDate())
-                   .memberId(review.getId())
-                   .nickname(review.getMember().getNickname())
                    .serviceId(review.getServices().getId())
+                   .country(review.getMember().getCountry())
+                   .nickname(review.getMember().getNickname())
                    .build();
            return responseDTO;
     }
 
-    public Long register(ReviewRequestDTO reviewRequestDTO) {
-        Review review = dtoToEntity(reviewRequestDTO);
-        reviewRepository.save(review);
-        return review.getId();
+    public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
+        List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
+        List<String> imageList = new ArrayList<>();
+        List<String> thumbnailList = new ArrayList<>();
+        // 프론트에서 개수 확인해야함 3개 만 가능하게!
+        Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
+        if (!uploadImage.isEmpty()) {
+            uploadImage.forEach(image ->{
+                imageList.add(image.get("imageUrl"));
+                thumbnailList.add(image.get("thumbnailUrl"));
+            });
+        }
+        review.setImages(imageList);
+        review.setThumbnails(thumbnailList);
+        Review savedReview = reviewRepository.save(review);
+        return savedReview.getId();
     }
 
-    public List<String> ImageList (Long serviceId) {
-        List<String> reviewList = reviewRepository.findImagesByServicesId(serviceId);
-        return reviewList;
+    public List<ReviewResponseDTO> ImageList (Long serviceId) {
+        List<Review> reviews = reviewRepository.findAllByServicesId(serviceId);
+        List<ReviewResponseDTO> result = new ArrayList<>();
+        for (Review review : reviews) {
+            ReviewResponseDTO dto = ReviewResponseDTO.builder()
+                    .images(review.getImages())
+                    .nickname(review.getMember().getNickname())
+                    .country(review.getMember().getCountry())
+                    .build();
+            result.add(dto);
+        }
+        return result;
     }
 
-    public SliceResponse<ReviewResponseDTO> reviewList(Long serviceId, Pageable pageable, Integer payStatus) {
+    public ReviewResponseDTO Detail (Long servicesId,Long reviewId,Member member){
+        Review review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getId()).orElseThrow(
+                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
+        );
+         System.out.println("images" + review.getImages());
+         System.out.println("review" + review);
+         System.out.println("member" + member);
+         System.out.println("reviewId" + reviewId);
+         System.out.println("serviceId" + servicesId);
+         return entityToDto(review);
+    }
+
+    public SliceResponse<ReviewResponseDTO> reviewList(Long servicesId, Pageable pageable, Integer payStatus) {
         // ReviewRepository의 listPage 메서드를 호출하여 페이징된 리뷰 목록을 가져옴
-        Slice<Review> result = reviewRepository.listPage(serviceId, pageable, payStatus);
+        Slice<Review> result = reviewRepository.listPage(servicesId, pageable, payStatus);
         // Review 엔터티를 ReviewResponseDTO로 변환
         List<ReviewResponseDTO> dtoList = result.getContent().stream()
                 .map(review -> entityToDto(review))
                 .collect(Collectors.toList());
-
         // SliceResponse 객체 생성
+        System.out.println("dtoList" + dtoList);
+        System.out.println("result" + result);
         return new SliceResponse<>(dtoList, pageable, result.hasNext());
     }
 

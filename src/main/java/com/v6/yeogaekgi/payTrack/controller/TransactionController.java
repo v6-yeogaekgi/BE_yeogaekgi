@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 @CrossOrigin(origins = {"*"})
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"*"})
+
 public class TransactionController {
     @Autowired
     private TransactionService transactionService;
