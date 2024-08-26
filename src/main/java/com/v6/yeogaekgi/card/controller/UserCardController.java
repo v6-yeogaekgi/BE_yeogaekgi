@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/usercard")
 @CrossOrigin(origins = {"*"})
 @Log4j2
@@ -27,9 +27,9 @@ public class UserCardController {
         log.info("list userCardDTO: " + userCardDTO);
         return new ResponseEntity<>(userCardService.getUserCardByUserId(userCardDTO.getMemberId()), HttpStatus.OK);
     }
+
     @PostMapping("/list")
-    public ResponseEntity<List<UserCardDTO>> postList(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
-        log.info("list userCardDTO: " + userCardDTO);
+    public ResponseEntity<List<UserCardDTO>> postList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
         return new ResponseEntity<>(userCardService.getUserCardByUserId(memberDetails.getMember().getId()), HttpStatus.OK);
     }
 
@@ -40,5 +40,10 @@ public class UserCardController {
         List<UserCardDTO> all = userCardService.getAll(userCardDTO);
         log.info("all : " + all);
         return new ResponseEntity<>(userCardService.getAll(userCardDTO), HttpStatus.OK);
+    }
+
+    @PostMapping("/detail")
+    public ResponseEntity<UserCardDTO> getDetail(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
+        return new ResponseEntity<>(userCardService.getUserCardByCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
     }
 }

@@ -5,6 +5,10 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.v6.yeogaekgi.review.dto.ReviewUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -123,4 +128,31 @@ public class S3Service {
         Thumbnailator.createThumbnail(inputStream, outputStream, 100, 100);
         return outputStream.toByteArray();
     }
+
+    public List<String> convertStringToList(String jsonString) {
+        if (jsonString == null || jsonString.isEmpty()) {
+            return new ArrayList<>();
+        }
+        try {
+            return new ObjectMapper().readValue(jsonString, new TypeReference<List<String>>() {});
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("변환 중 오류 발생", e);
+        }
+    }
+
+    public String convertListToString(List<Map<String, String>> list) {
+        // List<Map<String, String>>에서 "imageUrl" 값만 추출하여 List<String>으로 변환
+        List<String> imageUrls = list.stream()
+                .map(map -> map.get("imageUrl"))
+                .collect(Collectors.toList());
+
+        // List<String>을 JSON 문자열로 변환
+        try {
+            return new ObjectMapper().writeValueAsString(imageUrls);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("변환 중 오류 발생", e);
+        }
+    }
+
+
 }

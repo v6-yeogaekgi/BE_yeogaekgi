@@ -43,6 +43,7 @@ public class PayTrackService {
                             .transferType(obj[11] != null ? ((Number) obj[11]).intValue() : null)
                             .krwAmount(obj[12] != null ? ((Number) obj[12]).intValue() : null)
                             .foreignAmount(obj[13] != null ? ((Number) obj[13]).intValue() : null)
+                            .currencyType(obj[14] != null ? ((Number) obj[14]).intValue() : null)
                             .isPayment(isPayment)
                             .build();
                 })

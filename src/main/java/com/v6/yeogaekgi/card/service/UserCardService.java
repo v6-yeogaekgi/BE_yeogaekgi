@@ -35,6 +35,11 @@ public class UserCardService {
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
+    public UserCardDTO getUserCardByCardId(Long cardId) {
+        Optional<UserCard> byId = userCardRepository.findById(cardId);
+        return byId.map(this::entityToDto).orElse(null);
+    }
+
     @Transactional
     public void updateBalance(UserCardDTO userCardDTO) {
         try {

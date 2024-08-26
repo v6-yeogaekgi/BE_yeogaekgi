@@ -50,4 +50,6 @@ public class UserCard {
     private int starred;
 
     public void updatePayBalance(int payBalance) {this.payBalance = payBalance;}
+
+    public void updateTransitBalance(int transitBalance) {this.transitBalance = transitBalance;}
 }

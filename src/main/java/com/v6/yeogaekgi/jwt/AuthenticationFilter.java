@@ -8,6 +8,7 @@ import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenProvider tokenProvider;
@@ -56,7 +59,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult){
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         String email = ((MemberDetailsImpl) authResult.getPrincipal()).getUsername();
 
         String token = tokenProvider.createToken(email);
@@ -74,8 +77,17 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.addHeader(TokenProvider.REFRESH_HEADER, refreshToken.getToken());
         response.setContentType("application/json; charset=UTF-8");
 
-        response.setStatus(HttpServletResponse.SC_OK);
-        writeResponse(response, "로그인 성공");
+//        response.setStatus(HttpServletResponse.SC_OK);
+//        writeResponse(response, "로그인 성공");
+        // response body에 토큰 정보 추가
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("token", token);
+        responseBody.put("refreshToken", refreshToken.getToken());
+
+        // response body에 토근 정보 출력
+        try (PrintWriter writer = response.getWriter()) {
+            writer.write(new ObjectMapper().writeValueAsString(responseBody));
+        }
     }
 
     @Override

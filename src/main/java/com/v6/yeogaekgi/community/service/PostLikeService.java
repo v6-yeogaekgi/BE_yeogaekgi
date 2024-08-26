@@ -37,14 +37,10 @@ public class PostLikeService {
 
     // Like 버튼 눌렀을 때
     @Transactional
-    public Map<String, Object> postLikeActive(Long postId, MemberDetailsImpl memberDetails){
+    public Map<String, Object> postLikeActive(Long postId, Member member){
         Map<String, Object> data = new HashMap<>();
 
-        Long memberId =  memberDetails.getMember().getId();
-        PostLike postLike = PostLike.builder()
-                .post(Post.builder().id(postId).build())
-                .member(Member.builder().id(memberId).build())
-                .build();
+        Long memberId =  member.getId();
         boolean likeState = false;
         int likeCnt = 0;
 
@@ -53,18 +49,17 @@ public class PostLikeService {
             Post post = temp.get();
             likeCnt = post.getLikeCnt();
 
-            if (plRepository.existsByPost_IdAndMember_Id(postId, memberId)) { // 테이블에 값이 있으면
-                // delete
+            if (plRepository.existsByPost_IdAndMember_Id(postId, memberId)) { // 테이블에 값이 있으면 delete
                 plRepository.deleteByPost_IdAndMember_Id(postId, memberId);
-                // Post table LikeCnt update
-                post.changeLikeCnt(--likeCnt);
+                post.changeLikeCnt(--likeCnt); // Post table LikeCnt update
                 likeState = false;
 
-            } else { // 테이블에 값이 없으면
-                // insert
-                plRepository.save(postLike);
-                // Post table LikeCnt update
-                post.changeLikeCnt(++likeCnt);
+            } else { // 테이블에 값이 없으면 insert
+                plRepository.save(PostLike.builder()
+                        .post(Post.builder().id(postId).build())
+                        .member(Member.builder().id(memberId).build())
+                        .build());
+                post.changeLikeCnt(++likeCnt); // Post table LikeCnt update
                 likeState = true;
             }
             postRepository.save(post);
