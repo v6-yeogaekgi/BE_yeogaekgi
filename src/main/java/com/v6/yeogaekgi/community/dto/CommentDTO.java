@@ -29,4 +29,7 @@ public class CommentDTO {
     // country
     private String code;
 
+    // service
+    private Long currentMemberId;
+
 }

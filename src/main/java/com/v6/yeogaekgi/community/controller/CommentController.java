@@ -25,20 +25,20 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("all/{postId}")
-    public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("postId") Long postId) {
+    public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("postId") Long postId,@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------list--------");
         log.info("postNo : "+postId);
 
-        List<CommentDTO> commentDTOList = commentService.getListOfComment(postId);
+        List<CommentDTO> commentDTOList = commentService.getListOfComment(postId,memberDetails.getMember());
         return new ResponseEntity<>(commentDTOList, HttpStatus.OK);
     }
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentId") Long commentId) {
+    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentId") Long commentId,@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------one comment--------");
         log.info("commentNo : "+commentId);
 
-        CommentDTO commentDTO = commentService.getComment(commentId);
+        CommentDTO commentDTO = commentService.getComment(commentId,memberDetails.getMember());
         return new ResponseEntity<>(commentDTO, HttpStatus.OK);
     }
 
