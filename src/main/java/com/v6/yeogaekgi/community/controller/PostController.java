@@ -7,6 +7,8 @@ import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.community.service.PostLikeService;
 import com.v6.yeogaekgi.community.service.PostService;
+import com.v6.yeogaekgi.member.dto.MemberResponseDTO;
+import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -42,10 +44,18 @@ public class PostController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Long> registerPost(@RequestPart("multipartFile") List<MultipartFile> multipartFiles, @RequestPart("hashtag") String hashtag, @RequestPart("content") String content, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    public ResponseEntity<Long> registerPost(
+            @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
+            @RequestPart(value = "hashtag", required = false) String hashtag,
+            @RequestPart("content") String content,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 이미지 업로드 -> url 리스트로 반환 -> List<String>을 JSON 문자열로 변환
-        String imageUrl = s3Service.convertListToString(s3Service.uploadImage(multipartFiles));
+        String imageUrl = null;
+        if(multipartFiles != null && multipartFiles.size() > 0) {
+            imageUrl = s3Service.convertListToString(s3Service.uploadImage(multipartFiles));
+        }
+
         PostDTO postDTO = PostDTO.builder().images(imageUrl).hashtag(hashtag).content(content).build();
 
         log.info("----------------register Post-------------------");
@@ -92,16 +102,24 @@ public class PostController {
     }
 
     @GetMapping("/likeList")
-    public ResponseEntity<List<Long>> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    public ResponseEntity<?> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------------get Post Like list--------------");
-        return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
+        try{
+            return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+
     }
 
     @PostMapping("/like/{postId}")
-    public ResponseEntity<Map<String, Object>> postLikeActive(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    public ResponseEntity<?> postLikeActive(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("-------------- post like on/off --------------");
-
-        return new ResponseEntity<>(postLikeService.postLikeActive(postId, memberDetails), HttpStatus.OK);
+        try {
+            Member member  = memberDetails.getMember();
+            return new ResponseEntity<>(postLikeService.postLikeActive(postId, member), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
     }
-
 }
