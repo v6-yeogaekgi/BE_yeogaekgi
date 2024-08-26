@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.review.repository;
 
+import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.services.entity.Services;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -19,5 +20,11 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
     where r.status != 1
 """)
     List<String> findImagesByServicesId(Long servicesId);
+
+    @EntityGraph(attributePaths = {"services"})
+    List<Review> findAllByServicesId(Long servicesId);
+
     Optional<Review> findByServicesIdAndId(Long servicesId, Long reviewId);
+
+    Optional<Review> findByServicesIdAndIdAndMemberId(Long servicesId, Long reviewId, Long memberId);
 }

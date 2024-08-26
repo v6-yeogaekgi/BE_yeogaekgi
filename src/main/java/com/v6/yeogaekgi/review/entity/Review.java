@@ -60,17 +60,17 @@ public class Review extends BaseEntity {
         return convertStringToList(this.images);
     }
 
-//    public void setImages(List<String> images) {
-//        this.images = convertListToString(images);
-//    }
+    public void setImages(List<String> images) {
+        this.images = convertListToString(images);
+    }
 
     public List<String> getThumbnails() {
         return convertStringToList(this.thumbnails);
     }
 
-//    public void setThumbnails(List<String> thumbnails) {
-//        this.thumbnails = convertListToString(thumbnails);
-//    }
+    public void setThumbnails(List<String> thumbnails) {
+        this.thumbnails = convertListToString(thumbnails);
+    }
 
     private List<String> convertStringToList(String jsonString) {
         if (jsonString == null || jsonString.isEmpty()) {

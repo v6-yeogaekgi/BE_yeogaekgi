@@ -2,6 +2,7 @@ package com.v6.yeogaekgi.review.controller;
 
 
 import com.v6.yeogaekgi.review.dto.*;
+import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,30 +31,43 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/register")
-    public ResponseEntity<Long> registerPost(@RequestBody ReviewRequestDTO reviewRequestDTO,@AuthenticationPrincipal MemberDetailsImpl memberDetails,List<MultipartFile> multipartFile){
+    @PostMapping("/{servicesId}/register")
+    public ResponseEntity<Long> registerPost(@RequestParam (value = "files", required = false)  List<MultipartFile> multipartFile,
+                                             @ModelAttribute("reviewRequestDTO") ReviewRequestDTO reviewRequestDTO,
+                                             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+                                             @PathVariable Long servicesId){
         log.info("----------------register Review-------------------");
         log.info("ReviewDTO : "+reviewRequestDTO);
-        Long id = reviewService.register(reviewRequestDTO,memberDetails.getMember(),multipartFile);
+        Long id = reviewService.register(multipartFile,servicesId,reviewRequestDTO,memberDetails.getMember());
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     //이미지만 있는 리스트들 (맵에 이미지들만 있는 부분)
-    @GetMapping("/{serviceId}/ImgList")
-    public ResponseEntity<List<String>> list (@PathVariable("serviceId") Long serviceId){
+    @GetMapping("/{servicesId}/ImgList")
+    public ResponseEntity<List<ReviewResponseDTO>> Imglist (@PathVariable("servicesId") Long servicesId){
         log.info("-------------list review---------------");
-         return new ResponseEntity<>(reviewService.ImageList(serviceId),HttpStatus.OK);
+         return new ResponseEntity<>(reviewService.ImageList(servicesId),HttpStatus.OK);
     }
 
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
-    @GetMapping("/{serviceId}/reviewList")
+    @GetMapping("/{servicesId}/reviewList")
     public ResponseEntity<SliceResponse<ReviewResponseDTO>> reviewList(
-            @PathVariable Long serviceId,
+            @PathVariable Long servicesId,
             Pageable pageable,
             @RequestParam(required = false) Integer payStatus
     ) {
-        return new ResponseEntity<>(reviewService.reviewList(serviceId, pageable, payStatus),HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.reviewList(servicesId, pageable, payStatus),HttpStatus.OK);
     }
+
+    @GetMapping("/{servicesId}/{reviewId}/detail")
+    public ResponseEntity<ReviewResponseDTO> getReviewDetail(
+            @PathVariable Long servicesId,
+            @PathVariable Long reviewId,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        log.info("-------------detail review---------------");
+        return new ResponseEntity<>(reviewService.Detail(servicesId, reviewId, memberDetails.getMember()), HttpStatus.OK);
+    }
+
 
     @PutMapping("/{servicesId}/{reviewId}")
     public ResponseEntity<ReviewUpdateResponseDTO>updateReview(@RequestPart (value = "images", required = false) List<MultipartFile> images,

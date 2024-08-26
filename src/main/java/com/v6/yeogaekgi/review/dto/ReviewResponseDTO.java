@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.review.dto;
 
+import com.v6.yeogaekgi.member.entity.Country;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +21,8 @@ public class ReviewResponseDTO {
     private String content;
     private int status;
     private Long serviceId;  // 서비스 no
-    private Long memberId;   // 멤버 no
     private String nickname;
+    private Country country;
     private Timestamp regDate;
     private Timestamp modDate;
 }

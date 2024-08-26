@@ -20,14 +20,14 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
         super(Review.class);
     }
 
-    public Slice<Review> listPage(Long serviceId, Pageable pageable, Integer payStatus) {
+    public Slice<Review> listPage(Long servicesId, Pageable pageable, Integer payStatus) {
         QReview review = QReview.review;
 
         JPQLQuery<Review> jpqlQuery = this.from(review);
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         BooleanExpression expression = review.status.eq(0)
-                .and(review.services.id.eq(serviceId));
+                .and(review.services.id.eq(servicesId));
 
         booleanBuilder.and(expression);
 
@@ -55,4 +55,5 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
 
         return new SliceImpl<>(reviewList, pageable, hasNext);
     }
+
 }
