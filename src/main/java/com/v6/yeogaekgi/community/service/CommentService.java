@@ -70,7 +70,15 @@ public class CommentService {
     }
 
     @Transactional
-    public void remove(Long commentNo) {
+    public void remove(Long commentNo, Long postNo) {
+
+        // commentCnt - 1
+        Optional<Post> result = postRepository.findById(postNo);
+        if (result.isPresent()) {
+            Post post = result.get();
+            post.changeCommentCnt(post.getCommentCnt()-1);
+            postRepository.save(post);
+        }
         repository.deleteById(commentNo);
 
     }
