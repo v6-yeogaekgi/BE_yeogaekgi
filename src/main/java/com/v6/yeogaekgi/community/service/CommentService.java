@@ -27,20 +27,20 @@ public class CommentService {
     private final CommentRepository repository;
     private final PostRepository postRepository;
 
-    public List<CommentDTO> getListOfComment(Long postNo) {
+    public List<CommentDTO> getListOfComment(Long postNo, Member member) {
         Post post = Post.builder().id(postNo).build();
         List<Comment> result = repository.findByPost(post);
-        return result.stream().map(Comment -> entityToDto(Comment)).collect(Collectors.toList());
+        return result.stream().map(Comment -> entityToDto(Comment,member)).collect(Collectors.toList());
 
     }
 
-    public CommentDTO getComment(Long commentId) {
+    public CommentDTO getComment(Long commentId, Member member) {
         Optional<Comment> optionalComment = repository.findById(commentId);
 
         if (optionalComment.isPresent()) {
             Comment comment = optionalComment.get();
 
-            return entityToDto(comment);
+            return entityToDto(comment,member);
         } else return null;
 
     }
@@ -70,7 +70,15 @@ public class CommentService {
     }
 
     @Transactional
-    public void remove(Long commentNo) {
+    public void remove(Long commentNo, Long postNo) {
+
+        // commentCnt - 1
+        Optional<Post> result = postRepository.findById(postNo);
+        if (result.isPresent()) {
+            Post post = result.get();
+            post.changeCommentCnt(post.getCommentCnt()-1);
+            postRepository.save(post);
+        }
         repository.deleteById(commentNo);
 
     }
@@ -88,7 +96,7 @@ public class CommentService {
         return comment;
     }
 
-    public CommentDTO entityToDto(Comment comment) {
+    public CommentDTO entityToDto(Comment comment, Member member) {
 
         CommentDTO commentDTO = CommentDTO.builder()
                 .commentId(comment.getId())
@@ -99,6 +107,7 @@ public class CommentService {
                 .memberId(comment.getMember().getId())
                 .nickname(comment.getMember().getNickname())
                 .code(comment.getMember().getCountry().getCode())
+                .currentMemberId(member.getId())
                 .build();
 
         return commentDTO;
