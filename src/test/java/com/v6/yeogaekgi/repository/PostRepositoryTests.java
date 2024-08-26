@@ -3,7 +3,9 @@ package com.v6.yeogaekgi.repository;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
+import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.CommentRepository;
+import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,8 @@ public class PostRepositoryTests {
 //    private PostRepository repository;
     @Autowired
     private PostRepository postRepository;
-
+    @Autowired
+    private PostLikeRepository postLikeRepository;
 
 
 //    @Test
@@ -106,6 +109,11 @@ public class PostRepositoryTests {
         }
         log.info("ㄴTotal elements: {}", resultPage.getTotalElements());
         log.info("ㄴTotal pages: {}", resultPage.getTotalPages());
+    }
+    @Test
+    public void GetMyLikelist(){
+        List<Long> result = postLikeRepository.findPost_IdByMember_Id(1L );
+        log.info(result.toString());
     }
 
 //    @Transactional

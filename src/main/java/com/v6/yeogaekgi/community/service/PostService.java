@@ -53,7 +53,7 @@ public class PostService {
         }
 
         return result.getContent().stream()
-                .map(Post -> entityToDto(Post, (memberDetails == null? null : memberDetails.getMember())))
+                .map(Post -> entityToDto(Post, memberId))
                 .collect(Collectors.toList());
     }
 
@@ -65,7 +65,7 @@ public class PostService {
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
-            postDto = entityToDto(post.get(), (memberDetails == null? null : memberDetails.getMember()));
+            postDto = entityToDto(post.get(), memberId);
             postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
         }
         return postDto;
@@ -119,7 +119,6 @@ public class PostService {
 
     // ============================= convert type =============================
     public Post dtoToEntity(PostDTO postDTO, Member member){
-
         Post post = Post.builder()
                 .id(postDTO.getPostId())
                 .content(postDTO.getContent())
@@ -129,10 +128,9 @@ public class PostService {
                 .likeCnt(postDTO.getLikeCnt())
                 .member(member)
                 .build();
-
         return post;
     }
-    public PostDTO entityToDto(Post post, Member currentMember){
+    public PostDTO entityToDto(Post post, Long currentMemberId){
 
         PostDTO postDTO = PostDTO.builder()
                 .postId(post.getId())
@@ -145,7 +143,8 @@ public class PostService {
                 .modDate(post.getModDate())
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
-                .currentMemberId(currentMember.getId())
+                .code(post.getMember().getCountry().getCode())
+                .currentMemberId(currentMemberId)
                 .build();
 
         return postDTO;
