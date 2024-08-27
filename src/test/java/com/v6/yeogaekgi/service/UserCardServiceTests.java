@@ -17,7 +17,7 @@ public class UserCardServiceTests extends CommonTests {
     @Test
     public void testGetUserCard() {
         long userCardNo = 399;
-        UserCardDTO userCardByCardId = userCardService.getUserCardByCardId(userCardNo);
+        UserCardDTO userCardByCardId = userCardService.getUserCardByUserCardId(userCardNo);
         System.out.println(userCardByCardId);
 
         assertNotNull(userCardByCardId);
