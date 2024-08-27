@@ -45,5 +45,6 @@ public class Post extends BaseEntity {
     public void changeImages(String images) {this.images = images;}
     public void changeHashtag(String hashtag) {this.hashtag = hashtag;}
     public void changeLikeCnt(int likeCnt) {this.likeCnt = likeCnt;}
+    public void changeCommentCnt(int commentCnt) {this.commentCnt = commentCnt;}
 
 }
