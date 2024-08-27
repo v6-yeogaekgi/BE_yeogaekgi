@@ -43,7 +43,7 @@ public class PostController {
     @GetMapping("/list")
     public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("-------- post list -------- search [Hashtag/Content] = [" + dto.getHashtag() + "/" + dto.getContent() + "]");
-        return new ResponseEntity<>(postService.getPostList(dto, memberDetails), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPostList(dto, memberDetails.getMember()), HttpStatus.OK);
     }
 
     @PostMapping("/register")
@@ -136,7 +136,7 @@ public class PostController {
     public ResponseEntity<PostDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------------get post--------------");
         log.info("postId: " + postId);
-        return new ResponseEntity<>(postService.getPost(postId, memberDetails), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPost(postId, memberDetails.getMember()), HttpStatus.OK);
     }
 
     @GetMapping("/hashtag/{hashtag}")
