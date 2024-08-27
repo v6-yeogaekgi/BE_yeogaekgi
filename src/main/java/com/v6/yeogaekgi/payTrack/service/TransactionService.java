@@ -111,7 +111,7 @@ public class TransactionService {
                                 .tranType(2) // 환급 타입
                                 .currencyType(currency_type)
                                 .krwAmount(BigDecimal.valueOf(userCard.getPayBalance() - 3000)) // 수수료 3,000원
-                                .foreignAmount(BigDecimal.valueOf((userCard.getPayBalance() - 3000) / 100)) // todo 번역 API 연동 시 userCard.getPayBalance 를 currency_type 에 따라 환율 적용
+                                .foreignAmount(transactionDTO.getForeignAmount())
                                 .tranDate(new Timestamp(System.currentTimeMillis()))
                                 .payBalanceSnap(0)
                                 .transitBalanceSnap(userCard.getTransitBalance())
