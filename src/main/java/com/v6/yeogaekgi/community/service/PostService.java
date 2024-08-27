@@ -36,9 +36,9 @@ public class PostService {
 
 
     // 게시글 리스트 (내용/해시태그 검색 포함)
-    public List<PostDTO> getPostList(SearchDTO search, MemberDetailsImpl memberDetails) {
-        // memberId 불러옴
-        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
+    public List<PostDTO> getPostList(SearchDTO search, Member member) {
+//        // memberId 불러옴
+//        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
 
         Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
         Page<Post> result;
@@ -47,26 +47,26 @@ public class PostService {
         }else if(search.getContent() != null && !search.getContent().isEmpty()){
             result = repository.findByContentContaining(search.getContent(), pageable);
         }else if(search.getMyPost()){
-            result = repository.findByMember_Id(memberId, pageable);
+            result = repository.findByMember_Id(member.getId(), pageable);
         }else{
             result = repository.findAll(pageable);
         }
 
         return result.getContent().stream()
-                .map(Post -> entityToDto(Post, memberId))
+                .map(Post -> entityToDto(Post, member))
                 .collect(Collectors.toList());
     }
 
     // 게시글 상세
-    public PostDTO getPost(Long postId, MemberDetailsImpl memberDetails) {
-        // memberId 불러옴
-        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
+    public PostDTO getPost(Long postId, Member member) {
+//        // memberId 불러옴
+//        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
 
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
-            postDto = entityToDto(post.get(), memberId);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
+            postDto = entityToDto(post.get(), member);
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, member.getId()));
         }
         return postDto;
     }
@@ -131,7 +131,7 @@ public class PostService {
                 .build();
         return post;
     }
-    public PostDTO entityToDto(Post post, Long currentMemberId){
+    public PostDTO entityToDto(Post post, Member member){
 
         PostDTO postDTO = PostDTO.builder()
                 .postId(post.getId())
@@ -145,7 +145,8 @@ public class PostService {
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
                 .code(post.getMember().getCountry().getCode())
-                .currentMemberId(currentMemberId)
+                .currentMemberId(member.getId())
+                .currentMemberCode(member.getCountry().getCode())
                 .build();
 
         return postDTO;
