@@ -6,6 +6,7 @@ import com.v6.yeogaekgi.member.dto.MemberRequestDTO;
 
 import com.v6.yeogaekgi.member.dto.MemberResponseDTO;
 import com.v6.yeogaekgi.member.service.MemberService;
+import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -51,6 +52,20 @@ public class MemberController {
             return new ResponseEntity<>(responseBody, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping("/members/detail")
+    public ResponseEntity<?> detail(@RequestBody LoginRequestDTO loginRequestDto) {
+        try {
+            MemberResponseDTO memberResponseDTO = memberService.login(loginRequestDto);
+
+            Map<String, Object> responseBody = new HashMap<>();
+            responseBody.put("user", memberResponseDTO);
+
+            return new ResponseEntity<>(responseBody, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
