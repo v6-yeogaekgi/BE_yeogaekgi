@@ -49,6 +49,7 @@ dependencies {
 			"jakarta.annotation:jakarta.annotation-api",
 			'com.querydsl:querydsl-apt:5.1.0:jakarta'
 	)
+	implementation 'com.deepl.api:deepl-java:1.5.0'
 
 
 
