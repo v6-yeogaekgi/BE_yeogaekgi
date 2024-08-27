@@ -27,4 +27,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
     Optional<Review> findByServicesIdAndId(Long servicesId, Long reviewId);
 
     Optional<Review> findByServicesIdAndIdAndMemberId(Long servicesId, Long reviewId, Long memberId);
+
+//    @EntityGraph(attributePaths = {"member"})
+    List<Review> findByMemberId(Long memberId);
 }

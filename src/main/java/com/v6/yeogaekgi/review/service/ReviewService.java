@@ -110,6 +110,13 @@ public class ReviewService {
     }
 
     @Transactional
+    public List<ReviewResponseDTO> getUserReviewList(Member member) {
+        List<Review> result = reviewRepository.findByMemberId(member.getId());
+        List<ReviewResponseDTO> dtoList = result.stream().map(review -> entityToDto(review)).collect(Collectors.toList());
+        return dtoList;
+    }
+
+    @Transactional
     public ReviewUpdateResponseDTO updateReview(List<MultipartFile> images, Long servicesId, Long reviewId, ReviewUpdateDTO reviewUpdateDTO, Member member) {
         Review review = reviewRepository.findByServicesIdAndId(servicesId, reviewId).orElseThrow(
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")

@@ -1,9 +1,11 @@
 package com.v6.yeogaekgi.review.controller;
 
 
+import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/review")
@@ -57,6 +59,12 @@ public class ReviewController {
             @RequestParam(required = false) Integer payStatus
     ) {
         return new ResponseEntity<>(reviewService.reviewList(servicesId, pageable, payStatus),HttpStatus.OK);
+    }
+
+    @PostMapping("/list")
+    public ResponseEntity<List<ReviewResponseDTO>> getUserReviews(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        Member member = memberDetails.getMember();
+        return new ResponseEntity<>(reviewService.getUserReviewList(member), HttpStatus.OK);
     }
 
     @GetMapping("/{servicesId}/{reviewId}/detail")
