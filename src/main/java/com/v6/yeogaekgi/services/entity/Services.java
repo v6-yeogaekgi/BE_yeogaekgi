@@ -44,4 +44,13 @@ public class Services {
 
     @Column(name = "like_cnt")
     private int likeCnt;
+
+    public void incrementLikeCnt() {
+        this.likeCnt += 1;
+    }
+
+    public void decreaseLikeCnt(){
+        this.likeCnt -= 1;
+    }
+
 }
