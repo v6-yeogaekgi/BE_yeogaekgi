@@ -5,11 +5,11 @@ import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.util.S3.S3Service;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -52,26 +52,33 @@ public class ReviewService {
            return responseDTO;
     }
 
+    @Transactional
     public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
-        List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
-        List<String> imageList = new ArrayList<>();
-        List<String> thumbnailList = new ArrayList<>();
-        // 프론트에서 개수 확인해야함 3개 만 가능하게!
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
-        if (!uploadImage.isEmpty()) {
-            uploadImage.forEach(image ->{
-                imageList.add(image.get("imageUrl"));
-                thumbnailList.add(image.get("thumbnailUrl"));
-            });
+        if (multipartFile != null){
+            List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
+            List<String> imageList = new ArrayList<>();
+            List<String> thumbnailList = new ArrayList<>();
+            if (!uploadImage.isEmpty()) {
+                uploadImage.forEach(image ->{
+                    imageList.add(image.get("imageUrl"));
+                    thumbnailList.add(image.get("thumbnailUrl"));
+                });
+                review.setImages(imageList);
+                review.setThumbnails(thumbnailList);
+                Review savedReview = reviewRepository.save(review);
+                return savedReview.getId();
+            }
+        }else{
+            Review savedReview = reviewRepository.save(review);
+            return savedReview.getId();
         }
-        review.setImages(imageList);
-        review.setThumbnails(thumbnailList);
-        Review savedReview = reviewRepository.save(review);
-        return savedReview.getId();
+        return null;
     }
 
+    @Transactional(readOnly = true)
     public List<ReviewResponseDTO> ImageList (Long serviceId) {
-        List<Review> reviews = reviewRepository.findAllByServicesId(serviceId);
+        List<Review> reviews = reviewRepository.findImageMatchByServicesId(serviceId);
         List<ReviewResponseDTO> result = new ArrayList<>();
         for (Review review : reviews) {
             ReviewResponseDTO dto = ReviewResponseDTO.builder()
@@ -84,6 +91,7 @@ public class ReviewService {
         return result;
     }
 
+    @Transactional(readOnly = true)
     public ReviewResponseDTO Detail (Long servicesId,Long reviewId,Member member){
         Review review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getId()).orElseThrow(
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
@@ -96,6 +104,7 @@ public class ReviewService {
          return entityToDto(review);
     }
 
+    @Transactional(readOnly = true)
     public SliceResponse<ReviewResponseDTO> reviewList(Long servicesId, Pageable pageable, Integer payStatus) {
         // ReviewRepository의 listPage 메서드를 호출하여 페이징된 리뷰 목록을 가져옴
         Slice<Review> result = reviewRepository.listPage(servicesId, pageable, payStatus);
