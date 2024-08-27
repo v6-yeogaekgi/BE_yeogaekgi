@@ -46,4 +46,19 @@ public class UserCardController {
     public ResponseEntity<UserCardDTO> getDetail(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
         return new ResponseEntity<>(userCardService.getUserCardByCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
     }
+
+    @PostMapping("/modify/star")
+    public ResponseEntity<String> modifyStar(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        // 프론트에서 받을 정보 userCardNo
+        // security 에서 받을 정보 -> member
+        // Long id = memberDetails.getMember().getId();
+
+        boolean result = userCardService.changesUserCardStarred(userCardDTO);
+        if(result){
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("false", HttpStatus.OK);
+    }
+
+
 }
