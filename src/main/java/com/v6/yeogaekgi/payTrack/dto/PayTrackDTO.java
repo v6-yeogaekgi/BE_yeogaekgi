@@ -2,6 +2,7 @@ package com.v6.yeogaekgi.payTrack.dto;
 
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
@@ -40,7 +41,7 @@ public class PayTrackDTO {
 
     private Integer krwAmount;
 
-    private Integer foreignAmount;
+    private BigDecimal foreignAmount;
 
     private Integer currencyType;
 
