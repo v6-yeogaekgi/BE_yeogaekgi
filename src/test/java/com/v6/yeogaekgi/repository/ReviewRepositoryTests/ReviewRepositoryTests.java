@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.stream.LongStream;
 
 @SpringBootTest
@@ -35,5 +36,10 @@ public class ReviewRepositoryTests {
         });
     }
 
+    @Test
+    void getUserReview() {
+        List<Review> result = reviewRepository.findByMemberId(1000L);
+        System.out.println(result);
+    }
 }
 
