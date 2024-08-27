@@ -108,6 +108,7 @@ public class CommentService {
                 .nickname(comment.getMember().getNickname())
                 .code(comment.getMember().getCountry().getCode())
                 .currentMemberId(member.getId())
+                .currentMemberCode(member.getCountry().getCode())
                 .build();
 
         return commentDTO;

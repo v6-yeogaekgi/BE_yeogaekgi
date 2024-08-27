@@ -31,5 +31,7 @@ public class CommentDTO {
 
     // service
     private Long currentMemberId;
+    private String currentMemberCode;
+
 
 }

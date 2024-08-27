@@ -5,12 +5,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TranslationRequest {
+public class Translation {
+
+    private String detected_source_language;
     private String text;
-    private String targetLang;
 }

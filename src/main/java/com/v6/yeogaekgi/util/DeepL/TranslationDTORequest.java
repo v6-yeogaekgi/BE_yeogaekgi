@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.deepl.api.Translation;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TranslationResponse {
-    private String List<Translation> translations;
+public class TranslationDTORequest {
+    private String[] text;
+    private String target_lang;
 }
