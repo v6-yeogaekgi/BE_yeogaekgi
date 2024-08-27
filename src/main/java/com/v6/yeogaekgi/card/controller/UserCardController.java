@@ -1,7 +1,6 @@
 package com.v6.yeogaekgi.card.controller;
 
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
-import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.service.UserCardService;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,7 +42,7 @@ public class UserCardController {
 
     @PostMapping("/detail")
     public ResponseEntity<UserCardDTO> getDetail(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
-        return new ResponseEntity<>(userCardService.getUserCardByCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
+        return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
     }
 
     @PostMapping("/modify/star")

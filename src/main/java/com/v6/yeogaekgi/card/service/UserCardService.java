@@ -1,20 +1,17 @@
 package com.v6.yeogaekgi.card.service;
 
-import com.amazonaws.services.s3.transfer.Copy;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
-import com.v6.yeogaekgi.card.repository.CardRepository;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import io.jsonwebtoken.io.IOException;
-import jakarta.servlet.http.PushBuilder;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.geom.Area;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -37,9 +34,10 @@ public class UserCardService {
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
-    public UserCardDTO getUserCardByCardId(Long cardId) {
-        Optional<UserCard> byId = userCardRepository.findById(cardId);
-        return byId.map(this::entityToDto).orElse(null);
+    public UserCardDTO getUserCardByUserCardId(Long userCardId) {
+        return userCardRepository.findById(userCardId)
+                .map(this::entityToDto)
+                .orElseThrow(() -> new EntityNotFoundException("UserCard not found with id: " + userCardId));
     }
 
     @Transactional
@@ -57,11 +55,12 @@ public class UserCardService {
         // parameter userCardDTO ->
         // userCardNo = 주카드 타겟
         // memberNo = 주카드 갱신 사용자
-        UserCardDTO prevUserCard = getUserCardByCardId(userCardDTO.getUserCardId());
+
+        UserCardDTO prevUserCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
         UserCardDTO nextUserCard = null;
 
         try{
-            List<UserCardDTO> all = getAllByMemberId(userCardDTO.getMemberId());
+            List<UserCardDTO> all = getAllByMemberId(prevUserCard.getMemberId());
             for (UserCardDTO cardDTO : all) {
                 if(cardDTO.getStatus() == 1){
                     if(cardDTO.getStarred()==1){
@@ -75,7 +74,7 @@ public class UserCardService {
                     }
                 }
             }
-            if(nextUserCard.getStarred() != prevUserCard.getStarred()) return true;
+            if (nextUserCard != null && nextUserCard.getStarred() != prevUserCard.getStarred()) return true;
 
             return false;
         }catch (Exception e){
