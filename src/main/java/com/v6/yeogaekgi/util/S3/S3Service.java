@@ -153,6 +153,14 @@ public class S3Service {
             throw new RuntimeException("변환 중 오류 발생", e);
         }
     }
+    public String convertListToString2(List<String> list) {
+        // List<String>을 JSON 문자열로 변환
+        try {
+            return new ObjectMapper().writeValueAsString(list);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("변환 중 오류 발생", e);
+        }
+    }
 
 
 }
