@@ -15,11 +15,12 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListRepository {
     @EntityGraph(attributePaths = {"services"})
     @Query("""
-    select r.images from Review r
-    join Services s on s.id =:servicesId
-    where r.status != 1
+    select r from Review r
+    where r.services.id = :servicesId
+    and r.status != 1
+    order by r.regDate desc
 """)
-    List<String> findImagesByServicesId(Long servicesId);
+    List<Review> findImageMatchByServicesId(Long servicesId);
 
     @EntityGraph(attributePaths = {"services"})
     List<Review> findAllByServicesId(Long servicesId);
@@ -27,4 +28,7 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
     Optional<Review> findByServicesIdAndId(Long servicesId, Long reviewId);
 
     Optional<Review> findByServicesIdAndIdAndMemberId(Long servicesId, Long reviewId, Long memberId);
+
+//    @EntityGraph(attributePaths = {"member"})
+    List<Review> findByMemberId(Long memberId);
 }

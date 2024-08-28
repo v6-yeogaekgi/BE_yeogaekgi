@@ -7,6 +7,7 @@ import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public class PayTrackService {
                             .tranType(obj[10] != null ? ((Number) obj[10]).intValue() : null)
                             .transferType(obj[11] != null ? ((Number) obj[11]).intValue() : null)
                             .krwAmount(obj[12] != null ? ((Number) obj[12]).intValue() : null)
-                            .foreignAmount(obj[13] != null ? ((Number) obj[13]).intValue() : null)
+                            .foreignAmount(obj[13] != null ? (BigDecimal) obj[13] : null)
                             .currencyType(obj[14] != null ? ((Number) obj[14]).intValue() : null)
                             .isPayment(isPayment)
                             .build();

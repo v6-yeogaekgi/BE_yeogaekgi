@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.util.S3.S3Service;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository repository;
     private final PostLikeRepository plRepository;
+    private final S3Service s3Service;
 
 
     // 게시글 리스트 (내용/해시태그 검색 포함)
@@ -72,21 +74,21 @@ public class PostService {
     }
 
     // 게시글 등록 [bongbong]
-    public Long register(PostDTO postDTO,Member member) {
-        Post post = dtoToEntity(postDTO,member);
+    public Long register(Post post) {
+//        Post post = dtoToEntity(postDTO,member);
         repository.save(post);
         return post.getId();
     }
 
     // 게시글 수정 [bongbong]
-    public void modify(PostDTO postDTO) {
+    public void modify(Post post) {
 
-        Optional<Post> result = repository.findById(postDTO.getPostId());
+        Optional<Post> result = repository.findById(post.getId());
         if(result.isPresent()){
-            Post post = result.get();
-            post.changeContent(postDTO.getContent());
-            post.changeImages(postDTO.getImages());
-            post.changeHashtag(postDTO.getHashtag());
+//            Post post = result.get();
+//            post.changeContent(postDTO.getContent());
+//            post.changeImages(postDTO.getImages());
+//            post.changeHashtag(postDTO.getHashtag());
 
             repository.save(post);
         }
@@ -125,7 +127,7 @@ public class PostService {
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
                 .commentCnt(postDTO.getCommentCnt())
-                .images(postDTO.getImages())
+                .images(s3Service.convertListToString2(postDTO.getImages()))
                 .likeCnt(postDTO.getLikeCnt())
                 .member(member)
                 .build();
@@ -138,7 +140,7 @@ public class PostService {
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
                 .commentCnt(post.getCommentCnt())
-                .images(post.getImages())
+                .images(s3Service.convertStringToList(post.getImages()))
                 .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
