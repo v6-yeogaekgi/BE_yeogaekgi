@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
+import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.community.service.PostLikeService;
@@ -59,11 +60,11 @@ public class PostController {
             imageUrl = s3Service.convertListToString(s3Service.uploadImage(multipartFiles));
         }
 
-        PostDTO postDTO = PostDTO.builder().images(imageUrl).hashtag(hashtag).content(content).build();
+        Post post = Post.builder().images(imageUrl).hashtag(hashtag).content(content).member(memberDetails.getMember()).build();
 
         log.info("----------------register Post-------------------");
-        log.info("postDTO : " + postDTO);
-        Long postId = postService.register(postDTO,memberDetails.getMember());
+        log.info("postDTO : " + post);
+        Long postId = postService.register(post);
         return new ResponseEntity<>(postId, HttpStatus.OK);
     }
 
@@ -105,19 +106,19 @@ public class PostController {
             log.error("Error converting image URLs to JSON string", e);
         }
 
-        PostDTO postDTO = PostDTO.builder()
+        Post post = Post.builder()
                 .images(imageUrls)
                 .hashtag(hashtag)
                 .content(content)
-                .postId(postId)
+                .id(postId)
                 .build();
 
-        log.info("---------------modify post--------------" + postDTO.getPostId());
-        log.info("postDTO: " + postDTO);
+        log.info("---------------modify post--------------" + post.getId());
+        log.info("postDTO: " + post);
 
-        postService.modify(postDTO);
+        postService.modify(post);
 
-        return new ResponseEntity<>(postDTO.getPostId(), HttpStatus.OK);
+        return new ResponseEntity<>(post.getId(), HttpStatus.OK);
     }
 
 

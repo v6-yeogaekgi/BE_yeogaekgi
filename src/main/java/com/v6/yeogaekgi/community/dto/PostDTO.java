@@ -16,7 +16,7 @@ public class PostDTO {
     // post
     private Long postId;
     private String content;
-    private String images;
+    private List<String> images;
     private String hashtag;
     private int likeCnt;
     private int commentCnt;
