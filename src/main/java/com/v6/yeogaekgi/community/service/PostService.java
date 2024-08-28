@@ -97,7 +97,7 @@ public class PostService {
 
     // 게시글 삭제 [bongbong]
     public void remove(Long postId) {
-        
+
         repository.deleteById(postId);
 
     }
