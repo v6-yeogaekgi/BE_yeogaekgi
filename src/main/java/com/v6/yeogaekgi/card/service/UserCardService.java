@@ -24,11 +24,6 @@ import java.util.stream.Collectors;
 public class UserCardService {
     private final UserCardRepository userCardRepository;
 
-//    public UserCardDTO getUserCardById(UserCardDTO userCardDTO) {
-//        UserCard uc = userCardRepository.findById(userCardDTO.getUserCardId()).orElse(null);
-//        return entityToDto(uc);
-//    }
-
     public List<UserCardDTO> getUserCardByUserId(Long userId) {
         List<UserCard> result = userCardRepository.findByMember_Id(userId);
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
@@ -80,6 +75,33 @@ public class UserCardService {
         }catch (Exception e){
             throw new RuntimeException("error", e);
         }
+    }
+
+    public boolean deleteUserCardStarred(UserCardDTO userCardDTO){
+        int prevStatus = userCardDTO.getStarred();
+        try {
+            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+            userCard.updateStarred(0);
+            UserCard save = userCardRepository.save(dtoToEntity(userCard));
+            if(save.getStarred() != prevStatus) return true;
+        }catch (Exception e){
+            throw new RuntimeException("error", e);
+        }
+        return false;
+    }
+
+    public boolean deleteUserCard(UserCardDTO userCardDTO){
+        try {
+            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+            userCard.updateStatus(2);
+            // 삭제 대상 카드가 주카드일때 주카드 상태 해제 이후 save
+            if(userCard.getStarred()==1) userCard.setStarred(0);
+            UserCard save = userCardRepository.save(dtoToEntity(userCard));
+            if(save.getStatus() == 2) return true;
+        }catch (Exception e){
+            throw new RuntimeException("error", e);
+        }
+        return false;
     }
 
     public List<UserCardDTO> getAllByMemberId(Long memberId) {

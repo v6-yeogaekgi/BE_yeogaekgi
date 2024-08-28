@@ -45,7 +45,7 @@ public class UserCardController {
         return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
     }
 
-    @PostMapping("/modify/star")
+    @PutMapping("/modify/star")
     public ResponseEntity<String> modifyStar(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         // 프론트에서 받을 정보 userCardNo
         // security 에서 받을 정보 -> member
@@ -58,5 +58,24 @@ public class UserCardController {
         return new ResponseEntity<>("false", HttpStatus.OK);
     }
 
+    @PutMapping("/delete/star")
+    public ResponseEntity<String> deleteStar(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        // 프론트에서 받을 정보 userCardNo
+        // security 에서 받을 정보 -> member
+        // Long id = memberDetails.getMember().getId();
+        boolean result = userCardService.deleteUserCardStarred(userCardDTO);
+        if(result){
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("false", HttpStatus.OK);
+    }
 
+    @PutMapping("/delete/card")
+    public ResponseEntity<String> deleteCard(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        boolean result = userCardService.deleteUserCard(userCardDTO);
+        if(result){
+            return new ResponseEntity<>("success", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("false", HttpStatus.OK);
+    }
 }

@@ -30,4 +30,8 @@ public class UserCardDTO {
     public void updateStarred(int starred) {
         this.starred = starred;
     }
+
+    public void updateStatus(int status) {
+        this.status = status;
+    }
 }
