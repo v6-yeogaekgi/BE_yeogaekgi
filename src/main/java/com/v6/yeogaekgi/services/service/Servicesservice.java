@@ -1,9 +1,7 @@
 package com.v6.yeogaekgi.services.service;
 
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.services.dto.ServiceResponseDTO;
-import com.v6.yeogaekgi.services.dto.ServicesLikeResponsDTO;
 import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesLikeRepository;
@@ -15,7 +13,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
