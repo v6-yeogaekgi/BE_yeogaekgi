@@ -26,4 +26,12 @@ public class UserCardDTO {
     private String cardName;
     // Member
     private Long memberId;
+
+    public void updateStarred(int starred) {
+        this.starred = starred;
+    }
+
+    public void updateStatus(int status) {
+        this.status = status;
+    }
 }
