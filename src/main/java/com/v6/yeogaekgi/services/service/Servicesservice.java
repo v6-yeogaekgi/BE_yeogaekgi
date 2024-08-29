@@ -61,7 +61,7 @@ public class Servicesservice {
             int countUpdated = services.getLikeCnt();
             likeCheckRs = false;
             servicesRepository.save(services);
-            result.put("countUpdated",countUpdated);
+            result.put("like cancel",countUpdated);
             result.put("likeCheckRs",likeCheckRs);
             return result;
         }else{
@@ -74,7 +74,7 @@ public class Servicesservice {
             int countUpdated = services.getLikeCnt();
             likeCheckRs = true;
             servicesRepository.save(services);
-            result.put("countUpdated",countUpdated);
+            result.put("like add",countUpdated);
             result.put("likeCheckRs",likeCheckRs);
             return result;
         }
