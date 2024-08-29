@@ -48,9 +48,7 @@ public class PostController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             @RequestParam(value = "search", required = false) SearchDTO search,
             @RequestParam(value = "page", required = false) PageRequestDTO page) {
-        log.info("-------- post list -------- ");
-        log.info("[search : " + search.toString() + "] ");
-        log.info("[page : " + page.toString() + "] ");
+        log.info("\n-------- post list --------\n[search : " + search.toString() + "]\n[page : " + page.toString() + "] ");
         PageResultDTO<PostDTO> result = postService.getPostList(search, page,  memberDetails.getMember());
         if(result != null){
             if(result.getContent().size() == 0){
@@ -77,7 +75,7 @@ public class PostController {
 
         Post post = Post.builder().images(imageUrl).hashtag(hashtag).content(content).member(memberDetails.getMember()).build();
 
-        log.info("----------------register Post-------------------");
+        log.info("\n----------------register Post-------------------");
         log.info("postDTO : " + post);
         Long postId = postService.register(post);
         return new ResponseEntity<>(postId, HttpStatus.OK);
@@ -90,7 +88,8 @@ public class PostController {
                                            @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
                                            @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
                                            @RequestPart(value = "hashtag", required = false) String hashtag,
-                                           @RequestPart("content") String content) {
+                                           @RequestPart("content") String content,
+                                           @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 새 이미지 업로드 -> url 리스트로 반환
         List<String> newImageUrls = new ArrayList<>();
@@ -126,6 +125,7 @@ public class PostController {
                 .hashtag(hashtag)
                 .content(content)
                 .id(postId)
+                .member(memberDetails.getMember())
                 .build();
 
         log.info("---------------modify post--------------" + post.getId());
