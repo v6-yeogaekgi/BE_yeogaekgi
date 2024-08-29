@@ -25,6 +25,7 @@ public class Post extends BaseEntity {
     @Column(nullable=false)
     private String content;
 
+    @Column(columnDefinition = "TEXT")
     private String images;
 
     private String hashtag;

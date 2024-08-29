@@ -12,6 +12,7 @@ import com.v6.yeogaekgi.community.service.PostService;
 import com.v6.yeogaekgi.member.dto.MemberResponseDTO;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import com.v6.yeogaekgi.util.PageDTO.PageRequestDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -42,9 +43,12 @@ public class PostController {
     private final S3Service s3Service;
 
     @GetMapping("/list")
-    public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        log.info("-------- post list -------- search [Hashtag/Content] = [" + dto.getHashtag() + "/" + dto.getContent() + "]");
-        return new ResponseEntity<>(postService.getPostList(dto, memberDetails.getMember()), HttpStatus.OK);
+    public ResponseEntity<List<PostDTO>> getPostList(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            @RequestParam(value = "search", required = false) SearchDTO searchDTO,
+            @RequestParam(value = "page", required = false) PageRequestDTO pageRequestDTO) {
+        log.info("-------- post list -------- search [Hashtag/Content/page/size] = [" + searchDTO.getHashtag() + "/" + searchDTO.getContent() + "]");
+        return new ResponseEntity<>(postService.getPostList(searchDTO, memberDetails.getMember()), HttpStatus.OK);
     }
 
     @PostMapping("/register")
