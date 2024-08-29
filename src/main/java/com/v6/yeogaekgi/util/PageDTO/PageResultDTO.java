@@ -30,7 +30,6 @@ public class PageResultDTO<DTO, EN> {
     private boolean prev, next;
 
     //페이지 번호  목록
-    // test3
     private List<Integer> pageList;
 
     public PageResultDTO(Page<EN> result, Function<EN,DTO> fn ){
