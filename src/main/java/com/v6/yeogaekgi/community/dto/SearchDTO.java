@@ -11,9 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SearchDTO {
 
-
-    private String content; // 내용 검색
-    private String hashtag; // 해시태그 검색
+    @Builder.Default
+    private String keyword = ""; // 검색 keyword
+    @Builder.Default
+    private String type = "content"; // 검색 type : content, hashtag
     @Builder.Default
     private Boolean myPost = false; // 1이면 내 게시글만 보기
 }
