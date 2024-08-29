@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -33,5 +35,13 @@ public class UserCardServiceTests extends CommonTests {
                 .memberId(member_no)
                 .build();
         userCardService.changesUserCardStarred(cardDTO);
+    }
+
+    @Test
+    public void testGetHomeCard() {
+        long memberId = 1396;
+        String area = "서울";
+        List<UserCardDTO> result = userCardService.getHomeCardByMemberAndArea(memberId, area);
+        System.out.println(result);
     }
 }

@@ -109,21 +109,32 @@ public class UserCardService {
         return find.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
-        log.info("==================");
-        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
-        ArrayList<UserCard> result = new ArrayList<>();
-        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
-        for(UserCard uc : find) {
-            log.info(uc.toString());
-            log.info(uc.getCard().toString());
-            log.info(uc.getCard().getArea());
-            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
-                result.add(uc);
+    public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberId, String area) {
+        List<UserCard> find = userCardRepository.findByMember_Id(memberId);
+        List<UserCardDTO> result = new ArrayList<>();
+        for(UserCard userCard : find) {
+            if (userCard.getCard().getArea().equals(area)) {
+                result.add(entityToDto(userCard));
             }
         }
-        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+        return result;
     }
+
+//    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
+//        log.info("==================");
+//        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
+//        ArrayList<UserCard> result = new ArrayList<>();
+//        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
+//        for(UserCard uc : find) {
+//            log.info(uc.toString());
+//            log.info(uc.getCard().toString());
+//            log.info(uc.getCard().getArea());
+//            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
+//                result.add(uc);
+//            }
+//        }
+//        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+//    }
 
     public UserCard dtoToEntity(UserCardDTO userCardDTO) {
         UserCard userCard = UserCard.builder()
