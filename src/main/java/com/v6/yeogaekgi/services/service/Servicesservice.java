@@ -1,11 +1,13 @@
 package com.v6.yeogaekgi.services.service;
 
+import com.amazonaws.services.ec2.model.ServiceType;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.services.dto.ServiceResponseDTO;
 import com.v6.yeogaekgi.services.dto.ServicesLikeResponsDTO;
 import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
+import com.v6.yeogaekgi.services.entity.ServicesType;
 import com.v6.yeogaekgi.services.repository.ServicesLikeRepository;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -14,9 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,25 +39,31 @@ public class Servicesservice {
                 .build();
     }
 
-    public List<ServiceResponseDTO> findAllServices() {
-        List<Services> servicesList = servicesRepository.findAll();
-        return servicesList.stream()
-                .map(this::entityToDto) // entityToDto 메서드를 사용하여 변환
-                .collect(Collectors.toList());
+    public List<Services> findAllServices() {
+        return servicesRepository.findAll();
+    }
+
+    public List<Services> findServicesByTypes(List<ServicesType> type){
+        return servicesRepository.findByTypes(type);
     }
 
     @Transactional
-    public Boolean servicesLike (Long servicesId,Long memberId){
+    public Map<String,Object> servicesLike (Long servicesId,Long memberId){
+        Map<String,Object> result = new HashMap<>();
+        Boolean likeCheckRs =null;
         Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
         Services services = servicesRepository.findById(servicesId)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
         if(serviceLikeCheck.isPresent()){
             Long servicesLikeId = serviceLikeCheck.get().getId();
             servicesLikeRepository.deleteById(servicesLikeId);
-
             services.decreaseLikeCnt();
+            int countUpdated = services.getLikeCnt();
+            likeCheckRs = false;
             servicesRepository.save(services);
-            return false;
+            result.put("countUpdated",countUpdated);
+            result.put("likeCheckRs",likeCheckRs);
+            return result;
         }else{
             ServiceLike serviceLike = ServiceLike.builder()
                     .service(Services.builder().id(servicesId).build())
@@ -65,9 +71,25 @@ public class Servicesservice {
                     .build();
             servicesLikeRepository.save(serviceLike);
             services.incrementLikeCnt();
+            int countUpdated = services.getLikeCnt();
+            likeCheckRs = true;
             servicesRepository.save(services);
-            return true;
+            result.put("countUpdated",countUpdated);
+            result.put("likeCheckRs",likeCheckRs);
+            return result;
         }
     }
+    @Transactional
+    public Boolean servicesLikeCheck(Long servicesId,Long memberId){
+        Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
+        Services services = servicesRepository.findById(servicesId)
+                .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+        if(serviceLikeCheck.isPresent()){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
 }
