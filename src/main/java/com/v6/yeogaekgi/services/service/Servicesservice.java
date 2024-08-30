@@ -48,19 +48,38 @@ public class Servicesservice {
     }
 
     @Transactional
-    public Map<String,Object> servicesLike (Long servicesId,Long memberId){
-        Map<String,Object> result = new HashMap<>();
-        Boolean likeCheckRs =null;
+    public Boolean servicesLike (Long servicesId,Long memberId){
         Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
         Services services = servicesRepository.findById(servicesId)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+        if (!serviceLikeCheck.isPresent()) {
+            ServiceLike serviceLike = ServiceLike.builder()
+                    .service(Services.builder().id(servicesId).build())
+                    .member(Member.builder().id(memberId).build())
+                    .build();
+            servicesLikeRepository.save(serviceLike);
+            services.incrementLikeCnt();
+            servicesRepository.save(services);
+            return true;
+        }else{
+            Long servicesLikeId = serviceLikeCheck.get().getId();
+            servicesLikeRepository.deleteById(servicesLikeId);
+            services.decreaseLikeCnt();
+            servicesRepository.save(services);
+            return false;
+        }
+
+//        if (!serviceLikeCheck.isPresent()) {
 //        if(serviceLikeCheck.isPresent()){
 //            Long servicesLikeId = serviceLikeCheck.get().getId();
 //            servicesLikeRepository.deleteById(servicesLikeId);
-//
 //            services.decreaseLikeCnt();
+//            int countUpdated = services.getLikeCnt();
+//            likeCheckRs = false;
 //            servicesRepository.save(services);
-//            return false;
+//            result.put("like cancel",countUpdated);
+//            result.put("likeCheckRs",likeCheckRs);
+//            return result;
 //        }else{
 //            ServiceLike serviceLike = ServiceLike.builder()
 //                    .service(Services.builder().id(servicesId).build())
@@ -68,34 +87,13 @@ public class Servicesservice {
 //                    .build();
 //            servicesLikeRepository.save(serviceLike);
 //            services.incrementLikeCnt();
+//            int countUpdated = services.getLikeCnt();
+//            likeCheckRs = true;
 //            servicesRepository.save(services);
-//            return true;
+//            result.put("like add",countUpdated);
+//            result.put("likeCheckRs",likeCheckRs);
+//            return result;
 //        }
-        if (!serviceLikeCheck.isPresent()) {
-        if(serviceLikeCheck.isPresent()){
-            Long servicesLikeId = serviceLikeCheck.get().getId();
-            servicesLikeRepository.deleteById(servicesLikeId);
-            services.decreaseLikeCnt();
-            int countUpdated = services.getLikeCnt();
-            likeCheckRs = false;
-            servicesRepository.save(services);
-            result.put("like cancel",countUpdated);
-            result.put("likeCheckRs",likeCheckRs);
-            return result;
-        }else{
-            ServiceLike serviceLike = ServiceLike.builder()
-                    .service(Services.builder().id(servicesId).build())
-                    .member(Member.builder().id(memberId).build())
-                    .build();
-            servicesLikeRepository.save(serviceLike);
-            services.incrementLikeCnt();
-            int countUpdated = services.getLikeCnt();
-            likeCheckRs = true;
-            servicesRepository.save(services);
-            result.put("like add",countUpdated);
-            result.put("likeCheckRs",likeCheckRs);
-            return result;
-        }
     }
     @Transactional
     public Boolean servicesLikeCheck(Long servicesId,Long memberId){
@@ -105,15 +103,8 @@ public class Servicesservice {
         if(serviceLikeCheck.isPresent()){
             return true;
         }else{
-            Long servicesLikeId = serviceLikeCheck.get().getId();
-            servicesLikeRepository.deleteById(servicesLikeId);
-            services.decreaseLikeCnt();
-            servicesRepository.save(services);
-            return false;
-        }else{
             return false;
         }
     }
-
 
 }
