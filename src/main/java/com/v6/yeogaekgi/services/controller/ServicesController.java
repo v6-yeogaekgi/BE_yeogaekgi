@@ -30,10 +30,10 @@ public class ServicesController {
     public ResponseEntity<String> servicesLike (@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Long memberId = memberDetails.getMember().getId();
         if(servicesservice.servicesLike(servicesId,memberId)){
-            return new ResponseEntity<>("like cancel",HttpStatus.OK);
+            return new ResponseEntity<>("like add",HttpStatus.OK);
         }
         else {
-            return new ResponseEntity<>("like add",HttpStatus.OK);
+            return new ResponseEntity<>("like cancel",HttpStatus.OK);
         }
     }
 
