@@ -51,14 +51,24 @@ public class Servicesservice {
         Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
         Services services = servicesRepository.findById(servicesId)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
-        if(serviceLikeCheck.isPresent()){
-            Long servicesLikeId = serviceLikeCheck.get().getId();
-            servicesLikeRepository.deleteById(servicesLikeId);
-
-            services.decreaseLikeCnt();
-            servicesRepository.save(services);
-            return false;
-        }else{
+//        if(serviceLikeCheck.isPresent()){
+//            Long servicesLikeId = serviceLikeCheck.get().getId();
+//            servicesLikeRepository.deleteById(servicesLikeId);
+//
+//            services.decreaseLikeCnt();
+//            servicesRepository.save(services);
+//            return false;
+//        }else{
+//            ServiceLike serviceLike = ServiceLike.builder()
+//                    .service(Services.builder().id(servicesId).build())
+//                    .member(Member.builder().id(memberId).build())
+//                    .build();
+//            servicesLikeRepository.save(serviceLike);
+//            services.incrementLikeCnt();
+//            servicesRepository.save(services);
+//            return true;
+//        }
+        if (!serviceLikeCheck.isPresent()) {
             ServiceLike serviceLike = ServiceLike.builder()
                     .service(Services.builder().id(servicesId).build())
                     .member(Member.builder().id(memberId).build())
@@ -67,6 +77,12 @@ public class Servicesservice {
             services.incrementLikeCnt();
             servicesRepository.save(services);
             return true;
+        }else{
+            Long servicesLikeId = serviceLikeCheck.get().getId();
+            servicesLikeRepository.deleteById(servicesLikeId);
+            services.decreaseLikeCnt();
+            servicesRepository.save(services);
+            return false;
         }
     }
 
