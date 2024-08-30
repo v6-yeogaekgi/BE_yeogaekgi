@@ -29,15 +29,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 내용 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Slice<Post> findByContentContaining(String content);
+    Slice<Post> findByContentContaining(String content, Pageable pageable);
 
     // 해시 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Slice<Post> findByHashtag(String hashtag);
+    Slice<Post> findByHashtag(String hashtag, Pageable pageable);
 
     // 해시 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Slice<Post> findByMember_Id(Long memberId);
+    Slice<Post> findByMember_Id(Long memberId,Pageable pageable);
 
 
 

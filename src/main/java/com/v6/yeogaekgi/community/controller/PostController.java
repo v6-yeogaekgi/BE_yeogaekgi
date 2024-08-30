@@ -46,10 +46,9 @@ public class PostController {
     @GetMapping("/list")
     public ResponseEntity<PageResultDTO<PostDTO>> getPostList(
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            @RequestParam(value = "search", required = false) SearchDTO search,
-            @RequestParam(value = "page", required = false) PageRequestDTO page) {
-        log.info("\n-------- post list --------\n[search : " + search.toString() + "]\n[page : " + page.toString() + "] ");
-        PageResultDTO<PostDTO> result = postService.getPostList(search, page,  memberDetails.getMember());
+            SearchDTO search) {
+        log.info("\n-------- post list --------\n[" + search.toString() + "]");
+        PageResultDTO<PostDTO> result = postService.getPostList(search,  memberDetails.getMember());
         if(result != null){
             if(result.getContent().size() == 0){
                 return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
@@ -63,8 +62,8 @@ public class PostController {
     @PostMapping("/register")
     public ResponseEntity<Long> registerPost(
             @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
-            @RequestPart(value = "hashtag", required = false) String hashtag,
-            @RequestPart("content") String content,
+            @RequestParam(value = "hashtag", required = false) String hashtag,
+            @RequestParam("content") String content,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 이미지 업로드 -> url 리스트로 반환 -> List<String>을 JSON 문자열로 변환

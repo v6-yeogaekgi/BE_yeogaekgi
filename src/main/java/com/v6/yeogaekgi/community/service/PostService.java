@@ -35,23 +35,24 @@ public class PostService {
 
 
     // 게시글 리스트 (내용/해시태그 검색 포함)
-    public PageResultDTO<PostDTO> getPostList(SearchDTO search, PageRequestDTO page, Member member) {
+    public PageResultDTO<PostDTO> getPostList(SearchDTO search, Member member) {
         Slice<Post> result = null;
+        Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
         if("content".equals(search.getType())){
-            result = repository.findByContentContaining(search.getKeyword());
+            result = repository.findByContentContaining(search.getKeyword(), pageable);
         }
         if("hashtag".equals(search.getType())){
-            result = repository.findByHashtag(search.getKeyword());
+            result = repository.findByHashtag(search.getKeyword(), pageable);
         }
         if(search.getMyPost()){
-            result = repository.findByMember_Id(member.getId());
+            result = repository.findByMember_Id(member.getId(), pageable);
         }
 
         if(result != null){
             List<PostDTO> content = result.getContent().stream()
                     .map(Post -> entityToDto(Post, member))
                     .collect(Collectors.toList());
-            Pageable pageable = PageRequest.of(page.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
+//            Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
 
             PageResultDTO<PostDTO> pageResultDTO = new PageResultDTO<>(content, pageable, result.hasNext());
 

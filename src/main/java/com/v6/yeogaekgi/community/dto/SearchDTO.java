@@ -17,4 +17,6 @@ public class SearchDTO {
     private String type = "content"; // 검색 type : content, hashtag
     @Builder.Default
     private Boolean myPost = false; // 1이면 내 게시글만 보기
+    @Builder.Default
+    private int page = 0;
 }
