@@ -1,8 +1,9 @@
 package com.v6.yeogaekgi.services.controller;
 
-import com.v6.yeogaekgi.member.entity.Member;
+
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
-import com.v6.yeogaekgi.services.dto.ServiceResponseDTO;
+import com.v6.yeogaekgi.services.entity.Services;
+import com.v6.yeogaekgi.services.entity.ServicesType;
 import com.v6.yeogaekgi.services.service.Servicesservice;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,9 +23,22 @@ public class ServicesController {
     private final Servicesservice servicesservice;
 
     @GetMapping("/servicesList")
-    public ResponseEntity<List<ServiceResponseDTO>> getAllServices() {
-        return new ResponseEntity<>(servicesservice.findAllServices(), HttpStatus.OK);
+    public ResponseEntity<List<Services>> getAllServices(@RequestParam(required = false)List<ServicesType> type) {
+        List<Services> services;
+        if (type == null||type.isEmpty()) {
+            services = servicesservice.findAllServices();
+        } else {
+            services = servicesservice.findServicesByTypes(type);
+        }
+        return new ResponseEntity<>(services, HttpStatus.OK);
     }
+
+    @GetMapping("/like/{servicesId}/check")
+    public ResponseEntity<?> servicesLikeCheck(@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        Long memberId = memberDetails.getMember().getId();
+        return new ResponseEntity<>(servicesservice.servicesLikeCheck(servicesId,memberId),HttpStatus.OK);
+    }
+
 
     @PostMapping("/like/{servicesId}")
     public ResponseEntity<String> servicesLike (@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
