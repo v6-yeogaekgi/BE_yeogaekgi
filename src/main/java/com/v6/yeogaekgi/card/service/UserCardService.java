@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.card.service;
 
+import com.v6.yeogaekgi.card.dto.CardDTO;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
@@ -110,13 +111,25 @@ public class UserCardService {
     }
 
     public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberId, String area) {
+        log.info("----getHomeCardByMemberAndArea----");
+
         List<UserCard> find = userCardRepository.findByMember_Id(memberId);
         List<UserCardDTO> result = new ArrayList<>();
+
         for(UserCard userCard : find) {
-            if (userCard.getCard().getArea().equals(area)) {
-                result.add(entityToDto(userCard));
+//            log.info(userCard.toString());
+            String userCardArea = userCard.getCard().getArea();
+            if(userCardArea != null && area != null){
+                if(userCardArea.equals(area)) {
+                    result.add(entityToDto(userCard));
+                } else {
+                    log.info(userCard.getCard().getArea());
+                }
+            } else {
+                log.info("null error");
             }
         }
+        log.info("result: " + result);
         return result;
     }
 

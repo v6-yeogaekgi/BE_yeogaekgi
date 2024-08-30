@@ -87,9 +87,10 @@ public class UserCardController {
         return new ResponseEntity<>(cardService.getCardAreas(), HttpStatus.OK);
     }
 
-    @PostMapping("/home/list")
+    @PostMapping("/area")
     public ResponseEntity<?> getHomeCards(@RequestBody String area, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         log.info("-----------getHomeCards-----------");
+        log.info("-----------print area: " + area);
         List<UserCardDTO> result = userCardService.getHomeCardByMemberAndArea(memberDetails.getMember().getId(), area);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
