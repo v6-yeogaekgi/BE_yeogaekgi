@@ -52,10 +52,14 @@ public class ServicesController {
 
 
     @PostMapping("/like/{servicesId}")
-    public ResponseEntity<Map<String, Object>> servicesLike (@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+    public ResponseEntity<String> servicesLike (@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         Long memberId = memberDetails.getMember().getId();
-        return new ResponseEntity<>(servicesservice.servicesLike(servicesId,memberId),HttpStatus.OK);
+        if(servicesservice.servicesLike(servicesId,memberId)){
+            return new ResponseEntity<>("like add",HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>("like cancel",HttpStatus.OK);
+        }
     }
-
 
 }

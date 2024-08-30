@@ -121,7 +121,24 @@ public class ReviewService {
     @Transactional
     public List<ReviewResponseDTO> getUserReviewList(Member member) {
         List<Review> result = reviewRepository.findByMemberId(member.getId());
-        List<ReviewResponseDTO> dtoList = result.stream().map(review -> entityToDto(review)).collect(Collectors.toList());
+        ArrayList<ReviewResponseDTO> dtoList = new ArrayList<>();
+        for(Review review : result) {
+            ReviewResponseDTO dto = ReviewResponseDTO.builder()
+                    .reviewId(review.getId())
+                    .images(review.getImages())
+                    .thumbnail(review.getThumbnails())
+                    .score(review.getScore())
+                    .content(review.getContent())
+                    .status(review.getStatus())
+                    .nickname(review.getMember().getNickname())
+                    .country(review.getMember().getCountry())
+                    .serviceId(review.getServices().getId())
+                    .serviceName(review.getServices().getName())
+                    .regDate(review.getRegDate())
+                    .modDate(review.getModDate())
+                    .build();
+            dtoList.add(dto);
+        }
         return dtoList;
     }
 
