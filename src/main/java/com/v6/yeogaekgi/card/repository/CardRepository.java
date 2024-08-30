@@ -9,5 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
-
+    @Query("""
+    select distinct area from Card
+""")
+    List<String> findDistinctArea();
 }

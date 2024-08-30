@@ -1,5 +1,6 @@
 package com.v6.yeogaekgi.card.service;
 
+import com.v6.yeogaekgi.card.dto.CardDTO;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
@@ -109,21 +110,44 @@ public class UserCardService {
         return find.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
-        log.info("==================");
-        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
-        ArrayList<UserCard> result = new ArrayList<>();
-        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
-        for(UserCard uc : find) {
-            log.info(uc.toString());
-            log.info(uc.getCard().toString());
-            log.info(uc.getCard().getArea());
-            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
-                result.add(uc);
+    public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberId, String area) {
+        log.info("----getHomeCardByMemberAndArea----");
+
+        List<UserCard> find = userCardRepository.findByMember_Id(memberId);
+        List<UserCardDTO> result = new ArrayList<>();
+
+        for(UserCard userCard : find) {
+//            log.info(userCard.toString());
+            String userCardArea = userCard.getCard().getArea();
+            if(userCardArea != null && area != null){
+                if(userCardArea.equals(area)) {
+                    result.add(entityToDto(userCard));
+                } else {
+                    log.info(userCard.getCard().getArea());
+                }
+            } else {
+                log.info("null error");
             }
         }
-        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+        log.info("result: " + result);
+        return result;
     }
+
+//    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
+//        log.info("==================");
+//        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
+//        ArrayList<UserCard> result = new ArrayList<>();
+//        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
+//        for(UserCard uc : find) {
+//            log.info(uc.toString());
+//            log.info(uc.getCard().toString());
+//            log.info(uc.getCard().getArea());
+//            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
+//                result.add(uc);
+//            }
+//        }
+//        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+//    }
 
     public UserCard dtoToEntity(UserCardDTO userCardDTO) {
         UserCard userCard = UserCard.builder()
