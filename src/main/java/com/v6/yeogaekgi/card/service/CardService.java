@@ -17,6 +17,11 @@ import java.util.stream.Collectors;
 public class CardService {
     private final CardRepository cardRepository;
 
+    public List<String> getCardAreas() {
+        List<String> result = cardRepository.findDistinctArea();
+        return result;
+    }
+
     public Card dtoToEntity(CardDTO cardDTO) {
         Card card = Card.builder()
                 .id(cardDTO.getCardId())

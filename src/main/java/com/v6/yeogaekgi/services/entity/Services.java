@@ -1,5 +1,7 @@
 package com.v6.yeogaekgi.services.entity;
 
+import com.v6.yeogaekgi.member.entity.Country;
+import com.v6.yeogaekgi.payTrack.entity.Payment;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -52,5 +54,6 @@ public class Services {
     public void decreaseLikeCnt(){
         this.likeCnt -= 1;
     }
+
 
 }

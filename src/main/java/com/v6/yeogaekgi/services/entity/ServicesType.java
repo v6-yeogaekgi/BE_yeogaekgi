@@ -4,4 +4,5 @@ public enum ServicesType {
     TouristAttraction,
     ACTIVITY,
     ETC;
+
 }
