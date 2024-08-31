@@ -9,22 +9,19 @@ import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.util.PageDTO.PageRequestDTO;
+import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,37 +35,42 @@ public class PostService {
 
 
     // 게시글 리스트 (내용/해시태그 검색 포함)
-    public List<PostDTO> getPostList(SearchDTO search, Member member) {
-//        // memberId 불러옴
-//        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
-
+    public PageResultDTO<PostDTO> getPostList(SearchDTO search, Member member) {
+        Slice<Post> result = null;
         Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
-        Page<Post> result;
-        if(search.getHashtag() != null && !search.getHashtag().isEmpty()){
-            result = repository.findByHashtag(search.getHashtag(), pageable);
-        }else if(search.getContent() != null && !search.getContent().isEmpty()){
-            result = repository.findByContentContaining(search.getContent(), pageable);
-        }else if(search.getMyPost()){
+        if("content".equals(search.getType())){
+            result = repository.findByContentContaining(search.getKeyword(), pageable);
+        }
+        if("hashtag".equals(search.getType())){
+            result = repository.findByHashtag(search.getKeyword(), pageable);
+        }
+        if(search.getMyPost()){
             result = repository.findByMember_Id(member.getId(), pageable);
-        }else{
-            result = repository.findAll(pageable);
         }
 
-        return result.getContent().stream()
-                .map(Post -> entityToDto(Post, member))
-                .collect(Collectors.toList());
+        if(result != null){
+            List<PostDTO> content = result.getContent().stream()
+                    .map(Post -> entityToDto(Post, member))
+                    .collect(Collectors.toList());
+//            Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
+
+            PageResultDTO<PostDTO> pageResultDTO = new PageResultDTO<>(content, pageable, result.hasNext());
+
+            return pageResultDTO;
+        }
+        return null;
     }
 
     // 게시글 상세
     public PostDTO getPost(Long postId, Member member) {
 //        // memberId 불러옴
-//        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
+        Long memberId= member == null ? 0L : member.getId();
 
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
             postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, member.getId()));
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId,  memberId));
         }
         return postDto;
     }
@@ -97,7 +99,7 @@ public class PostService {
 
     // 게시글 삭제 [bongbong]
     public void remove(Long postId) {
-        
+
         repository.deleteById(postId);
 
     }
@@ -147,8 +149,8 @@ public class PostService {
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
                 .code(post.getMember().getCountry().getCode())
-                .currentMemberId(member.getId())
-                .currentMemberCode(member.getCountry().getCode())
+                .currentMemberId(member==null? null : member.getId())
+                .currentMemberCode(member==null? null :member.getCountry().getCode())
                 .build();
 
         return postDTO;

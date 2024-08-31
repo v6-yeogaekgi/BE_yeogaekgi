@@ -12,6 +12,8 @@ import com.v6.yeogaekgi.community.service.PostService;
 import com.v6.yeogaekgi.member.dto.MemberResponseDTO;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import com.v6.yeogaekgi.util.PageDTO.PageRequestDTO;
+import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -42,16 +44,26 @@ public class PostController {
     private final S3Service s3Service;
 
     @GetMapping("/list")
-    public ResponseEntity<List<PostDTO>> getPostList(SearchDTO dto, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        log.info("-------- post list -------- search [Hashtag/Content] = [" + dto.getHashtag() + "/" + dto.getContent() + "]");
-        return new ResponseEntity<>(postService.getPostList(dto, memberDetails.getMember()), HttpStatus.OK);
+    public ResponseEntity<PageResultDTO<PostDTO>> getPostList(
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+            SearchDTO search) {
+        log.info("\n-------- post list --------\n[" + search.toString() + "]");
+        PageResultDTO<PostDTO> result = postService.getPostList(search,  memberDetails.getMember());
+        if(result != null){
+            if(result.getContent().size() == 0){
+                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<Long> registerPost(
             @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
-            @RequestPart(value = "hashtag", required = false) String hashtag,
-            @RequestPart("content") String content,
+            @RequestParam(value = "hashtag", required = false) String hashtag,
+            @RequestParam("content") String content,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 이미지 업로드 -> url 리스트로 반환 -> List<String>을 JSON 문자열로 변환
@@ -62,7 +74,7 @@ public class PostController {
 
         Post post = Post.builder().images(imageUrl).hashtag(hashtag).content(content).member(memberDetails.getMember()).build();
 
-        log.info("----------------register Post-------------------");
+        log.info("\n----------------register Post-------------------");
         log.info("postDTO : " + post);
         Long postId = postService.register(post);
         return new ResponseEntity<>(postId, HttpStatus.OK);
@@ -75,7 +87,8 @@ public class PostController {
                                            @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
                                            @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
                                            @RequestPart(value = "hashtag", required = false) String hashtag,
-                                           @RequestPart("content") String content) {
+                                           @RequestPart("content") String content,
+                                           @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 새 이미지 업로드 -> url 리스트로 반환
         List<String> newImageUrls = new ArrayList<>();
@@ -111,6 +124,7 @@ public class PostController {
                 .hashtag(hashtag)
                 .content(content)
                 .id(postId)
+                .member(memberDetails.getMember())
                 .build();
 
         log.info("---------------modify post--------------" + post.getId());
@@ -137,7 +151,7 @@ public class PostController {
     public ResponseEntity<PostDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------------get post--------------");
         log.info("postId: " + postId);
-        return new ResponseEntity<>(postService.getPost(postId, memberDetails.getMember()), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPost(postId, memberDetails== null?null :memberDetails.getMember()), HttpStatus.OK);
     }
 
     @GetMapping("/hashtag/{hashtag}")
