@@ -87,6 +87,7 @@ public class QnaService {
                 .qnaDate(dto.getQnaDate())
                 .reply(dto.getReply())
                 .replyDate(dto.getReplyDate())
+                .status(dto.getStatus())
                 .member(member)
                 .build();
         return entity;
@@ -103,6 +104,7 @@ public class QnaService {
                 .replyDate(entity.getReplyDate())
                 .memberId(entity.getMember().getId())
                 .code(entity.getMember().getCountry().getCode())
+                .status(entity.isStatus())
                 .build();
         return dto;
     };
