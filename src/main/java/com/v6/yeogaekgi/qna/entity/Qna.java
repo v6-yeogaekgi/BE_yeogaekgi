@@ -2,9 +2,7 @@ package com.v6.yeogaekgi.qna.entity;
 
 import com.v6.yeogaekgi.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
@@ -13,6 +11,8 @@ import java.sql.Timestamp;
 @Setter
 @Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "qna")
 public class Qna {
     @Id
