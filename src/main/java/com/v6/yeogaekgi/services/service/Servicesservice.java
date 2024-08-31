@@ -4,7 +4,6 @@ import com.amazonaws.services.ec2.model.ServiceType;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.services.dto.ServiceResponseDTO;
-import com.v6.yeogaekgi.services.dto.ServicesLikeResponsDTO;
 import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.entity.ServicesType;
