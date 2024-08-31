@@ -151,7 +151,7 @@ public class PostController {
     public ResponseEntity<PostDTO> getPost(@PathVariable Long postId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------------get post--------------");
         log.info("postId: " + postId);
-        return new ResponseEntity<>(postService.getPost(postId, memberDetails.getMember()), HttpStatus.OK);
+        return new ResponseEntity<>(postService.getPost(postId, memberDetails== null?null :memberDetails.getMember()), HttpStatus.OK);
     }
 
     @GetMapping("/hashtag/{hashtag}")
