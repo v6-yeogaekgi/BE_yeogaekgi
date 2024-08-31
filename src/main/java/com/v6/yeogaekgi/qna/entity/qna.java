@@ -1,6 +1,8 @@
 package com.v6.yeogaekgi.qna.entity;
 
+import com.v6.yeogaekgi.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CurrentTimestamp;
@@ -9,13 +11,14 @@ import java.sql.Timestamp;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "qna")
-public class qna {
+public class Qna {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="qna_no")
-    private int id;
+    private Long id;
 
     @Column(nullable=false)
     private String title;
@@ -23,19 +26,23 @@ public class qna {
     @Column(nullable=false)
     private String content;
 
-    @Column
-    private String img;
+    @Column(columnDefinition = "TEXT")
+    private String images;
 
-    @Column(nullable=false)
+    @Column(name="qna_date", nullable=false)
     @CurrentTimestamp
-    private Timestamp qna_date;
+    private Timestamp qnaDate;
 
     @Column
     private String reply;
 
-    @Column
-    private Timestamp reply_date;
+    @Column(name="reply_date")
+    private Timestamp replyDate;
 
     @Column(nullable=false)
-    private int status;
+    private boolean status=false;
+
+    @ManyToOne
+    @JoinColumn(name = "member_no", nullable = false)
+    private Member member;
 }
