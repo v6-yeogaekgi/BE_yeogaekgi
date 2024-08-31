@@ -64,13 +64,13 @@ public class PostService {
     // 게시글 상세
     public PostDTO getPost(Long postId, Member member) {
 //        // memberId 불러옴
-//        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
+        Long memberId= member == null ? 0L : member.getId();
 
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
         if(post.isPresent()){
             postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, member.getId()));
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId,  memberId));
         }
         return postDto;
     }
@@ -149,8 +149,8 @@ public class PostService {
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
                 .code(post.getMember().getCountry().getCode())
-                .currentMemberId(member.getId())
-                .currentMemberCode(member.getCountry().getCode())
+                .currentMemberId(member==null? null : member.getId())
+                .currentMemberCode(member==null? null :member.getCountry().getCode())
                 .build();
 
         return postDTO;
