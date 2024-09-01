@@ -1,11 +1,12 @@
 package com.v6.yeogaekgi.review.repository;
 
-import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.review.entity.Review;
-import com.v6.yeogaekgi.services.entity.Services;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -31,4 +32,8 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
 
 //    @EntityGraph(attributePaths = {"member"})
     List<Review> findByMemberId(Long memberId);
+
+    @Modifying
+    @Query("UPDATE Review r SET r.payment = :payment WHERE r.id = :reviewId")
+    void updatePaymentById(@Param("reviewId") Long reviewId, @Param("payment") Payment payment);
 }

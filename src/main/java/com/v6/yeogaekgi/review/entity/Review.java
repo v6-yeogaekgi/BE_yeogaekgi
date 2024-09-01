@@ -60,6 +60,10 @@ public class Review extends BaseEntity {
         return convertStringToList(this.images);
     }
 
+    public void setPayment (Payment payment) {
+        this.payment = payment;
+    }
+
     public void setImages(List<String> images) {
         this.images = convertListToString(images);
     }

@@ -8,6 +8,8 @@ import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class PaymentService {
                 .map(this::entityToDto)
                 .orElse(null);
     }
+
 
     private Payment dtoToEntity(PaymentDTO dto) {
         return Payment.builder()

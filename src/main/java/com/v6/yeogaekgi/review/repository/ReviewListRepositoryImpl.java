@@ -1,5 +1,4 @@
 package com.v6.yeogaekgi.review.repository;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -12,15 +11,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
-
 import java.util.List;
-
 public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implements ReviewListRepository {
     public ReviewListRepositoryImpl() {
         super(Review.class);
     }
 
-    public Slice<Review> listPage(Long servicesId, Pageable pageable, Integer payStatus) {
+    public Slice<Review> listPage(Long servicesId, Pageable pageable) {
         QReview review = QReview.review;
 
         JPQLQuery<Review> jpqlQuery = this.from(review);
@@ -31,11 +28,6 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
 
         booleanBuilder.and(expression);
 
-        if (payStatus != null) {
-            BooleanExpression condition = review.payment.isNotNull();
-            booleanBuilder.and(condition);
-        }
-
         pageable.getSort().forEach(sortOrder -> {
             Order order = sortOrder.isAscending() ? Order.ASC : Order.DESC;
             PathBuilder<?> entityPath = new PathBuilder<>(Review.class, "review");
@@ -44,6 +36,10 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
 
         jpqlQuery.where(booleanBuilder);
 
+        // Offset 설정
+        jpqlQuery.offset(pageable.getOffset());
+
+        // Limit 설정
         jpqlQuery.limit(pageable.getPageSize() + 1);
 
         List<Review> reviewList = jpqlQuery.fetch();
@@ -55,5 +51,4 @@ public class ReviewListRepositoryImpl extends QuerydslRepositorySupport implemen
 
         return new SliceImpl<>(reviewList, pageable, hasNext);
     }
-
 }
