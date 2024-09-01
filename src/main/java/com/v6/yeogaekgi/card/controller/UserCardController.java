@@ -22,29 +22,15 @@ public class UserCardController {
     private final UserCardService userCardService;
     private final CardService cardService;
 
-//    @GetMapping("/list")
-//    public ResponseEntity<List<UserCardDTO>> list(UserCardDTO userCardDTO) { // 사용자카드 리스트 가져오기
-//        log.info("list userCardDTO: " + userCardDTO);
-//        return new ResponseEntity<>(userCardService.getUserCardByUserId(userCardDTO.getMemberId()), HttpStatus.OK);
-//    }
-
-    @PostMapping("/list")
-    public ResponseEntity<List<UserCardDTO>> postList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
+    @GetMapping("/list")
+    public ResponseEntity<List<UserCardDTO>> list(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
+        log.info("get mapping user card list");
         return new ResponseEntity<>(userCardService.getUserCardByUserId(memberDetails.getMember().getId()), HttpStatus.OK);
     }
 
-//    //카드, 사용자카드 리스트 가져오기
-//    @PostMapping("/list2")
-//    public ResponseEntity<List<UserCardDTO>> list3(@RequestBody UserCardDTO userCardDTO) {
-//        log.info("list2 userCardDTO: " + userCardDTO);
-//        List<UserCardDTO> all = userCardService.getAll(userCardDTO);
-//        log.info("all : " + all);
-//        return new ResponseEntity<>(userCardService.getAll(userCardDTO), HttpStatus.OK);
-//    }
-
-    @PostMapping("/detail")
-    public ResponseEntity<UserCardDTO> getDetail(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
-        return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardDTO.getUserCardId()), HttpStatus.OK);
+    @GetMapping("/{userCardId}")
+    public ResponseEntity<UserCardDTO> getDetail(@PathVariable Long userCardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
+        return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardId), HttpStatus.OK);
     }
 
     @PutMapping("/modify/star")

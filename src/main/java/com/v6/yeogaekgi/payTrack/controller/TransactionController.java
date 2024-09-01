@@ -28,32 +28,43 @@ public class TransactionController {
     }
 
     @PostMapping("/refund")
-    public ResponseEntity<String> refund(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boolean result = transactionService.refundTransaction(transactionDTO, memberDetails.getMember());
-
-        if (!result) {
-            return new ResponseEntity<>("false", HttpStatus.OK);
+    public ResponseEntity<?> refund(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        try {
+            boolean result = transactionService.refundTransaction(transactionDTO, memberDetails.getMember());
+            if (result) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
-        return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
     @PostMapping("/toptup")
     public ResponseEntity<String> topup(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boolean result = transactionService.topupTransaction(transactionDTO, memberDetails.getMember());
-        if (result) {
-            return new ResponseEntity<>("success", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("false", HttpStatus.OK);
+        try {
+            boolean result = transactionService.topupTransaction(transactionDTO, memberDetails.getMember());
+            if (result) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/conversion")
     public ResponseEntity<String> conversion(@RequestBody TransactionDTO transactionDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        boolean result = transactionService.conversionAmount(transactionDTO, memberDetails.getMember());
-        if (result) {
-            return new ResponseEntity<>("success", HttpStatus.OK);
+        try {
+            boolean result = transactionService.conversionAmount(transactionDTO, memberDetails.getMember());
+            if (result) {
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }catch (Exception e) {
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        return new ResponseEntity<>("false", HttpStatus.OK);
     }
 }
