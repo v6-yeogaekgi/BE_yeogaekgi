@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"*"})
 @RestController
 @RequestMapping("/services")
 @Log4j2
@@ -22,16 +22,25 @@ import java.util.List;
 public class ServicesController {
     private final Servicesservice servicesservice;
 
-    @GetMapping("/servicesList")
-    public ResponseEntity<List<Services>> getAllServices(@RequestParam(required = false)List<ServicesType> type) {
+    @GetMapping("/servicesList/{area}")
+    public ResponseEntity<List<Services>> getAllServices(
+            @PathVariable String area,
+            @RequestParam(required = false) List<ServicesType> type) {
+
         List<Services> services;
-        if (type == null||type.isEmpty()) {
-            services = servicesservice.findAllServices();
+
+        if (type == null || type.isEmpty()) {
+            services = servicesservice.findAllServices(area);
         } else {
-            services = servicesservice.findServicesByTypes(type);
+            services = servicesservice.findServicesByTypesAndArea(type, area);
         }
+
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
+
+    
+
+
 
     @GetMapping("/like/{servicesId}/check")
     public ResponseEntity<?> servicesLikeCheck(@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){

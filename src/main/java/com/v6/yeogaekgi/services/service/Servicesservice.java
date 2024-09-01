@@ -38,12 +38,12 @@ public class Servicesservice {
                 .build();
     }
 
-    public List<Services> findAllServices() {
-        return servicesRepository.findAll();
+    public List<Services> findAllServices(String area) {
+        return servicesRepository.findAllServices(area);
     }
 
-    public List<Services> findServicesByTypes(List<ServicesType> type){
-        return servicesRepository.findByTypes(type);
+    public List<Services> findServicesByTypesAndArea(List<ServicesType> type,String area){
+        return servicesRepository.findServicesByTypesAndArea(type,area);
     }
 
     @Transactional

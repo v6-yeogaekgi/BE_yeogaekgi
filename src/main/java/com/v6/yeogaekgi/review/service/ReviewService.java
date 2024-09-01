@@ -1,9 +1,13 @@
 package com.v6.yeogaekgi.review.service;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.payTrack.entity.Payment;
+import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
+import com.v6.yeogaekgi.payTrack.service.PaymentService;
 import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
+import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import com.v6.yeogaekgi.util.S3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -21,7 +25,8 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final S3Service s3Service;
-
+    private final PaymentRepository paymentRepository;
+    private final ServicesRepository servicesRepository;
 
     public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO,Member member,Long servicesId) {
         //url들을 프론트에서 배열로 보내줄 예정
@@ -37,6 +42,7 @@ public class ReviewService {
     public ReviewResponseDTO entityToDto(Review review) {
         List<String> images = review.getImages();
         List<String> thumbnails = review.getThumbnails();
+
         ReviewResponseDTO responseDTO = ReviewResponseDTO.builder()
                    .reviewId(review.getId())
                    .score(review.getScore())
@@ -49,12 +55,17 @@ public class ReviewService {
                    .country(review.getMember().getCountry())
                    .nickname(review.getMember().getNickname())
                    .build();
+              if(review.getPayment()!= null){
+                  responseDTO.setPaymentId(review.getPayment().getId());
+              }
            return responseDTO;
     }
 
     @Transactional
     public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
+        String service = servicesRepository.findServiceNameById(servicesId);
+        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service);
         if (multipartFile != null){
             List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
             List<String> imageList = new ArrayList<>();
@@ -66,14 +77,18 @@ public class ReviewService {
                 });
                 review.setImages(imageList);
                 review.setThumbnails(thumbnailList);
-                Review savedReview = reviewRepository.save(review);
-                return savedReview.getId();
             }
-        }else{
-            Review savedReview = reviewRepository.save(review);
-            return savedReview.getId();
         }
-        return null;
+        Review savedReview = reviewRepository.save(review);
+        System.out.println(savedReview);
+        if(payment.isPresent()) {
+            System.out.println("------------------------");
+            System.out.println(payment.get().getId());
+            System.out.println(payment.get());
+            System.out.println("------------------------");
+            savedReview.setPayment(payment.get());
+        }
+        return savedReview.getId();
     }
 
     @Transactional(readOnly = true)
@@ -85,6 +100,7 @@ public class ReviewService {
                     .images(review.getImages())
                     .nickname(review.getMember().getNickname())
                     .country(review.getMember().getCountry())
+                    .score(review.getScore())
                     .build();
             result.add(dto);
         }
@@ -105,9 +121,9 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<ReviewResponseDTO> reviewList(Long servicesId, Pageable pageable, Integer payStatus) {
+    public SliceResponse<ReviewResponseDTO> reviewList(Long servicesId, Pageable pageable) {
         // ReviewRepository의 listPage 메서드를 호출하여 페이징된 리뷰 목록을 가져옴
-        Slice<Review> result = reviewRepository.listPage(servicesId, pageable, payStatus);
+        Slice<Review> result = reviewRepository.listPage(servicesId, pageable);
         // Review 엔터티를 ReviewResponseDTO로 변환
         List<ReviewResponseDTO> dtoList = result.getContent().stream()
                 .map(review -> entityToDto(review))
