@@ -11,6 +11,6 @@ import java.util.Optional;
 
 public interface ReviewListRepository {
     @EntityGraph(attributePaths = {"member", "services"})
-    Slice<Review> listPage(Long servicesId,Pageable pageable,Integer payStatus);
+    Slice<Review> listPage(Long servicesId,Pageable pageable);
 
 }

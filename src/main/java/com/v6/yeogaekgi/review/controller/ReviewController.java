@@ -51,6 +51,7 @@ public class ReviewController {
          return new ResponseEntity<>(reviewService.ImageList(servicesId),HttpStatus.OK);
     }
 
+
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
     @GetMapping("/{servicesId}/reviewList")
     public ResponseEntity<SliceResponse<ReviewResponseDTO>> reviewList(
@@ -58,7 +59,7 @@ public class ReviewController {
             Pageable pageable,
             @RequestParam(required = false) Integer payStatus
     ) {
-        return new ResponseEntity<>(reviewService.reviewList(servicesId, pageable, payStatus),HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.reviewList(servicesId, pageable),HttpStatus.OK);
     }
 
     @PostMapping("/list")

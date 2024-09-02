@@ -26,4 +26,5 @@ public class ReviewResponseDTO {
     private Country country;
     private Timestamp regDate;
     private Timestamp modDate;
+    private Long paymentId;
 }

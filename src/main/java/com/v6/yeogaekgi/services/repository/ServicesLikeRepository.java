@@ -10,8 +10,8 @@ import java.util.OptionalInt;
 
 public interface ServicesLikeRepository extends JpaRepository<ServiceLike,Long> {
     Optional<ServiceLike> findByServiceIdAndMemberId(Long serviceId, Long memberId);
-    List<ServiceLike> findByMemberId(Long memberId);
 
+    List<ServiceLike> findByMemberId(Long memberId);
 
     @Query("""
     select count(sk)
