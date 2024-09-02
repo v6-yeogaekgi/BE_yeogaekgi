@@ -79,12 +79,14 @@ public class UserCardService {
     }
 
     public boolean deleteUserCardStarred(UserCardDTO userCardDTO){
-        int prevStatus = userCardDTO.getStarred();
+
         try {
             UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+            int prevStarred = userCard.getStarred();
             userCard.updateStarred(0);
             UserCard save = userCardRepository.save(dtoToEntity(userCard));
-            if(save.getStarred() != prevStatus) return true;
+
+            if(save.getStarred() != prevStarred) return true;
         }catch (Exception e){
             throw new RuntimeException("error", e);
         }
