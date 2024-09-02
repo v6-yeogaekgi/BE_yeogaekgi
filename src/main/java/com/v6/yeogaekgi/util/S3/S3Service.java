@@ -54,24 +54,24 @@ public class S3Service {
                 // 업로드한 원본 파일의 URL 가져오기
                 String fileUrl = amazonS3.getUrl(bucket, fileName).toString();
 
-                // 썸네일 생성 및 업로드
-                byte[] thumbnailBytes = createThumbnail(file.getInputStream());
-                ObjectMetadata thumbnailMetadata = new ObjectMetadata();
-                thumbnailMetadata.setContentLength(thumbnailBytes.length);
-                thumbnailMetadata.setContentType(file.getContentType());
-
-                amazonS3.putObject(new PutObjectRequest(bucket, thumbnailFileName,
-                        new ByteArrayInputStream(thumbnailBytes), thumbnailMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
-
-                // 업로드한 썸네일 파일의 URL 가져오기
-                String thumbnailUrl = amazonS3.getUrl(bucket, thumbnailFileName).toString();
+//                // 썸네일 생성 및 업로드
+//                byte[] thumbnailBytes = createThumbnail(file.getInputStream());
+//                ObjectMetadata thumbnailMetadata = new ObjectMetadata();
+//                thumbnailMetadata.setContentLength(thumbnailBytes.length);
+//                thumbnailMetadata.setContentType(file.getContentType());
+//
+//                amazonS3.putObject(new PutObjectRequest(bucket, thumbnailFileName,
+//                        new ByteArrayInputStream(thumbnailBytes), thumbnailMetadata)
+//                        .withCannedAcl(CannedAccessControlList.PublicRead));
+//
+//                // 업로드한 썸네일 파일의 URL 가져오기
+//                String thumbnailUrl = amazonS3.getUrl(bucket, thumbnailFileName).toString();
 
                 // 원본 파일 이름, 이미지 URL, 썸네일 URL을 Map에 추가
                 Map<String, String> fileUrlMap = new HashMap<>();
                 fileUrlMap.put("originalFileName", originalFileName);  // 파일 이름 추가
                 fileUrlMap.put("imageUrl", fileUrl);
-                fileUrlMap.put("thumbnailUrl", thumbnailUrl);
+//                fileUrlMap.put("thumbnailUrl", thumbnailUrl);
 
                 // 리스트에 추가
                 fileUrlList.add(fileUrlMap);
