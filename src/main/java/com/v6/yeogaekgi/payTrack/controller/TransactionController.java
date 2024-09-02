@@ -24,7 +24,11 @@ public class TransactionController {
     @GetMapping("/{tranId}")
     public ResponseEntity<TransactionDTO> getTransaction(@PathVariable("tranId") Long tranId) {
         log.info("tranId: " + tranId);
-        return new ResponseEntity<>(transactionService.getTransactionById(tranId), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(transactionService.getTransactionById(tranId), HttpStatus.OK);
+        }catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/refund")
