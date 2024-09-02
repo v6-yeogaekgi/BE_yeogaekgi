@@ -68,41 +68,20 @@ public class Servicesservice {
             return false;
         }
 
-//        if (!serviceLikeCheck.isPresent()) {
-//        if(serviceLikeCheck.isPresent()){
-//            Long servicesLikeId = serviceLikeCheck.get().getId();
-//            servicesLikeRepository.deleteById(servicesLikeId);
-//            services.decreaseLikeCnt();
-//            int countUpdated = services.getLikeCnt();
-//            likeCheckRs = false;
-//            servicesRepository.save(services);
-//            result.put("like cancel",countUpdated);
-//            result.put("likeCheckRs",likeCheckRs);
-//            return result;
-//        }else{
-//            ServiceLike serviceLike = ServiceLike.builder()
-//                    .service(Services.builder().id(servicesId).build())
-//                    .member(Member.builder().id(memberId).build())
-//                    .build();
-//            servicesLikeRepository.save(serviceLike);
-//            services.incrementLikeCnt();
-//            int countUpdated = services.getLikeCnt();
-//            likeCheckRs = true;
-//            servicesRepository.save(services);
-//            result.put("like add",countUpdated);
-//            result.put("likeCheckRs",likeCheckRs);
-//            return result;
-//        }
     }
     @Transactional
-    public Boolean servicesLikeCheck(Long servicesId,Long memberId){
+    public Map<String,Object> servicesLikeCheck(Long servicesId,Long memberId){
+        Map<String,Object> result = new HashMap<>();
         Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
-        Services services = servicesRepository.findById(servicesId)
-                .orElseThrow(() -> new EntityNotFoundException("Service not found"));
+        Optional<Long> servicesLikeCount =servicesLikeRepository.servicesLikeCount(servicesId);
         if(serviceLikeCheck.isPresent()){
-            return true;
+            result.put("status",true);
+            result.put("count",servicesLikeCount.get());
+            return result;
         }else{
-            return false;
+            result.put("status",false);
+            result.put("count",servicesLikeCount.get());
+            return result;
         }
     }
 

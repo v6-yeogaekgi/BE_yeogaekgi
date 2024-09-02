@@ -38,9 +38,6 @@ public class ServicesController {
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
-    
-
-
 
     @GetMapping("/like/{servicesId}/check")
     public ResponseEntity<?> servicesLikeCheck(@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
