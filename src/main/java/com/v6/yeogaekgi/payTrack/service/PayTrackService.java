@@ -1,10 +1,12 @@
 package com.v6.yeogaekgi.payTrack.service;
 
+import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
 import com.v6.yeogaekgi.payTrack.repository.PayTrackQueryRepository;
 import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
 import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -16,13 +18,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PayTrackService {
 
-    private final PaymentRepository paymentRepository;
-
-    private final TransactionRepository transactionRepository;
-
     private final PayTrackQueryRepository payTrackQueryRepository;
 
-    public List<PayTrackDTO> findPayTrackByUserCardNo(long userCardNo, int year, int month) {
+    private final UserCardRepository userCardRepository;
+
+    public List<PayTrackDTO> findPayTrackByUserCardNo(long memberId, long userCardNo, int year, int month) {
+
+        if (!isUserCardOwner(memberId, userCardNo)) {
+            throw new AccessDeniedException("You don't have permission to access this card's data");
+        }
+
         List<Object[]> payTrackByUserCardNo = payTrackQueryRepository.findPayTrackByUserCardNo(userCardNo, year, month);
 
         List<PayTrackDTO> payTrackDTOList = payTrackByUserCardNo.stream()
@@ -51,5 +56,9 @@ public class PayTrackService {
                 .collect(Collectors.toList());
 
         return payTrackDTOList;
+    }
+
+    private boolean isUserCardOwner(Long memberId, Long userCardNo) {
+        return userCardRepository.existsByIdAndMember_Id(userCardNo, memberId);
     }
 }

@@ -6,6 +6,7 @@ import com.v6.yeogaekgi.payTrack.dto.PaymentDTO;
 import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +17,15 @@ import java.util.List;
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
-    public PaymentDTO findById(Long id) {
-        return paymentRepository.findById(id)
-                .map(this::entityToDto)
-                .orElse(null);
+    public PaymentDTO findById(Long id, Long memberNo) {
+        Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Payment not found"));
+
+        if (!payment.getMember().getId().equals(memberNo)) {
+            throw new AccessDeniedException("You don't have permission to view this payment");
+        }
+
+        return entityToDto(payment);
     }
 
 

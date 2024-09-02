@@ -3,9 +3,11 @@ package com.v6.yeogaekgi.payTrack.controller;
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
 import com.v6.yeogaekgi.payTrack.dto.PayTrackRequestDTO;
 import com.v6.yeogaekgi.payTrack.service.PayTrackService;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +20,16 @@ public class PayTrackController {
 
     private final PayTrackService payTrackService;
 
-    @PostMapping("/list")
-    public ResponseEntity<List<PayTrackDTO>> getPayTrackList(@RequestBody PayTrackRequestDTO requestDTO){
-        List<PayTrackDTO> payTrackByUserCardNo = payTrackService.findPayTrackByUserCardNo(requestDTO.getUserCardNo(), requestDTO.getYear(), requestDTO.getMonth());
-        return new ResponseEntity<>(payTrackByUserCardNo, HttpStatus.OK);
+    @GetMapping("/list")
+    public ResponseEntity<List<PayTrackDTO>> getPayTrackList(
+            @RequestParam Long userCardNo,
+            @RequestParam Integer year,
+            @RequestParam Integer month,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+
+        List<PayTrackDTO> payTracks = payTrackService.findPayTrackByUserCardNo(
+                memberDetails.getMember().getId(), userCardNo, year, month);
+
+        return ResponseEntity.ok(payTracks);
     }
 }
