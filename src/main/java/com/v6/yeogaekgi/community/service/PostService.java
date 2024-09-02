@@ -122,12 +122,16 @@ public class PostService {
             }
         }
 
-        // 기존 이미지와 새 이미지 URL 합치기
-        if (postDTO.getExistingImages() != null) {
-            newImageUrls.addAll(postDTO.getExistingImages());
-        }
+        // 새 이미지 URL들을 먼저 추가
+        List<String> combinedImageUrls = new ArrayList<>();
 
-        postDTO.setImages(newImageUrls);
+        // 기존 이미지 URL들을 새 이미지 URL들 뒤에 추가
+        if (postDTO.getExistingImages() != null) {
+            combinedImageUrls.addAll(postDTO.getExistingImages());
+        }
+        combinedImageUrls.addAll(newImageUrls);
+
+        postDTO.setImages(combinedImageUrls);
         post.changeContent(postDTO.getContent());
         post.changeImages(s3Service.convertListToString2(postDTO.getImages()));
         post.changeHashtag(postDTO.getHashtag());
@@ -138,6 +142,20 @@ public class PostService {
 
     // 게시글 삭제 [bongbong]
     public void remove(Long postId) {
+
+
+        // 게시글 조회
+        Post post = repository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        // 삭제할 이미지 처리
+        if (post.getImages() != null) {
+            List<String> imageUrls = s3Service.convertStringToList(post.getImages());
+
+            for (String imageUrl : imageUrls) {
+                s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
+            }
+        }
 
         repository.deleteById(postId);
 
