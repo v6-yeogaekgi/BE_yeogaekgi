@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.util.InputStreamMultipartFile;
 import com.v6.yeogaekgi.util.PageDTO.PageRequestDTO;
 import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
@@ -16,13 +17,23 @@ import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import java.util.zip.ZipFile;
 import org.springframework.data.domain.*;
-import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.*;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
 @Service
 @Log4j2
@@ -76,8 +87,11 @@ public class PostService {
     }
 
     // 게시글 등록 [bongbong]
-    public Long register(Post post) {
-//        Post post = dtoToEntity(postDTO,member);
+    public Long register(PostDTO postDTO,Member member) {
+
+        MultipartFile multipartFile = postDTO.getZip();
+        postDTO.setImages(uploadZipFile(multipartFile));
+        Post post = dtoToEntity(postDTO,member);
         repository.save(post);
         return post.getId();
     }
@@ -118,6 +132,72 @@ public class PostService {
     }
 
 
+
+
+    // 압축해제 및 업로드
+    public List<String> uploadZipFile(MultipartFile zipFile) {
+        if (zipFile == null || zipFile.isEmpty()) {
+            return null;
+        }
+
+        File tempFile = convertToFile(zipFile);
+        List<MultipartFile> multipartFiles = new ArrayList<>();
+
+        try (ZipFile zip = new ZipFile(tempFile)) {
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (!entry.isDirectory()) {
+                    try (InputStream inputStream = zip.getInputStream(entry)) {
+                        MultipartFile multipartFile = convertToMultipartFile(inputStream, entry.getName());
+                        multipartFiles.add(multipartFile);
+                    }
+                }
+            }
+
+            // S3에 업로드하고 URL 리스트를 반환
+            return s3Service.uploadImage(multipartFiles).stream()
+                    .map(map -> map.get("imageUrl"))
+                    .collect(Collectors.toList());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to process the uploaded ZIP file.", e);
+        } finally {
+            tempFile.delete();
+        }
+    }
+
+
+    // convertToFile
+    private File convertToFile(MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("temp", null);
+            try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+                fos.write(file.getBytes());
+            }
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert MultipartFile to File", e);
+        }
+    }
+
+    // convertToMultipartFile
+    private MultipartFile convertToMultipartFile(InputStream inputStream, String fileName) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            byteArrayOutputStream.write(buffer, 0, bytesRead);
+        }
+
+        // Content-Type 설정 (예: 이미지 파일의 경우 "image/jpeg" 등)
+        String contentType = "image/png"; // 기본 Content-Type
+
+        return new InputStreamMultipartFile(fileName, fileName, contentType, byteArrayOutputStream.toByteArray());
+    }
 
 
 
