@@ -21,6 +21,7 @@ public class PostDTO {
     private int likeCnt;
     private int commentCnt;
     private Timestamp regDate,modDate;
+    private MultipartFile zip;
 
     // member
     private Long memberId;
