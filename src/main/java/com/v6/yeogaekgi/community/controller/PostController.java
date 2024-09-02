@@ -79,56 +79,24 @@ public class PostController {
 
     @PutMapping("/{postId}")
     public ResponseEntity<Long> modifyPost(@PathVariable Long postId,
-                                           @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
+                                           @RequestPart(value = "multipartFile", required = false) MultipartFile multipartFile,
                                            @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
                                            @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
                                            @RequestPart(value = "hashtag", required = false) String hashtag,
                                            @RequestPart("content") String content,
                                            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
-        // 새 이미지 업로드 -> url 리스트로 반환
-        List<String> newImageUrls = new ArrayList<>();
-        if (multipartFiles != null && !multipartFiles.isEmpty()) {
-            newImageUrls.addAll(s3Service.uploadImage(multipartFiles).stream()
-                    .map(map -> map.get("imageUrl"))
-                    .toList());
-        }
 
-        // 삭제할 이미지 처리
-        if (deleteImages != null) {
-            for (String imageUrl : deleteImages) {
-                s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
-            }
-        }
 
-        // 기존 이미지와 새 이미지 URL 합치기
-        if (existingImages != null) {
-            newImageUrls.addAll(existingImages);
-        }
+        PostDTO postDTO = PostDTO.builder().postId(postId).zip(multipartFile).existingImages(existingImages).deleteImages(deleteImages).hashtag(hashtag).content(content).build();
 
-        // 이미지 URL 리스트를 JSON 문자열로 변환
-        ObjectMapper objectMapper = new ObjectMapper();
-        String imageUrls = "[]"; // 빈 리스트로 초기화
-        try {
-            imageUrls = objectMapper.writeValueAsString(newImageUrls);
-        } catch (Exception e) {
-            log.error("Error converting image URLs to JSON string", e);
-        }
+        log.info("---------------modify post--------------");
+        log.info("postDTO: " + postDTO);
 
-        Post post = Post.builder()
-                .images(imageUrls)
-                .hashtag(hashtag)
-                .content(content)
-                .id(postId)
-                .member(memberDetails.getMember())
-                .build();
+        Long modifiedPostId = postService.modify(postDTO,memberDetails.getMember());
 
-        log.info("---------------modify post--------------" + post.getId());
-        log.info("postDTO: " + post);
 
-        postService.modify(post);
-
-        return new ResponseEntity<>(post.getId(), HttpStatus.OK);
+        return new ResponseEntity<>(modifiedPostId, HttpStatus.OK);
     }
 
 

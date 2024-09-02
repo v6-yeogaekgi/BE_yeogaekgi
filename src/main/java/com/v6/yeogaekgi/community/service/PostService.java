@@ -1,6 +1,7 @@
 package com.v6.yeogaekgi.community.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
@@ -18,7 +19,9 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+
 import java.util.zip.ZipFile;
+
 import org.springframework.data.domain.*;
 
 import org.springframework.data.domain.PageRequest;
@@ -49,17 +52,17 @@ public class PostService {
     public PageResultDTO<PostDTO> getPostList(SearchDTO search, Member member) {
         Slice<Post> result = null;
         Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
-        if("content".equals(search.getType())){
+        if ("content".equals(search.getType())) {
             result = repository.findByContentContaining(search.getKeyword(), pageable);
         }
-        if("hashtag".equals(search.getType())){
+        if ("hashtag".equals(search.getType())) {
             result = repository.findByHashtag(search.getKeyword(), pageable);
         }
-        if(search.getMyPost()){
+        if (search.getMyPost()) {
             result = repository.findByMember_Id(member.getId(), pageable);
         }
 
-        if(result != null){
+        if (result != null) {
             List<PostDTO> content = result.getContent().stream()
                     .map(Post -> entityToDto(Post, member))
                     .collect(Collectors.toList());
@@ -75,44 +78,84 @@ public class PostService {
     // 게시글 상세
     public PostDTO getPost(Long postId, Member member) {
 //        // memberId 불러옴
-        Long memberId= member == null ? 0L : member.getId();
+        Long memberId = member == null ? 0L : member.getId();
 
         Optional<Post> post = repository.findById(postId);
         PostDTO postDto = null;
-        if(post.isPresent()){
+        if (post.isPresent()) {
             postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId,  memberId));
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
         }
         return postDto;
     }
 
     // 게시글 등록 [bongbong]
-    public Long register(PostDTO postDTO,Member member) {
+    public Long register(PostDTO postDTO, Member member) {
 
         MultipartFile multipartFile = postDTO.getZip();
         postDTO.setImages(uploadZipFile(multipartFile));
-        Post post = dtoToEntity(postDTO,member);
+        Post post = dtoToEntity(postDTO, member);
         repository.save(post);
         return post.getId();
     }
 
     // 게시글 수정 [bongbong]
-    public void modify(Post post) {
+    public Long modify(PostDTO postDTO, Member member) {
 
-        Optional<Post> result = repository.findById(post.getId());
-        if(result.isPresent()){
-//            Post post = result.get();
-//            post.changeContent(postDTO.getContent());
-//            post.changeImages(postDTO.getImages());
-//            post.changeHashtag(postDTO.getHashtag());
+        // 게시글 조회
+        Post post = repository.findById(postDTO.getPostId())
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
-            repository.save(post);
+        List<String> newImageUrls = new ArrayList<>();
+        MultipartFile multipartFile = postDTO.getZip();
+
+
+        // 새 이미지 업로드 -> url 리스트로 반환
+        if (multipartFile != null && !multipartFile.isEmpty()) {
+            newImageUrls = uploadZipFile(multipartFile);
         }
 
+        // 삭제할 이미지 처리
+        if (postDTO.getDeleteImages() != null) {
+            for (String imageUrl : postDTO.getDeleteImages()) {
+                s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
+            }
+        }
+
+        // 새 이미지 URL들을 먼저 추가
+        List<String> combinedImageUrls = new ArrayList<>();
+
+        // 기존 이미지 URL들을 새 이미지 URL들 뒤에 추가
+        if (postDTO.getExistingImages() != null) {
+            combinedImageUrls.addAll(postDTO.getExistingImages());
+        }
+        combinedImageUrls.addAll(newImageUrls);
+
+        postDTO.setImages(combinedImageUrls);
+        post.changeContent(postDTO.getContent());
+        post.changeImages(s3Service.convertListToString2(postDTO.getImages()));
+        post.changeHashtag(postDTO.getHashtag());
+
+        repository.save(post);
+        return post.getId();
     }
 
     // 게시글 삭제 [bongbong]
     public void remove(Long postId) {
+
+
+        // 게시글 조회
+        Post post = repository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        // 삭제할 이미지 처리
+        if (post.getImages() != null) {
+            List<String> imageUrls = s3Service.convertStringToList(post.getImages());
+
+            for (String imageUrl : imageUrls) {
+                s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
+            }
+        }
 
         repository.deleteById(postId);
 
@@ -130,8 +173,6 @@ public class PostService {
         }
         return hashtags;
     }
-
-
 
 
     // 압축해제 및 업로드
@@ -200,10 +241,8 @@ public class PostService {
     }
 
 
-
-
     // ============================= convert type =============================
-    public Post dtoToEntity(PostDTO postDTO, Member member){
+    public Post dtoToEntity(PostDTO postDTO, Member member) {
         Post post = Post.builder()
                 .id(postDTO.getPostId())
                 .content(postDTO.getContent())
@@ -215,7 +254,8 @@ public class PostService {
                 .build();
         return post;
     }
-    public PostDTO entityToDto(Post post, Member member){
+
+    public PostDTO entityToDto(Post post, Member member) {
 
         PostDTO postDTO = PostDTO.builder()
                 .postId(post.getId())
@@ -229,13 +269,12 @@ public class PostService {
                 .memberId(post.getMember().getId())
                 .nickname(post.getMember().getNickname())
                 .code(post.getMember().getCountry().getCode())
-                .currentMemberId(member==null? null : member.getId())
-                .currentMemberCode(member==null? null :member.getCountry().getCode())
+                .currentMemberId(member == null ? null : member.getId())
+                .currentMemberCode(member == null ? null : member.getCountry().getCode())
                 .build();
 
         return postDTO;
     }
-
 
 
 }

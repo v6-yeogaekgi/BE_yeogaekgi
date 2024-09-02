@@ -21,7 +21,7 @@ public class PostDTO {
     private int likeCnt;
     private int commentCnt;
     private Timestamp regDate,modDate;
-    private MultipartFile zip;
+
 
     // member
     private Long memberId;
@@ -32,4 +32,8 @@ public class PostDTO {
     private boolean likeState; // 현재 접속한 유저가 좋아요한 게시글인지. 아니면0, 맞으면1
     private Long currentMemberId;
     private String currentMemberCode;
+    private MultipartFile zip;
+    private List<String> existingImages;
+    private List<String> deleteImages;
+
 }
