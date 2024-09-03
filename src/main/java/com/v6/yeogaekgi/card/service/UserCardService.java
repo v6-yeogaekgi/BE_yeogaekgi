@@ -10,6 +10,7 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,10 @@ public class UserCardService {
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
-    public UserCardDTO getUserCardByUserCardId(Long userCardId) {
+    public UserCardDTO getUserCardByUserCardId(Long userCardId, Long memberId) {
+        if (!isUserCardOwner(memberId, userCardId)) {
+            throw new AccessDeniedException("You don't have permission to access this card's data");
+        }
         return userCardRepository.findById(userCardId)
                 .map(this::entityToDto)
                 .orElseThrow(() -> new EntityNotFoundException("UserCard not found with id: " + userCardId));
@@ -47,12 +51,12 @@ public class UserCardService {
     }
 
     @Transactional
-    public boolean changesUserCardStarred(UserCardDTO userCardDTO){
+    public boolean changesUserCardStarred(UserCardDTO userCardDTO, Long memberId){
         // parameter userCardDTO ->
         // userCardNo = 주카드 타겟
-        // memberNo = 주카드 갱신 사용자
+        // memberId = 주카드 갱신 사용자
 
-        UserCardDTO prevUserCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+        UserCardDTO prevUserCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
         UserCardDTO nextUserCard = null;
 
         try{
@@ -78,10 +82,10 @@ public class UserCardService {
         }
     }
 
-    public boolean deleteUserCardStarred(UserCardDTO userCardDTO){
+    public boolean deleteUserCardStarred(UserCardDTO userCardDTO, Long memberId){
 
         try {
-            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
             int prevStarred = userCard.getStarred();
             userCard.updateStarred(0);
             UserCard save = userCardRepository.save(dtoToEntity(userCard));
@@ -93,9 +97,9 @@ public class UserCardService {
         return false;
     }
 
-    public boolean deleteUserCard(UserCardDTO userCardDTO){
+    public boolean deleteUserCard(UserCardDTO userCardDTO, Long memberId){
         try {
-            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId());
+            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
             userCard.updateStatus(2);
             // 삭제 대상 카드가 주카드일때 주카드 상태 해제 이후 save
             if(userCard.getStarred()==1) userCard.setStarred(0);
@@ -135,21 +139,9 @@ public class UserCardService {
         return result;
     }
 
-//    public List<UserCardDTO> getAll(UserCardDTO userCardDTO) {
-//        log.info("==================");
-//        log.info("userCardDTO memberNo: " + userCardDTO.getMemberId());
-//        ArrayList<UserCard> result = new ArrayList<>();
-//        List<UserCard> find = userCardRepository.findByMember_Id(userCardDTO.getMemberId());
-//        for(UserCard uc : find) {
-//            log.info(uc.toString());
-//            log.info(uc.getCard().toString());
-//            log.info(uc.getCard().getArea());
-//            if(uc.getCard().getArea().equals(userCardDTO.getArea())) {
-//                result.add(uc);
-//            }
-//        }
-//        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
-//    }
+    private boolean isUserCardOwner(Long memberId, Long userCardId) {
+        return userCardRepository.existsByIdAndMember_Id(userCardId, memberId);
+    }
 
     public UserCard dtoToEntity(UserCardDTO userCardDTO) {
         UserCard userCard = UserCard.builder()
