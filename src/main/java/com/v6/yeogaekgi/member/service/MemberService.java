@@ -9,17 +9,27 @@ import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.member.repository.CountryRepository;
 import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.member.repository.RefreshTokenRepository;
+import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
 public class MemberService {
+    private static final Logger log = LoggerFactory.getLogger(MemberService.class);
     private final MemberRepository memberRepository;
     private final CountryRepository countryRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenProvider tokenProvider;
 
     @Transactional
     public void signUp(MemberRequestDTO memberRequestDto){
@@ -66,5 +76,17 @@ public class MemberService {
         return new MemberResponseDTO(member.getEmail(), member.getName(), member.getNickname(),
                 member.getGender(), member.getPhoneNumber(), member.getPassport(),
                 member.getAccountNumber(), member.getBank(), member.getCountry());
+    }
+
+    @Transactional
+    public boolean logout(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+            int deletedCount = refreshTokenRepository.deleteByEmail(memberDetails.getMember().getEmail());
+            if(deletedCount > 0) {
+                log.info("Logout success");
+                return true;
+            } else {
+                log.info("Logout delete fail");
+                return false;
+            }
     }
 }
