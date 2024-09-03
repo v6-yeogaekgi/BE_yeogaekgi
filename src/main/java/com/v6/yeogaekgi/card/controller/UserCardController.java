@@ -4,6 +4,7 @@ import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.service.CardService;
 import com.v6.yeogaekgi.card.service.UserCardService;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -33,9 +34,9 @@ public class UserCardController {
     }
 
     @GetMapping("/{userCardId}")
-    public ResponseEntity<UserCardDTO> getDetail(@PathVariable Long userCardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 카드번호로 카드 상세 조회
+    public ResponseEntity<UserCardDTO> getDetail(@PathVariable Long userCardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails, HttpServletRequest request) { // 카드번호로 카드 상세 조회
         try{
-            return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardId), HttpStatus.OK);
+            return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardId, memberDetails.getMember().getId()), HttpStatus.OK);
         } catch (RuntimeException e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -47,7 +48,7 @@ public class UserCardController {
         // security 에서 받을 정보 -> member
         // Long id = memberDetails.getMember().getId();
         try {
-            boolean result = userCardService.changesUserCardStarred(userCardDTO);
+            boolean result = userCardService.changesUserCardStarred(userCardDTO, memberDetails.getMember().getId());
             if(result){
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -63,7 +64,7 @@ public class UserCardController {
         // security 에서 받을 정보 -> member
         // Long id = memberDetails.getMember().getId();
         try {
-            boolean result = userCardService.deleteUserCardStarred(userCardDTO);
+            boolean result = userCardService.deleteUserCardStarred(userCardDTO, memberDetails.getMember().getId());
 
             if(result){
                 return new ResponseEntity<>(HttpStatus.OK);
@@ -77,7 +78,7 @@ public class UserCardController {
     @PutMapping("/delete/card")
     public ResponseEntity<String> deleteCard(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
         try{
-            boolean result = userCardService.deleteUserCard(userCardDTO);
+            boolean result = userCardService.deleteUserCard(userCardDTO, memberDetails.getMember().getId());
             if(result){
                 return new ResponseEntity<>("success", HttpStatus.OK);
             }
