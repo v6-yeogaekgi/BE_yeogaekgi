@@ -154,11 +154,16 @@ public class S3Service {
         }
     }
     public String convertListToString2(List<String> list) {
-        // List<String>을 JSON 문자열로 변환
-        try {
-            return new ObjectMapper().writeValueAsString(list);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("변환 중 오류 발생", e);
+        if (list != null) {
+            // List<String>을 JSON 문자열로 변환
+            try {
+                return new ObjectMapper().writeValueAsString(list);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("변환 중 오류 발생", e);
+            }
+        } else {
+            // list가 null인 경우 빈 문자열 반환
+            return "";
         }
     }
 
