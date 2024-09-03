@@ -96,6 +96,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //                                .requestMatchers("**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.GET).permitAll()
+                                .requestMatchers("/members/logout").permitAll()
                                 .anyRequest().authenticated()
 
         );
