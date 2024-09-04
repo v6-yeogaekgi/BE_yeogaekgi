@@ -19,7 +19,7 @@ public class UserCardServiceTests extends CommonTests {
     @Test
     public void testGetUserCard() {
         long userCardNo = 399;
-        UserCardDTO userCardByCardId = userCardService.getUserCardByUserCardId(userCardNo);
+        UserCardDTO userCardByCardId = userCardService.getUserCardByUserCardId(userCardNo, member.getId());
         System.out.println(userCardByCardId);
 
         assertNotNull(userCardByCardId);
@@ -34,7 +34,7 @@ public class UserCardServiceTests extends CommonTests {
                 .userCardId(userCardNo)
                 .memberId(member_no)
                 .build();
-        userCardService.changesUserCardStarred(cardDTO);
+        userCardService.changesUserCardStarred(cardDTO, member_no);
     }
 
     @Test

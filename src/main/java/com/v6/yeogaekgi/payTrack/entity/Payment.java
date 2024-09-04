@@ -2,6 +2,7 @@ package com.v6.yeogaekgi.payTrack.entity;
 
 import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.member.entity.Member;
+import com.v6.yeogaekgi.services.entity.Services;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,7 +53,7 @@ public class Payment {
     @JoinColumn(name = "member_no", nullable = false)
     private Member member;
 
-//    @ManyToOne
-//    @JoinColumn(name = "service_no", nullable = false)
-//    private Service service;
+    @ManyToOne
+    @JoinColumn(name = "service_no", nullable = true)
+    private Services services;
 }
