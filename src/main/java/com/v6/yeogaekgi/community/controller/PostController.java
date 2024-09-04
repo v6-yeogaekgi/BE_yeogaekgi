@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.community.service.PostLikeService;
 import com.v6.yeogaekgi.community.service.PostService;
+import com.v6.yeogaekgi.exception.ErrorDetails;
 import com.v6.yeogaekgi.member.dto.MemberResponseDTO;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,12 +70,19 @@ public class PostController {
             @RequestParam("content") String content,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
-        PostDTO postDTO = PostDTO.builder().zip(multipartFile).hashtag(hashtag).content(content).build();
+        try {
+            PostDTO postDTO = PostDTO.builder().zip(multipartFile).hashtag(hashtag).content(content).build();
 
-        log.info("\n----------------register Post-------------------");
-        log.info("postDTO : " + postDTO);
-        Long postId = postService.register(postDTO, memberDetails.getMember());
-        return new ResponseEntity<>(postId, HttpStatus.OK);
+            log.info("\n----------------register Post-------------------");
+            log.info("postDTO : " + postDTO);
+            Long postId = postService.register(postDTO, memberDetails.getMember());
+            return new ResponseEntity<>(postId, HttpStatus.OK);
+
+        }catch (Exception e) {
+
+            ErrorDetails errorDetails = new ErrorDetails(LocalDate.now(), e.getMessage(), request.getDescription(false))
+        }
+
     }
 
 
