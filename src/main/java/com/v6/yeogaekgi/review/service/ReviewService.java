@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,7 +87,13 @@ public class ReviewService {
             System.out.println(payment.get().getId());
             System.out.println(payment.get());
             System.out.println("------------------------");
-            savedReview.setPayment(payment.get());
+            try{
+                savedReview.setPayment(payment.get());
+            }
+            catch (Exception e){
+                Long error = -1L;
+                return error;
+            }
         }
         return savedReview.getId();
     }
@@ -94,6 +101,12 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDTO> ImageList (Long serviceId) {
         List<Review> reviews = reviewRepository.findImageMatchByServicesId(serviceId);
+        List<Integer> totalScore = reviewRepository.findScoreByServicesId(serviceId);
+        int score = 0;
+        System.out.println(totalScore);
+        for (Integer s : totalScore){
+            score += s;
+        }
         List<ReviewResponseDTO> result = new ArrayList<>();
         for (Review review : reviews) {
             ReviewResponseDTO dto = ReviewResponseDTO.builder()
@@ -101,6 +114,7 @@ public class ReviewService {
                     .nickname(review.getMember().getNickname())
                     .country(review.getMember().getCountry())
                     .score(review.getScore())
+                    .totalScore(score)
                     .build();
             result.add(dto);
         }
