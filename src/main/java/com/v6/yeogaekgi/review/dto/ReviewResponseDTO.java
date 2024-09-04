@@ -27,4 +27,5 @@ public class ReviewResponseDTO {
     private Timestamp regDate;
     private Timestamp modDate;
     private Long paymentId;
+    private int totalScore;
 }
