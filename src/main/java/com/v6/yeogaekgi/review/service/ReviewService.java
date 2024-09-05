@@ -222,13 +222,13 @@ public class ReviewService {
         }
 
         List<String> images = review.getImages();
-        List<String> thumbnails = review.getThumbnails();
+//        List<String> thumbnails = review.getThumbnails();
         for (String image : images) {
             s3Service.deleteImage(image);
         }
-        for (String thumbnail : thumbnails) {
-            s3Service.deleteImage(thumbnail);
-        }
+//        for (String thumbnail : thumbnails) {
+//            s3Service.deleteImage(thumbnail);
+//        }
         reviewRepository.delete(review);
     }
 }

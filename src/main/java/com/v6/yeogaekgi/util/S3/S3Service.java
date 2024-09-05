@@ -94,9 +94,9 @@ public class S3Service {
 
         // 썸네일 삭제
 //        String thumbnailFileName = createThumbnailFileName(fileName);
-        String thumbnailFileName = createThumbnailFileName(objectKey);
-        System.out.println("Deleting thumbnail: " + thumbnailFileName);
-        amazonS3.deleteObject(new DeleteObjectRequest(bucket, thumbnailFileName));
+//        String thumbnailFileName = createThumbnailFileName(objectKey);
+//        System.out.println("Deleting thumbnail: " + thumbnailFileName);
+//        amazonS3.deleteObject(new DeleteObjectRequest(bucket, thumbnailFileName));
     }
 
     private String extractObjectKeyFromUrl(String url){
