@@ -23,14 +23,6 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
 """)
     List<Review> findImageMatchByServicesId(Long servicesId);
 
-    @Query("""
-    select r.score from Review r
-    where r.services.id = :servicesId
-    and r.status != 1
-""")
-    List<Integer> findScoreByServicesId(Long servicesId);
-
-
 
     @EntityGraph(attributePaths = {"services"})
     List<Review> findAllByServicesId(Long servicesId);

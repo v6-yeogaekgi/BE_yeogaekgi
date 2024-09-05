@@ -101,12 +101,6 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewResponseDTO> ImageList (Long serviceId) {
         List<Review> reviews = reviewRepository.findImageMatchByServicesId(serviceId);
-        List<Integer> totalScore = reviewRepository.findScoreByServicesId(serviceId);
-        int score = 0;
-        System.out.println(totalScore);
-        for (Integer s : totalScore){
-            score += s;
-        }
         List<ReviewResponseDTO> result = new ArrayList<>();
         for (Review review : reviews) {
             ReviewResponseDTO dto = ReviewResponseDTO.builder()
@@ -114,7 +108,6 @@ public class ReviewService {
                     .nickname(review.getMember().getNickname())
                     .country(review.getMember().getCountry())
                     .score(review.getScore())
-                    .totalScore(score)
                     .build();
             result.add(dto);
         }
