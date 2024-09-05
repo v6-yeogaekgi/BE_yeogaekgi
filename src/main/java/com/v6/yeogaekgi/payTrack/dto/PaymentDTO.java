@@ -33,6 +33,6 @@ public class PaymentDTO {
     // member
     private Long memberNo;
 
-    //Services
-//    private Long serviceNo;
+//    Services
+    private Long serviceNo;
 }

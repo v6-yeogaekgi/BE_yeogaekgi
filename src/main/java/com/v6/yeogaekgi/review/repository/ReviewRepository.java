@@ -23,6 +23,9 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
 """)
     List<Review> findImageMatchByServicesId(Long servicesId);
 
+    @Query("SELECT r FROM Review r WHERE r.member.id = :memberId AND r.payment IS NOT NULL")
+    List<Review> findByMemberIdNotNull(@Param("memberId") Long memberId);
+
 
     @EntityGraph(attributePaths = {"services"})
     List<Review> findAllByServicesId(Long servicesId);

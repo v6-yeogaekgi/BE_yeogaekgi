@@ -2,6 +2,7 @@ package com.v6.yeogaekgi.payTrack.controller;
 
 import com.v6.yeogaekgi.payTrack.dto.PayDetailRequestDTO;
 import com.v6.yeogaekgi.payTrack.dto.PaymentDTO;
+import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.payTrack.service.PaymentService;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,4 +34,9 @@ public class PaymentController {
         }
     }
 
+    @GetMapping("/getPaymentsWithoutReviews")
+    public ResponseEntity<List<PaymentDTO>> getPaymentsWithoutReviews(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
+            List<PaymentDTO> paymentDTOS = paymentService.findPaymentsWithoutReviews(memberDetails.getMember().getId());
+            return new ResponseEntity<>(paymentDTOS, HttpStatus.OK);
+    }
 }
