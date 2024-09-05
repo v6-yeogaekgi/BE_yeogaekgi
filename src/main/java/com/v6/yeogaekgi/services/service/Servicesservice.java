@@ -42,8 +42,30 @@ public class Servicesservice {
         return servicesRepository.findAllServices(area);
     }
 
-    public List<Services> findServicesByTypesAndArea(List<ServicesType> type,String area){
-        return servicesRepository.findServicesByTypesAndArea(type,area);
+    public List<Services> findServicesWithFilters(List<ServicesType> type, String area, Boolean myLike, Boolean myReview, Long memberId) {
+        // myLike와 myReview가 모두 true인 경우
+        if (Boolean.TRUE.equals(myLike) && Boolean.TRUE.equals(myReview)) {
+            return (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyReviewANDmyLike(area, memberId)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyReviewANDmyLike(type, area, memberId);
+        }
+
+        // myLike만 true인 경우
+        if (Boolean.TRUE.equals(myLike)) {
+            return (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyLike(area, memberId)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyLike(type, area, memberId);
+        }
+
+        // myReview만 true인 경우
+        if (Boolean.TRUE.equals(myReview)) {
+            return (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyReview(area, memberId)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyReview(type, area, memberId);
+        }
+
+        // 기본적으로 타입 필터만 적용된 서비스 조회
+        return servicesRepository.findServicesByTypesAndArea(type, area);
     }
 
     @Transactional

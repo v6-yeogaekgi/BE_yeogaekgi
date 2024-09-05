@@ -25,16 +25,19 @@ public class ServicesController {
     @GetMapping("/servicesList/{area}")
     public ResponseEntity<List<Services>> getAllServices(
             @PathVariable String area,
-            @RequestParam(required = false) List<ServicesType> type) {
-
+            @RequestParam(required = false) List<ServicesType> type,
+            @RequestParam(required = false) Boolean myLike,
+            @RequestParam(required = false) Boolean myReview,
+            @AuthenticationPrincipal MemberDetailsImpl memberDetails
+    ) {
         List<Services> services;
-
-        if (type == null || type.isEmpty()) {
+        Long memberId = memberDetails.getMember().getId();
+        // 기본 필터링 조건 설정
+        if ((type == null || type.isEmpty()) && (myLike == null || !myLike) && (myReview == null || !myReview)) {
             services = servicesservice.findAllServices(area);
         } else {
-            services = servicesservice.findServicesByTypesAndArea(type, area);
+            services = servicesservice.findServicesWithFilters(type, area, myLike, myReview, memberId);
         }
-
         return new ResponseEntity<>(services, HttpStatus.OK);
     }
 
