@@ -15,6 +15,14 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("""
     select p from Payment p
     where p.member.id = :memberId
+    and p.services is not null
+""")
+    List<Payment> findAllPaymentsByMemberIdWithNonNullService(@Param("memberId") Long memberId);
+
+
+    @Query("""
+    select p from Payment p
+    where p.member.id = :memberId
     and p.serviceName LIKE %:serviceName%
 """)
     Optional<Payment> findByMemberIdAndServiceName(@Param("memberId") Long memberId,
