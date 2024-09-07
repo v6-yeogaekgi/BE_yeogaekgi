@@ -26,5 +26,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     and p.serviceName LIKE %:serviceName%
 """)
     Optional<Payment> findByMemberIdAndServiceName(@Param("memberId") Long memberId,
-                                                        @Param("serviceName") String serviceName);
+                                                   @Param("serviceName") String serviceName);
 }

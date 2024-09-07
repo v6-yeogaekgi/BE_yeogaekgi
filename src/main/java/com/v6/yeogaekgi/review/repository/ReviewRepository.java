@@ -40,4 +40,6 @@ public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListR
     @Modifying
     @Query("UPDATE Review r SET r.payment = :payment WHERE r.id = :reviewId")
     void updatePaymentById(@Param("reviewId") Long reviewId, @Param("payment") Payment payment);
+
+    Boolean existsByServicesIdAndMemberId(Long servicesId, Long memberId);
 }
