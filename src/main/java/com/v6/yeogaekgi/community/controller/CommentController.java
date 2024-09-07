@@ -22,6 +22,8 @@ import java.util.List;
 @CrossOrigin(origins = {"*"})
 public class CommentController {
 
+    // cicd test
+
     private final CommentService commentService;
 
     @GetMapping("all/{postId}")
