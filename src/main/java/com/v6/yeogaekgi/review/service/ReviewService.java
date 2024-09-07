@@ -67,6 +67,10 @@ public class ReviewService {
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
         String service = servicesRepository.findServiceNameById(servicesId);
         Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service);
+        Boolean reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId, member.getId());
+        if(reviewExist){
+            return -1L;
+        }
         if (multipartFile != null){
             List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
             List<String> imageList = new ArrayList<>();
@@ -83,10 +87,6 @@ public class ReviewService {
         Review savedReview = reviewRepository.save(review);
         System.out.println(savedReview);
         if(payment.isPresent()) {
-            System.out.println("------------------------");
-            System.out.println(payment.get().getId());
-            System.out.println(payment.get());
-            System.out.println("------------------------");
             try{
                 savedReview.setPayment(payment.get());
             }
