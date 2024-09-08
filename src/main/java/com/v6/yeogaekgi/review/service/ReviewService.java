@@ -69,17 +69,19 @@ public class ReviewService {
         String service = servicesRepository.findServiceNameById(servicesId);
 
         Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewRequestDTO.getPayNo());
-        if(!payment.isPresent()) {
-            throw new EntityNotFoundException("Payment not found with id: " + reviewRequestDTO.getPayNo());
-        }
+//        if(!payment.isPresent()) {
+//            throw new EntityNotFoundException("Payment not found with id: " + reviewRequestDTO.getPayNo());
+//        }
 
-        Boolean reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
+//        Boolean reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
+
+        Boolean reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getId());
+
         if(reviewExist){
             throw new IllegalStateException("Review already exists for this payment");
         }
 
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
-        review.setPayment(payment.get());
 
         if (multipartFile != null){
             List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
@@ -96,6 +98,10 @@ public class ReviewService {
         }
 
         Review savedReview = reviewRepository.save(review);
+        if(payment.isPresent()){
+            savedReview.setPayment(payment.get());
+        }
+
         System.out.println(savedReview);
 
         return savedReview.getId();
