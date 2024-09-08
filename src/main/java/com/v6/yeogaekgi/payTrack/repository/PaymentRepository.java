@@ -4,7 +4,6 @@ import com.v6.yeogaekgi.payTrack.entity.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +23,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     select p from Payment p
     where p.member.id = :memberId
     and p.serviceName LIKE %:serviceName%
+    and p.id = :payNo
 """)
     Optional<Payment> findByMemberIdAndServiceName(@Param("memberId") Long memberId,
-                                                   @Param("serviceName") String serviceName);
+                                                   @Param("serviceName") String serviceName, Long payNo);
 }

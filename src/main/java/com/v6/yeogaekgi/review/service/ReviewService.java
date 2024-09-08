@@ -35,6 +35,7 @@ public class ReviewService {
                 .score(reviewRequestDTO.getScore())
                 .content(reviewRequestDTO.getContent())
                 .member(member)
+                .payment(Payment.builder().id(reviewRequestDTO.getPayNo()).build())
                 .services(Services.builder().id(servicesId).build())
                 .build();
         return review;
@@ -66,7 +67,7 @@ public class ReviewService {
     public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
         String service = servicesRepository.findServiceNameById(servicesId);
-        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service);
+        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewRequestDTO.getPayNo());
         Boolean reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId, member.getId());
         if(reviewExist){
             return -1L;

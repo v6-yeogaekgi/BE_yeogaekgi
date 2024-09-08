@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 
 public class ReviewRequestDTO {
+    private Long payNo;
     private int score;
     private String content;
     private int status;
