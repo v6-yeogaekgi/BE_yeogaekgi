@@ -12,6 +12,7 @@ import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Log4j2
 public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final UserCardRepository userCardRepository;
@@ -45,20 +47,26 @@ public class PaymentService {
 
 
         if(paymentDTO.getPayType() == 1){
-            payBalance += paymentDTO.getPayPrice();
+            transitBalance -= paymentDTO.getPayPrice();
         }else{
-            transitBalance += paymentDTO.getPayPrice();
+            payBalance -= paymentDTO.getPayPrice();
         }
-
-
 
         prevUserCard.updatePayBalance(payBalance);
         prevUserCard.updateTransitBalance(transitBalance);
         userCardRepository.save(prevUserCard);
 
-        paymentRepository.save(
-                dtoToEntity(paymentDTO)
-        );
+        if(paymentDTO.getServiceNo() != null) {
+            Optional<Services> service = servicesRepository.findById(paymentDTO.getServiceNo());
+            if (service.isPresent()) {
+                paymentDTO.setServiceName(service.get().getName());
+            } else {
+                log.warn("Service not found for serviceNo: {}", paymentDTO.getServiceNo());
+                paymentDTO.setServiceName("Unknown Service");
+            }
+        }
+
+        paymentRepository.save(dtoToEntity(paymentDTO));
 
         return true;
     }

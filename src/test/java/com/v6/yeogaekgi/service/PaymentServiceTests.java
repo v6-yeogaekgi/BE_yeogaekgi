@@ -18,15 +18,15 @@ public class PaymentServiceTests {
     void insertPaymentHistory(){
 
         PaymentDTO dto = PaymentDTO.builder()
-                .payType(1)
-                .payPrice(17000)
+                .payType(0)
+                .payPrice(13000)
                 .payDate(new Timestamp(System.currentTimeMillis()))
-                .payBalanceSnap(48000)
-                .transitBalanceSnap(17200)
+                .payBalanceSnap(0)
+                .transitBalanceSnap(0)
                 .status(1)
-                .serviceName("Luge")
-                .userCardNo(1L  )
-                .memberNo(1L)
+                .serviceNo(30L)
+                .userCardNo(3L)
+                .memberNo(4L)
                 .build();
        paymentService.insertPayment(dto);
 
