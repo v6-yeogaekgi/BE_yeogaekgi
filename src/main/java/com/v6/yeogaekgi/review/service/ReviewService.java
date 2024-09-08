@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import com.v6.yeogaekgi.util.S3.S3Service;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -35,7 +36,7 @@ public class ReviewService {
                 .score(reviewRequestDTO.getScore())
                 .content(reviewRequestDTO.getContent())
                 .member(member)
-                .payment(Payment.builder().id(reviewRequestDTO.getPayNo()).build())
+//                .payment(Payment.builder().id(reviewRequestDTO.getPayNo()).build())
                 .services(Services.builder().id(servicesId).build())
                 .build();
         return review;
@@ -65,13 +66,21 @@ public class ReviewService {
 
     @Transactional
     public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
-        Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
         String service = servicesRepository.findServiceNameById(servicesId);
+
         Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewRequestDTO.getPayNo());
-        Boolean reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId, member.getId());
-        if(reviewExist){
-            return -1L;
+        if(!payment.isPresent()) {
+            throw new EntityNotFoundException("Payment not found with id: " + reviewRequestDTO.getPayNo());
         }
+
+        Boolean reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
+        if(reviewExist){
+            throw new IllegalStateException("Review already exists for this payment");
+        }
+
+        Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
+        review.setPayment(payment.get());
+
         if (multipartFile != null){
             List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
             List<String> imageList = new ArrayList<>();
@@ -85,17 +94,10 @@ public class ReviewService {
                 review.setThumbnails(thumbnailList);
             }
         }
+
         Review savedReview = reviewRepository.save(review);
         System.out.println(savedReview);
-        if(payment.isPresent()) {
-            try{
-                savedReview.setPayment(payment.get());
-            }
-            catch (Exception e){
-                Long error = -1L;
-                return error;
-            }
-        }
+
         return savedReview.getId();
     }
 
