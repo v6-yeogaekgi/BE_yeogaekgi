@@ -19,21 +19,17 @@ public class UserCardRepositoryTests {
 
     @Test
     void insertCard() {
-        LongStream.rangeClosed(1, 100).forEach(i -> {
             UserCard userCard = UserCard.builder()
                     .expDate(
                             new Timestamp(System.currentTimeMillis() + 77L * 24 * 60 * 60 * 1000)
                     )
-                    .payBalance(10000)
-                    .starred(i%2==0?0:1)
-                    .status(i%3==0?0:(i%3==1?1:2))
-                    .transitBalance(10000)
-                    .card(Card.builder().id(i).build())
-                    .member(Member.builder().id(i).build())
+                    .payBalance(0)
+                    .starred(1)
+                    .status(1)
+                    .transitBalance(0)
+                    .card(Card.builder().id(1L).build())
+                    .member(Member.builder().id(5L).build())
                     .build();
-
             userCardRepository.save(userCard);
-        });
-
     }
 }
