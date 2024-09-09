@@ -67,18 +67,17 @@ public class ReviewService {
     @Transactional
     public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
         String service = servicesRepository.findServiceNameById(servicesId);
+        Boolean reviewExist = null;
 
         Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewRequestDTO.getPayNo());
-//        if(!payment.isPresent()) {
-//            throw new EntityNotFoundException("Payment not found with id: " + reviewRequestDTO.getPayNo());
-//        }
-
-//        Boolean reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
-
-        Boolean reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getId());
+        if(!payment.isPresent()) {
+            reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getId());
+        } else {
+            reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
+        }
 
         if(reviewExist){
-            throw new IllegalStateException("Review already exists for this payment");
+            return -1L;
         }
 
         Review review = dtoToEntity(reviewRequestDTO,member,servicesId);

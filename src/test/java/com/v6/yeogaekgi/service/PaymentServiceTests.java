@@ -16,17 +16,16 @@ public class PaymentServiceTests {
 
     @Test
     void insertPaymentHistory(){
-
         PaymentDTO dto = PaymentDTO.builder()
                 .payType(0)
-                .payPrice(13000)
+                .payPrice(25000)
                 .payDate(new Timestamp(System.currentTimeMillis()))
                 .payBalanceSnap(0)
                 .transitBalanceSnap(0)
                 .status(1)
-                .serviceNo(30L)
-                .userCardNo(3L)
-                .memberNo(4L)
+                .serviceNo(40L)
+                .userCardNo(4L)
+                .memberNo(5L)
                 .build();
         paymentService.insertPayment(dto);
 
