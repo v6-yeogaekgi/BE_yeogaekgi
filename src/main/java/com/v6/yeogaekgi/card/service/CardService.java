@@ -24,7 +24,7 @@ public class CardService {
 
     public Card dtoToEntity(CardDTO cardDTO) {
         Card card = Card.builder()
-                .id(cardDTO.getCardId())
+                .no(cardDTO.getCardNo())
                 .design(cardDTO.getDesign())
                 .cardName(cardDTO.getCardName())
                 .area(cardDTO.getArea())
@@ -34,7 +34,7 @@ public class CardService {
 
     public CardDTO entityToDto(Card card) {
         CardDTO cardDTO = CardDTO.builder()
-                .cardId(card.getId())
+                .cardNo(card.getNo())
                 .design(card.getDesign())
                 .cardName(card.getCardName())
                 .area(card.getArea())

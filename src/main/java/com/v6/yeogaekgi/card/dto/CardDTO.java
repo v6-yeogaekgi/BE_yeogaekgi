@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 
 public class CardDTO {
-    private Long userCardId;
-    private Long cardId;
+    private Long userCardNo;
+    private Long cardNo;
     private String design;
     private String cardName;
     private String area;

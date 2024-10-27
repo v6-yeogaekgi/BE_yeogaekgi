@@ -20,7 +20,7 @@ public class UserCard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="user_card_no")
-    private Long id;
+    private Long no;
 
     // 등록날짜 + 77일
     @Column(name = "exp_date" ,nullable=false)
