@@ -3,8 +3,6 @@ package com.v6.yeogaekgi.payTrack.service;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
 import com.v6.yeogaekgi.payTrack.repository.PayTrackQueryRepository;
-import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
-import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -22,9 +20,9 @@ public class PayTrackService {
 
     private final UserCardRepository userCardRepository;
 
-    public List<PayTrackDTO> findPayTrackByUserCardNo(long memberId, long userCardNo, int year, int month) {
+    public List<PayTrackDTO> findPayTrackByUserCardNo(long memberNo, long userCardNo, int year, int month) {
 
-        if (!isUserCardOwner(memberId, userCardNo)) {
+        if (!isUserCardOwner(memberNo, userCardNo)) {
             throw new AccessDeniedException("You don't have permission to access this card's data");
         }
 
@@ -58,7 +56,7 @@ public class PayTrackService {
         return payTrackDTOList;
     }
 
-    private boolean isUserCardOwner(Long memberId, Long userCardNo) {
-        return userCardRepository.existsByIdAndMember_Id(userCardNo, memberId);
+    private boolean isUserCardOwner(Long memberNo, Long userCardNo) {
+        return userCardRepository.existsByIdAndMemberNo(userCardNo, memberNo);
     }
 }

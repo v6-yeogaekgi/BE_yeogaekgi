@@ -23,7 +23,7 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tran_no")
-    private Long id;
+    private Long no;
 
     @Column(name = "tran_type", nullable = false)
     private int tranType; // 0: 전환 | 1: 충전 | 2: 환급
