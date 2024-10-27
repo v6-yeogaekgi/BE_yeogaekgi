@@ -25,7 +25,7 @@ public class UserCardService {
     private final UserCardRepository userCardRepository;
 
     public List<UserCardDTO> getUserCardByUserNo(Long userNo) {
-        List<UserCard> result = userCardRepository.findByMember(userNo);
+        List<UserCard> result = userCardRepository.findByMemberNo(userNo);
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
@@ -110,14 +110,14 @@ public class UserCardService {
     }
 
     public List<UserCardDTO> getAllByMemberNo(Long memberNo) {
-        List<UserCard> find = userCardRepository.findByMember(memberNo);
+        List<UserCard> find = userCardRepository.findByMemberNo(memberNo);
         return find.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
     public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberNo, String area) {
         log.info("----getHomeCardByMemberAndArea----");
 
-        List<UserCard> find = userCardRepository.findByMember(memberNo);
+        List<UserCard> find = userCardRepository.findByMemberNo(memberNo);
         List<UserCardDTO> result = new ArrayList<>();
 
         for(UserCard userCard : find) {
@@ -138,7 +138,7 @@ public class UserCardService {
     }
 
     private boolean isUserCardOwner(Long memberNo, Long userCardNo) {
-        return userCardRepository.existsByNoAndMember(userCardNo, memberNo);
+        return userCardRepository.existsByNoAndMemberNo(userCardNo, memberNo);
     }
 
     public UserCard dtoToEntity(UserCardDTO userCardDTO) {

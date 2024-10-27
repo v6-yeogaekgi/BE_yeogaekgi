@@ -57,6 +57,6 @@ public class PayTrackService {
     }
 
     private boolean isUserCardOwner(Long memberId, Long userCardNo) {
-        return userCardRepository.existsByNoAndMember(userCardNo, memberId);
+        return userCardRepository.existsByNoAndMemberNo(userCardNo, memberId);
     }
 }
