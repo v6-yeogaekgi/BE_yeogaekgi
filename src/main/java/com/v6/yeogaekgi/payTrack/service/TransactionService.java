@@ -2,17 +2,13 @@ package com.v6.yeogaekgi.payTrack.service;
 
 import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
-import com.v6.yeogaekgi.member.entity.Country;
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.payTrack.dto.TransactionDTO;
 import com.v6.yeogaekgi.payTrack.entity.Transaction;
 import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
-import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import io.jsonwebtoken.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -116,7 +112,7 @@ public class TransactionService {
                                 .payBalanceSnap(0)
                                 .transitBalanceSnap(userCard.getTransitBalance())
                                 .member(Member.builder()
-                                        .id(member.getId())
+                                        .no(member.getNo())
                                         .build())
                                 .userCard(userCard)
                                 .build()
@@ -227,7 +223,7 @@ public class TransactionService {
                 .foreignAmount(transactionDTO.getForeignAmount())
                 .currencyType(transactionDTO.getCurrencyType())
                 .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
-                .member(Member.builder().id(transactionDTO.getMemberNo()).build())
+                .member(Member.builder().no(transactionDTO.getMemberNo()).build())
                 .build();
     }
 
@@ -243,7 +239,7 @@ public class TransactionService {
                 .foreignAmount(transaction.getForeignAmount())
                 .currencyType(transaction.getCurrencyType())
                 .userCardNo(transaction.getUserCard().getId())
-                .memberNo(transaction.getMember().getId())
+                .memberNo(transaction.getMember().getNo())
                 .build();
     }
 }

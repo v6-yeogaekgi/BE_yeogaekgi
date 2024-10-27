@@ -3,11 +3,9 @@ package com.v6.yeogaekgi.payTrack.service;
 import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.payTrack.dto.PaymentDTO;
 import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
-import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
@@ -17,7 +15,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -91,7 +88,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
-        if (!payment.getMember().getId().equals(memberNo)) {
+        if (!payment.getMember().getNo().equals(memberNo)) {
             throw new AccessDeniedException("You don't have permission to view this payment");
         }
 
@@ -109,7 +106,7 @@ public class PaymentService {
                 .status(dto.getStatus())
                 .serviceName(dto.getServiceName())
                 .userCard(UserCard.builder().id(dto.getUserCardNo()).build())
-                .member(Member.builder().id(dto.getMemberNo()).build());
+                .member(Member.builder().no(dto.getMemberNo()).build());
 
         if(dto.getServiceNo() != null) {
             Services service = servicesRepository.findById(dto.getServiceNo())
@@ -132,7 +129,7 @@ public class PaymentService {
                 .status(payment.getStatus())
                 .serviceName(payment.getServiceName())
                 .userCardNo(payment.getUserCard().getId())
-                .memberNo(payment.getMember().getId());
+                .memberNo(payment.getMember().getNo());
 
         if (payment.getServices() != null) {
             dtoBuilder.serviceNo(payment.getServices().getId());
