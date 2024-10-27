@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.math.BigDecimal;
 
 @SpringBootTest
@@ -29,7 +27,7 @@ public class TransactionServiceTests extends CommonTests {
                 .userCardNo(400L)
                 .build();
 
-        assertTrue(transactionService.refundTransaction(built, member));
+        transactionService.refundTransaction(built, member);
     }
 
     @Test
@@ -41,7 +39,7 @@ public class TransactionServiceTests extends CommonTests {
                 .userCardNo(400L)
                 .build();
 
-        assertTrue(transactionService.topupTransaction(built, member));
+        transactionService.topupTransaction(built, member);
     }
 
     @Test
@@ -53,6 +51,6 @@ public class TransactionServiceTests extends CommonTests {
                 .userCardNo(399L)
                 .build();
 
-        assertTrue(transactionService.conversionAmount(built, member));
+        transactionService.conversionAmount(built, member);
     }
 }
