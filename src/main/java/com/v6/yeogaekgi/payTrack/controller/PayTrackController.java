@@ -25,13 +25,8 @@ public class PayTrackController {
             @RequestParam Integer year,
             @RequestParam Integer month,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        try {
             List<PayTrackDTO> payTracks = payTrackService.findPayTrackByUserCardNo(
                     memberDetails.getMember().getNo(), userCardNo, year, month);
-
             return ResponseEntity.ok(payTracks);
-        } catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 }
