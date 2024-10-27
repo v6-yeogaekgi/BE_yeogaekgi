@@ -84,7 +84,7 @@ public class PaymentService {
 
 
 
-    public PaymentDTO findById(Long no, Long memberNo) {
+    public PaymentDTO findByNo(Long no, Long memberNo) {
         Payment payment = paymentRepository.findById(no)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 

@@ -25,21 +25,21 @@ public class ServicesLikeService {
         return serviceLikeListByMemberNo.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public void deleteById(Long id) {
-        servicesLikeRepository.deleteById(id);
+    public void deleteByNo(Long no) {
+        servicesLikeRepository.deleteById(no);
     }
 
     private ServicesLikeDTO entityToDto(ServicesLike servicesLike) {
-        Optional<Services> byId = servicesRepository.findById(servicesLike.getServices().getNo());
-        if(!byId.isPresent()){
+        Optional<Services> byNo = servicesRepository.findById(servicesLike.getServices().getNo());
+        if(!byNo.isPresent()){
             return null;
         }
-        Services services = byId.get();
+        Services services = byNo.get();
 
         return ServicesLikeDTO.builder()
-                .servicesLikeId(servicesLike.getNo())
-                .memberId(servicesLike.getMember().getNo())
-                .servicesId(servicesLike.getServices().getNo())
+                .servicesLikeNo(servicesLike.getNo())
+                .memberNo(servicesLike.getMember().getNo())
+                .servicesNo(servicesLike.getServices().getNo())
                 .address(services.getAddress())
                 .content(services.getContent())
                 .likeCnt(services.getLikeCnt())
