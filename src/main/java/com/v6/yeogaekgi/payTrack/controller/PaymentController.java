@@ -20,19 +20,13 @@ public class PaymentController {
 
     @GetMapping("/{payNo}")
     public ResponseEntity<PaymentDTO> getPaymentDetail(@PathVariable Long payNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        try {
-            PaymentDTO paymentDTO = paymentService.findByNo(payNo, memberDetails.getMember().getNo());
-            return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        PaymentDTO paymentDTO = paymentService.findByNo(payNo, memberDetails.getMember().getNo());
+        return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
     }
 
     @GetMapping("/getPaymentsWithoutReviews")
     public ResponseEntity<List<PaymentDTO>> getPaymentsWithoutReviews(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
-            List<PaymentDTO> paymentDTOS = paymentService.findPaymentsWithoutReviews(memberDetails.getMember().getNo());
-            return new ResponseEntity<>(paymentDTOS, HttpStatus.OK);
+        List<PaymentDTO> paymentDTOS = paymentService.findPaymentsWithoutReviews(memberDetails.getMember().getNo());
+        return new ResponseEntity<>(paymentDTOS, HttpStatus.OK);
     }
 }

@@ -27,14 +27,8 @@ public class ServicesLikeController {
 
     @DeleteMapping("/delete/{servicesLikeNo}")
     public ResponseEntity<String> deleteUserLike(@PathVariable Long servicesLikeNo) {
-        try {
-            servicesLikeService.deleteByNo(servicesLikeNo);
-            return new ResponseEntity<>("success", HttpStatus.OK);
-        } catch (Exception e) {
-            // 로그 기록
-            log.error("Error deleting service like: " + e.getMessage());
-            return new ResponseEntity<>("false", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        servicesLikeService.deleteByNo(servicesLikeNo);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
