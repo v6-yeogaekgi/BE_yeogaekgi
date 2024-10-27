@@ -21,7 +21,7 @@ public class PaymentController {
     @GetMapping("/{payNo}")
     public ResponseEntity<PaymentDTO> getPaymentDetail(@PathVariable Long payNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         try {
-            PaymentDTO paymentDTO = paymentService.findById(payNo, memberDetails.getMember().getNo());
+            PaymentDTO paymentDTO = paymentService.findByNo(payNo, memberDetails.getMember().getNo());
             return new ResponseEntity<>(paymentDTO, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
