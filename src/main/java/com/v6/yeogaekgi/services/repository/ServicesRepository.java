@@ -37,27 +37,27 @@ public interface ServicesRepository extends JpaRepository<Services,Long> {
     SELECT s FROM Services s 
     WHERE s.type IN :types
     AND s.address LIKE %:area%
-    AND s.id in (Select lk.service.id from ServiceLike lk where
-    lk.member.id=:memberId
+    AND s.no in (Select lk.services.no from ServicesLike lk where
+    lk.member.no=:memberNo
     )
     """)
     List<Services> findServicesByTypesAndAreaAndMyLike(
             @Param("types") List<ServicesType> types,
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
     // 필터 타입 안걸려 있고 내가 좋아요한 부분만 보고 싶은 경우
     @Query("""
     SELECT s FROM Services s 
     WHERE s.address LIKE %:area%
-    AND s.id in (Select lk.service.id from ServiceLike lk where
-    lk.member.id=:memberId
+    AND s.no in (Select lk.services.no from ServicesLike lk where
+    lk.member.no=:memberNo
     )
     """)
     List<Services> findServicesByAreaAndMyLike(
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
     // 필터 타입 걸려 있고 내가 쓴 리뷰만 보고 싶은 경우
@@ -65,23 +65,23 @@ public interface ServicesRepository extends JpaRepository<Services,Long> {
     SELECT s FROM Services s
     WHERE s.type IN :types
     AND s.address LIKE %:area%
-    AND s.id in (select r.services.id from Review r where r.member.id =:memberId)
+    AND s.no in (select r.services.no from Review r where r.member.no =:memberNo)
     """)
     List<Services> findServicesByTypesAndAreaAndMyReview(
             @Param("types") List<ServicesType> types,
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
     // 필터 타입 안 걸려 있고 내가 쓴 리뷰만 보고 싶은 경우
     @Query("""
     SELECT s FROM Services s
     WHERE s.address LIKE %:area%
-    AND s.id in (select r.services.id from Review r where r.member.id =:memberId)
+    AND s.no in (select r.services.no from Review r where r.member.no =:memberNo)
     """)
     List<Services> findServicesByAreaAndMyReview(
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
     //필터 타입 걸려 있고 내가 쓴 리뷰 및 좋아요 보고 싶은 경우
@@ -89,32 +89,32 @@ public interface ServicesRepository extends JpaRepository<Services,Long> {
     SELECT s FROM Services s
     WHERE s.type IN :types 
     AND s.address LIKE %:area%
-    AND (s.id in (select r.services.id from Review r where r.member.id =:memberId)
-    OR s.id in (Select lk.service.id from ServiceLike lk where
-    lk.member.id=:memberId)
+    AND (s.no in (select r.services.no from Review r where r.member.no =:memberNo)
+    OR s.no in (Select lk.services.no from ServicesLike lk where
+    lk.member.no=:memberNo)
     )""")
     List<Services> findServicesByTypesAndAreaAndMyReviewANDmyLike(
             @Param("types") List<ServicesType> types,
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
     @Query("""
     SELECT s FROM Services s
     WHERE s.address LIKE %:area%
-    AND (s.id in (select r.services.id from Review r where r.member.id =:memberId)
-    OR s.id in (Select lk.service.id from ServiceLike lk where
-    lk.member.id=:memberId)
+    AND (s.no in (select r.services.no from Review r where r.member.no =:memberNo)
+    OR s.no in (Select lk.services.no from ServicesLike lk where
+    lk.member.no=:memberNo)
     )""")
     List<Services> findServicesByAreaAndMyReviewANDmyLike(
             @Param("area") String area,
-            @Param("memberId") Long memberId
+            @Param("memberNo") Long memberNo
     );
 
 
     @Query("""
         SELECT s.name FROM Services s
-        WHERE s.id =:servicesId
+        WHERE s.no =:servicesNo
     """)
-    String findServiceNameById(@Param("servicesId") Long servicesId);
+    String findServiceNameByNo(@Param("servicesNo") Long servicesNo);
 }

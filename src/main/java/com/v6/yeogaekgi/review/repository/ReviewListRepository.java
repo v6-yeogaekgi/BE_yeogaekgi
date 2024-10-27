@@ -22,14 +22,14 @@ public class ReviewListRepository extends QuerydslRepositorySupport {
         super(Review.class);
     }
 
-    public Slice<Review> listPage(Long servicesId, Pageable pageable) {
+    public Slice<Review> listPage(Long servicesNo, Pageable pageable) {
         QReview review = QReview.review;
 
         JPQLQuery<Review> jpqlQuery = this.from(review);
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         BooleanExpression expression = review.status.eq(0)
-                .and(review.services.id.eq(servicesId));
+                .and(review.services.id.eq(servicesNo));
 
         booleanBuilder.and(expression);
 

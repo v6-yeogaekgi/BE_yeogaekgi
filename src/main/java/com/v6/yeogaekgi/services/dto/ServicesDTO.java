@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class ServicesDTO {
-    private Long id;
+    private Long no;
 
     private ServicesType serviceType;
 

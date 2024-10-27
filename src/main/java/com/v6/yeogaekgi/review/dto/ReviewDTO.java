@@ -20,8 +20,8 @@ public class ReviewDTO {
     private int score;
     private String content;
     private int status;
-    private Long serviceNo;  // 서비스 no
-    private String serviceName; // 서비스 이름
+    private Long servicesNo;  // 서비스 no
+    private String servicesName; // 서비스 이름
     private String nickname;
     private Country country;
     private Timestamp regDate;

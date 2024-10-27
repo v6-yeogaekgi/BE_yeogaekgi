@@ -25,7 +25,7 @@ public class ServicesLikeController {
 
     @GetMapping("/list")
     public ResponseEntity<List<ServicesLikeDTO>> userLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        return new ResponseEntity<>(servicesLikeService.findAllServiceLike(memberDetails.getMember().getId()), HttpStatus.OK);
+        return new ResponseEntity<>(servicesLikeService.findAllServiceLike(memberDetails.getMember().getNo()), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{servicesLikeId}")

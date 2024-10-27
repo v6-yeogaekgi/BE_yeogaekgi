@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 @Getter
 @Table(name = "services_like")
-public class ServiceLike {
+public class ServicesLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,7 @@ public class ServiceLike {
 
     @ManyToOne
     @JoinColumn(name ="service_no", nullable = false)
-    private Services service;
+    private Services services;
 
     @ManyToOne
     @JoinColumn(name = "member_no", nullable = false)

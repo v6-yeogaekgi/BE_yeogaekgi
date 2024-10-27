@@ -2,8 +2,8 @@ package com.v6.yeogaekgi.services.service;
 
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.services.dto.ServicesDTO;
-import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
+import com.v6.yeogaekgi.services.entity.ServicesLike;
 import com.v6.yeogaekgi.services.entity.ServicesType;
 import com.v6.yeogaekgi.services.repository.ServicesLikeRepository;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
@@ -25,7 +25,7 @@ public class Servicesservice {
 
     public ServicesDTO entityToDto(Services service) {
         return ServicesDTO.builder()
-                .id(service.getId())
+                .no(service.getNo())
                 .serviceType(service.getType())
                 .name(service.getName())
                 .content(service.getContent())
@@ -40,43 +40,48 @@ public class Servicesservice {
         return servicesRepository.findAllServices(area).stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<ServicesDTO> findServicesWithFilters(List<ServicesType> type, String area, Boolean myLike, Boolean myReview, Long memberId) {
+    public List<ServicesDTO> findServicesWithFilters(List<ServicesType> type, String area, Boolean myLike, Boolean myReview, Long memberNo) {
+        List<Services> result;
+
         // myLike와 myReview가 모두 true인 경우
-        List<Services> result = null;
-        if (myLike && myReview) {
-            result= (type == null || type.isEmpty())
-                    ? servicesRepository.findServicesByAreaAndMyReviewANDmyLike(area, memberId)
-                    : servicesRepository.findServicesByTypesAndAreaAndMyReviewANDmyLike(type, area, memberId);
+        if (Boolean.TRUE.equals(myLike) && Boolean.TRUE.equals(myReview)) {
+            result = (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyReviewANDmyLike(area, memberNo)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyReviewANDmyLike(type, area, memberNo);
+            return result.stream().map(this::entityToDto).collect(Collectors.toList());
         }
 
         // myLike만 true인 경우
-        if (myLike) {
-            result= (type == null || type.isEmpty())
-                    ? servicesRepository.findServicesByAreaAndMyLike(area, memberId)
-                    : servicesRepository.findServicesByTypesAndAreaAndMyLike(type, area, memberId);
+        if (Boolean.TRUE.equals(myLike)) {
+            result = (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyLike(area, memberNo)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyLike(type, area, memberNo);
+            return result.stream().map(this::entityToDto).collect(Collectors.toList());
         }
 
         // myReview만 true인 경우
-        if (myReview) {
-            result= (type == null || type.isEmpty())
-                    ? servicesRepository.findServicesByAreaAndMyReview(area, memberId)
-                    : servicesRepository.findServicesByTypesAndAreaAndMyReview(type, area, memberId);
+        if (Boolean.TRUE.equals(myReview)) {
+            result = (type == null || type.isEmpty())
+                    ? servicesRepository.findServicesByAreaAndMyReview(area, memberNo)
+                    : servicesRepository.findServicesByTypesAndAreaAndMyReview(type, area, memberNo);
+            return result.stream().map(this::entityToDto).collect(Collectors.toList());
         }
 
         // 기본적으로 타입 필터만 적용된 서비스 조회
-        result= servicesRepository.findServicesByTypesAndArea(type, area);
+        result = servicesRepository.findServicesByTypesAndArea(type, area);
         return result.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
+
     @Transactional
-    public boolean servicesLike (Long servicesId,Long memberId){
-        Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
-        Services services = servicesRepository.findById(servicesId)
+    public boolean servicesLike (Long servicesNo,Long memberNo){
+        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServiceNoAndMemberNo(servicesNo,memberNo);
+        Services services = servicesRepository.findById(servicesNo)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
         if (!serviceLikeCheck.isPresent()) {
-            ServiceLike serviceLike = ServiceLike.builder()
-                    .service(Services.builder().id(servicesId).build())
-                    .member(Member.builder().id(memberId).build())
+            ServicesLike serviceLike = ServicesLike.builder()
+                    .services(Services.builder().no(servicesNo).build())
+                    .member(Member.builder().no(memberNo).build())
                     .build();
             servicesLikeRepository.save(serviceLike);
             services.incrementLikeCnt();
@@ -92,10 +97,10 @@ public class Servicesservice {
 
     }
     @Transactional
-    public Map<String,Object> servicesLikeCheck(Long servicesId,Long memberId){
+    public Map<String,Object> servicesLikeCheck(Long servicesNo,Long memberNo){
         Map<String,Object> result = new HashMap<>();
-        Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
-        Optional<Long> servicesLikeCount =servicesLikeRepository.servicesLikeCount(servicesId);
+        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServiceNoAndMemberNo(servicesNo,memberNo);
+        Optional<Long> servicesLikeCount =servicesLikeRepository.servicesLikeCount(servicesNo);
         if(serviceLikeCheck.isPresent()){
             result.put("status",true);
             result.put("count",servicesLikeCount.get());

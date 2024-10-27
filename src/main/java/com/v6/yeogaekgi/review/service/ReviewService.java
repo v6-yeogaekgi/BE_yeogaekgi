@@ -32,14 +32,13 @@ public class ReviewService {
     private final PaymentRepository paymentRepository;
     private final ServicesRepository servicesRepository;
 
-    public Review dtoToEntity(ReviewDTO reviewDTO,Member member,Long servicesId) {
-        Review review = Review.builder()
+    public Review dtoToEntity(ReviewDTO reviewDTO,Member member,Long servicesNo) {
+        return Review.builder()
                 .score(reviewDTO.getScore())
                 .content(reviewDTO.getContent())
                 .member(member)
-                .services(Services.builder().id(servicesId).build())
+                .services(Services.builder().no(servicesNo).build())
                 .build();
-        return review;
     }
 
 
@@ -55,25 +54,25 @@ public class ReviewService {
                    .content(review.getContent())
                    .regDate(review.getRegDate())
                    .modDate(review.getModDate())
-                   .serviceNo(review.getServices().getId())
+                   .servicesNo(review.getServices().getNo())
                    .country(review.getMember().getCountry())
                    .nickname(review.getMember().getNickname())
                    .build();
               if(review.getPayment()!= null){
-                  responseDTO.setPaymentId(review.getPayment().getId());
+                  responseDTO.setPaymentId(review.getPayment().getNo());
               }
            return responseDTO;
     }
 
     @Transactional
     public Long register(List<MultipartFile> multipartFile, Long servicesNo,ReviewDTO reviewDTO, Member member) {
-        String service = servicesRepository.findServiceNameById(servicesNo);
+        String serviceName = servicesRepository.findServiceNameByNo(servicesNo);
         Boolean reviewExist = null;
-        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewDTO.getPayNo());
+        Optional<Payment> payment = paymentRepository.findByMemberNoAndServiceNameAndPayNo(member.getNo(),serviceName, reviewDTO.getPayNo());
         if(!payment.isPresent()) {
-            reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesNo,member.getId());
+            reviewExist = reviewRepository.existsByServicesNoAndMemberNo(servicesNo,member.getNo());
         } else {
-            reviewExist = reviewRepository.existsByPaymentId(reviewDTO.getPayNo());
+            reviewExist = reviewRepository.existsByPaymentNo(reviewDTO.getPayNo());
         }
         if(reviewExist){
             return -1L;
@@ -104,8 +103,8 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewDTO> ImageList (Long serviceId) {
-        List<Review> reviews = reviewRepository.findImageMatchByServicesId(serviceId);
+    public List<ReviewDTO> ImageList (Long serviceNo) {
+        List<Review> reviews = reviewRepository.findImageMatchByServicesNo(serviceNo);
         List<ReviewDTO> result = new ArrayList<>();
         for (Review review : reviews) {
             ReviewDTO dto = entityToDto(review);
@@ -115,14 +114,14 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewDTO Detail (Long servicesId,Long reviewId,Member member){
-        Optional<Review> review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getId());
+    public ReviewDTO Detail (Long servicesNo,Long reviewNo,Member member){
+        Optional<Review> review = reviewRepository.findByServicesNoAndNoAndMemberNo(servicesNo, reviewNo,member.getNo());
         return review.map(this::entityToDto).orElseThrow(()-> new IllegalArgumentException("이미지를 찾을 수 없습니다"));
     }
 
     @Transactional(readOnly = true)
-    public PageResultDTO<ReviewDTO> reviewList(Long servicesId, Pageable pageable) {
-        Slice<Review> result = new ReviewListRepository().listPage(servicesId,pageable);
+    public PageResultDTO<ReviewDTO> reviewList(Long servicesNo, Pageable pageable) {
+        Slice<Review> result = new ReviewListRepository().listPage(servicesNo,pageable);
         List<ReviewDTO> dtoList = result.getContent().stream()
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
@@ -131,7 +130,7 @@ public class ReviewService {
 
     @Transactional
     public List<ReviewDTO> getUserReviewList(Member member) {
-        List<Review> result = reviewRepository.findByMemberId(member.getId());
+        List<Review> result = reviewRepository.findByMemberNo(member.getNo());
         ArrayList<ReviewDTO> dtoList = new ArrayList<>();
         for(Review review : result) {
             ReviewDTO dto = entityToDto(review);
@@ -141,12 +140,12 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewUpdateResponseDTO updateReview(List<MultipartFile> images, Long servicesId, Long reviewId, ReviewUpdateDTO reviewUpdateDTO, Member member) {
-        Review review = reviewRepository.findByServicesIdAndId(servicesId, reviewId).orElseThrow(
+    public ReviewUpdateResponseDTO updateReview(List<MultipartFile> images, Long servicesNo, Long reviewNo, ReviewUpdateDTO reviewUpdateDTO, Member member) {
+        Review review = reviewRepository.findByServicesNoAndNo(servicesNo, reviewNo).orElseThrow(
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
         );
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMember().getNo().equals(member.getNo())) {
             throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
         }
 
@@ -188,11 +187,11 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long servicesId, Long reviewId, Member member) {
-        Review review = reviewRepository.findByServicesIdAndId(servicesId,reviewId)
+    public void deleteReview(Long servicesNo, Long reviewNo, Member member) {
+        Review review = reviewRepository.findByServicesNoAndNo(servicesNo,reviewNo)
                 .orElseThrow(()->new IllegalArgumentException("리뷰가 존재하지 않습니다."));
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMember().getNo().equals(member.getNo())) {
             throw new SecurityException("리뷰를 삭제할 권한이 없습니다.");
         }
 

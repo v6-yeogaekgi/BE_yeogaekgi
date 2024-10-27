@@ -42,21 +42,21 @@ public class ReviewController {
     }
 
     //이미지만 있는 리스트들 (맵에 이미지들만 있는 부분)
-    @GetMapping("/{servicesId}/ImgList")
-    public ResponseEntity<List<ReviewDTO>> Imglist (@PathVariable("servicesId") Long servicesId){
+    @GetMapping("/{servicesNo}/ImgList")
+    public ResponseEntity<List<ReviewDTO>> Imglist (@PathVariable("servicesNo") Long servicesNo){
         log.info("-------------list review---------------");
-         return new ResponseEntity<>(reviewService.ImageList(servicesId),HttpStatus.OK);
+         return new ResponseEntity<>(reviewService.ImageList(servicesNo),HttpStatus.OK);
     }
 
 
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
-    @GetMapping("/{servicesId}/reviewList")
+    @GetMapping("/{servicesNo}/reviewList")
     public ResponseEntity<PageResultDTO<ReviewDTO>> reviewList(
-            @PathVariable Long servicesId,
+            @PathVariable Long servicesNo,
             Pageable pageable,
             @RequestParam(required = false) Integer payStatus
     ) {
-        return new ResponseEntity<>(reviewService.reviewList(servicesId, pageable),HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.reviewList(servicesNo, pageable),HttpStatus.OK);
     }
 
     @PostMapping("/list")
@@ -65,32 +65,32 @@ public class ReviewController {
         return new ResponseEntity<>(reviewService.getUserReviewList(member), HttpStatus.OK);
     }
 
-    @GetMapping("/{servicesId}/{reviewId}/detail")
+    @GetMapping("/{servicesNo}/{reviewNo}/detail")
     public ResponseEntity<ReviewDTO> getReviewDetail(
-            @PathVariable Long servicesId,
-            @PathVariable Long reviewId,
+            @PathVariable Long servicesNo,
+            @PathVariable Long reviewNo,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("-------------detail review---------------");
-        return new ResponseEntity<>(reviewService.Detail(servicesId, reviewId, memberDetails.getMember()), HttpStatus.OK);
+        return new ResponseEntity<>(reviewService.Detail(servicesNo, reviewNo, memberDetails.getMember()), HttpStatus.OK);
     }
 
 
-    @PutMapping("/{servicesId}/{reviewId}")
+    @PutMapping("/{servicesNo}/{reviewNo}")
     public ResponseEntity<ReviewUpdateResponseDTO>updateReview(@RequestPart (value = "images", required = false) List<MultipartFile> images,
                                                                @RequestParam (required = false) List<Integer> chooseImages,
                                                                @RequestParam (required = false) Integer score,
                                                                @RequestParam (required = false) String content,
-                                                               @PathVariable Long servicesId,
-                                                               @PathVariable Long reviewId,
+                                                               @PathVariable Long servicesNo,
+                                                               @PathVariable Long reviewNo,
                                                                @AuthenticationPrincipal MemberDetailsImpl MemberDetails){
         ReviewUpdateDTO reviewUpdateDTO = new ReviewUpdateDTO(chooseImages, score, content);
-        ReviewUpdateResponseDTO reviewUpdateResponseDTO = reviewService.updateReview(images, servicesId,reviewId,reviewUpdateDTO,MemberDetails.getMember());
+        ReviewUpdateResponseDTO reviewUpdateResponseDTO = reviewService.updateReview(images, servicesNo,reviewNo,reviewUpdateDTO,MemberDetails.getMember());
         return ResponseEntity.ok().body(reviewUpdateResponseDTO);
     }
 
-    @DeleteMapping("/{servicesId}/{reviewId}")
-    public ResponseEntity<?>deleteReview(@PathVariable  Long servicesId, @PathVariable Long reviewId, @AuthenticationPrincipal MemberDetailsImpl MemberDetails){
-        reviewService.deleteReview(servicesId,reviewId, MemberDetails.getMember());
+    @DeleteMapping("/{servicesNo}/{reviewNo}")
+    public ResponseEntity<?>deleteReview(@PathVariable  Long servicesNo, @PathVariable Long reviewNo, @AuthenticationPrincipal MemberDetailsImpl MemberDetails){
+        reviewService.deleteReview(servicesNo,reviewNo, MemberDetails.getMember());
         return ResponseEntity.ok().body("리뷰가 삭제되었습니다");
     }
 }
