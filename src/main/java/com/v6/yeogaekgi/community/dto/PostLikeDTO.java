@@ -14,12 +14,12 @@ import java.sql.Timestamp;
 public class PostLikeDTO {
 
     // comment
-    private Long postLikeId;
+    private Long postLikeNo;
 
     // post
-    private Long postId;
+    private Long postNo;
 
     // member
-    private Long memberId;
+    private Long memberNo;
 
 }

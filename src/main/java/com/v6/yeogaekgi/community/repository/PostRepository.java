@@ -22,11 +22,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p.hashtag, COUNT(p.hashtag) count FROM post p WHERE p.hashtag LIKE CONCAT(:hashtag, '%') GROUP BY p.hashtag ORDER BY count DESC limit 10", nativeQuery = true)
     List<Object[]> getHashtag(String hashtag);
 
-    // 전체 리스트 조회
-//    @EntityGraph(attributePaths = {"member"})
-//    Slice<Post> findAll(Pageable pageable);
-
-
     // 내용 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
     Slice<Post> findByContentContaining(String content, Pageable pageable);
@@ -37,7 +32,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 해시 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Slice<Post> findByMember_Id(Long memberId,Pageable pageable);
+    Slice<Post> findByMember_Id(Long memberNo,Pageable pageable);
 
 
 

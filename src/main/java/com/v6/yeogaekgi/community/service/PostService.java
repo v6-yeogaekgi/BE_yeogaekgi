@@ -48,64 +48,59 @@ public class PostService {
     private final S3Service s3Service;
 
 
-    // 게시글 리스트 (내용/해시태그 검색 포함)
+    // 게시글 리스트
     public PageResultDTO<PostDTO> getPostList(SearchDTO search, Member member) {
         Slice<Post> result = null;
-        Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
-        if ("content".equals(search.getType())) {
+        Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "no"));
+        if ("content".equals(search.getType())) { // 내용 검색
             result = repository.findByContentContaining(search.getKeyword(), pageable);
         }
-        if ("hashtag".equals(search.getType())) {
+        if ("hashtag".equals(search.getType())) { // 해시태그 검색
             result = repository.findByHashtag(search.getKeyword(), pageable);
         }
-        if (search.getMyPost()) {
-            result = repository.findByMember_Id(member.getId(), pageable);
+        if (search.getMyPost()) { // 내가 작성한 게시글
+            result = repository.findByMember_Id(member.getNo(), pageable);
         }
 
         if (result != null) {
             List<PostDTO> content = result.getContent().stream()
                     .map(Post -> entityToDto(Post, member))
                     .collect(Collectors.toList());
-//            Pageable pageable = PageRequest.of(search.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
-
             PageResultDTO<PostDTO> pageResultDTO = new PageResultDTO<>(content, pageable, result.hasNext());
-
             return pageResultDTO;
         }
+
         return null;
     }
 
     // 게시글 상세
-    public PostDTO getPost(Long postId, Member member) {
-//        // memberId 불러옴
-        Long memberId = member == null ? 0L : member.getId();
-
-        Optional<Post> post = repository.findById(postId);
+    public PostDTO getPost(Long postNo, Member member) {
+        Long memberNo = member == null ? 0L : member.getNo(); // memberNo 가져옴
+        Optional<Post> post = repository.findById(postNo);
         PostDTO postDto = null;
         if (post.isPresent()) {
             postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postId, memberId));
+            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postNo, memberNo));
         }
         return postDto;
     }
 
-    // 게시글 등록 [bongbong]
+    // 게시글 등록
     public Long register(PostDTO postDTO, Member member) {
 
         MultipartFile multipartFile = postDTO.getZip();
         postDTO.setImages(uploadZipFile(multipartFile));
         Post post = dtoToEntity(postDTO, member);
         repository.save(post);
-        return post.getId();
+        return post.getNo();
     }
 
-    // 게시글 수정 [bongbong]
+    // 게시글 수정
     public Long modify(PostDTO postDTO, Member member) {
 
         // 게시글 조회
-        Post post = repository.findById(postDTO.getPostId())
+        Post post = repository.findById(postDTO.getPostNo())
                 .orElseThrow(() -> new RuntimeException("Post not found"));
-
         List<String> newImageUrls = new ArrayList<>();
         MultipartFile multipartFile = postDTO.getZip();
 
@@ -115,7 +110,7 @@ public class PostService {
             newImageUrls = uploadZipFile(multipartFile);
         }
 
-        // 삭제할 이미지 처리
+        // S3 삭제할 이미지 처리
         if (postDTO.getDeleteImages() != null) {
             for (String imageUrl : postDTO.getDeleteImages()) {
                 s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
@@ -137,18 +132,19 @@ public class PostService {
         post.changeHashtag(postDTO.getHashtag());
 
         repository.save(post);
-        return post.getId();
+        return post.getNo();
     }
 
-    // 게시글 삭제 [bongbong]
-    public void remove(Long postId) {
+
+    // 게시글 삭제
+    public void remove(Long postNo) {
 
 
         // 게시글 조회
-        Post post = repository.findById(postId)
+        Post post = repository.findById(postNo)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        // 삭제할 이미지 처리
+        // S3 삭제할 이미지 처리
         if (post.getImages() != null) {
             List<String> imageUrls = s3Service.convertStringToList(post.getImages());
 
@@ -157,8 +153,7 @@ public class PostService {
             }
         }
 
-        repository.deleteById(postId);
-
+        repository.deleteById(postNo);
     }
 
     // 해시태그 검색 list
@@ -244,7 +239,7 @@ public class PostService {
     // ============================= convert type =============================
     public Post dtoToEntity(PostDTO postDTO, Member member) {
         Post post = Post.builder()
-                .id(postDTO.getPostId())
+                .no(postDTO.getPostNo())
                 .content(postDTO.getContent())
                 .hashtag(postDTO.getHashtag())
                 .commentCnt(postDTO.getCommentCnt())
@@ -258,7 +253,7 @@ public class PostService {
     public PostDTO entityToDto(Post post, Member member) {
 
         PostDTO postDTO = PostDTO.builder()
-                .postId(post.getId())
+                .postNo(post.getNo())
                 .content(post.getContent())
                 .hashtag(post.getHashtag())
                 .commentCnt(post.getCommentCnt())
@@ -266,10 +261,10 @@ public class PostService {
                 .likeCnt(post.getLikeCnt())
                 .regDate(post.getRegDate())
                 .modDate(post.getModDate())
-                .memberId(post.getMember().getId())
+                .memberNo(post.getMember().getNo())
                 .nickname(post.getMember().getNickname())
                 .code(post.getMember().getCountry().getCode())
-                .currentMemberId(member == null ? null : member.getId())
+                .currentMemberNo(member == null ? null : member.getNo())
                 .currentMemberCode(member == null ? null : member.getCountry().getCode())
                 .build();
 
