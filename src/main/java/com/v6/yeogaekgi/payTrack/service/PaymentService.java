@@ -9,6 +9,7 @@ import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
+import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.AccessDeniedException;
@@ -31,29 +32,38 @@ public class PaymentService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public boolean insertPayment(PaymentDTO paymentDTO) {
-        Optional<UserCard> userCard = userCardRepository.findById(paymentDTO.getUserCardNo());
+    public void insertPayment(PaymentDTO paymentDTO) {
+        UserCard prevUserCard = userCardRepository.findById(paymentDTO.getUserCardNo())
+                .orElseThrow(() -> new NoSuchElementException("카드를 찾을 수 없습니다"));
+        log.info("저장할 결제내역  - 결제 타입 {} - 결제 금액 {} - 결제 날짜 {} - 결제 상태 {} - 서비스 번호 {} - 사용자 카드 번호 {} - 사용자 번호 {}",
+                paymentDTO.getPayType(),
+                paymentDTO.getPayPrice(),
+                paymentDTO.getPayDate(),
+                paymentDTO.getStatus(),
+                paymentDTO.getServiceNo(),
+                paymentDTO.getUserCardNo(),
+                paymentDTO.getMemberNo()
+                );
 
-        if (!userCard.isPresent()) {
-            return false;
-        }
-        UserCard prevUserCard = userCard.get();
 
         int payBalance = prevUserCard.getPayBalance();
         int transitBalance = prevUserCard.getTransitBalance();
 
-
-        if(paymentDTO.getPayType() == 1){
+        if (paymentDTO.getPayType() == 1) {
             transitBalance -= paymentDTO.getPayPrice();
-        }else{
+        } else {
             payBalance -= paymentDTO.getPayPrice();
         }
 
         prevUserCard.updatePayBalance(payBalance);
         prevUserCard.updateTransitBalance(transitBalance);
-        userCardRepository.save(prevUserCard);
+        UserCard savedCard = userCardRepository.save(prevUserCard);
 
-        if(paymentDTO.getServiceNo() != null) {
+        if (savedCard == null) {
+            throw new IllegalStateException("카드 잔액 수정에 실패했습니다");
+        }
+
+        if (paymentDTO.getServiceNo() != null) {
             Optional<Services> service = servicesRepository.findById(paymentDTO.getServiceNo());
             if (service.isPresent()) {
                 paymentDTO.setServiceName(service.get().getName());
@@ -63,9 +73,25 @@ public class PaymentService {
             }
         }
 
-        paymentRepository.save(dtoToEntity(paymentDTO));
+        Payment savedPayment = paymentRepository.save(dtoToEntity(paymentDTO));
 
-        return true;
+        if(savedPayment == null) {
+            throw new IllegalStateException("결제내역 저장에 실패했습니다");
+        }
+
+        log.info("결제내역 저장 완료");
+        log.info("저장된 결제내역  - 결제 번호 {} - 결제 타입 {} - 결제 금액 {}- 결제 날짜 {} - 결제 상태 {} - 서비스 이름 {} - 사용자 카드 번호 {} - 사용자 번호 {}",
+                paymentDTO.getPayNo(),
+                paymentDTO.getPayType(),
+                paymentDTO.getPayPrice(),
+                paymentDTO.getPayDate(),
+                paymentDTO.getStatus(),
+                paymentDTO.getServiceName(),
+                paymentDTO.getUserCardNo(),
+                paymentDTO.getMemberNo()
+        );
+        log.info("결제내역 저장 후 - 페이 잔액: {}, 교통 잔액: {}",
+                savedCard.getPayBalance(), savedCard.getTransitBalance());
     }
 
     public List<PaymentDTO> findPaymentsWithoutReviews(Long memberNo) {
@@ -83,10 +109,9 @@ public class PaymentService {
     }
 
 
-
     public PaymentDTO findByNo(Long no, Long memberNo) {
         Payment payment = paymentRepository.findById(no)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() -> new NoSuchElementException("결제내역을 찾을 수 없습니다"));
 
         if (!payment.getMember().getNo().equals(memberNo)) {
             throw new AccessDeniedException("You don't have permission to view this payment");
@@ -108,9 +133,9 @@ public class PaymentService {
                 .userCard(UserCard.builder().no(dto.getUserCardNo()).build())
                 .member(Member.builder().no(dto.getMemberNo()).build());
 
-        if(dto.getServiceNo() != null) {
+        if (dto.getServiceNo() != null) {
             Services service = servicesRepository.findById(dto.getServiceNo())
-                    .orElseThrow(() -> new RuntimeException("Service not found"));
+                    .orElseThrow(() -> new NoSuchElementException("서비스를 찾을 수 없습니다"));
             paymentBuilder.services(service);
         }
 
