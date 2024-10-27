@@ -29,7 +29,7 @@ public class ReviewListRepository extends QuerydslRepositorySupport {
 
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         BooleanExpression expression = review.status.eq(0)
-                .and(review.services.id.eq(servicesNo));
+                .and(review.services.no.eq(servicesNo));
 
         booleanBuilder.and(expression);
 
