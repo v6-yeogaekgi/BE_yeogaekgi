@@ -41,3 +41,5 @@ out/
 db.properties
 application-private.properties
 
+## log ##
+logback-spring.xml
