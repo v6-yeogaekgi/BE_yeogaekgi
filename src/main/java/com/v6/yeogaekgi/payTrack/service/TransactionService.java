@@ -2,17 +2,13 @@ package com.v6.yeogaekgi.payTrack.service;
 
 import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
-import com.v6.yeogaekgi.member.entity.Country;
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.member.repository.MemberRepository;
 import com.v6.yeogaekgi.payTrack.dto.TransactionDTO;
 import com.v6.yeogaekgi.payTrack.entity.Transaction;
 import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
-import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import io.jsonwebtoken.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +25,8 @@ public class TransactionService {
 
     private final UserCardRepository userCardRepository;
 
-    public TransactionDTO getTransactionById(Long tranId) {
-        TransactionDTO resultDTO = transactionRepository.findById(tranId)
+    public TransactionDTO getTransactionByNo(Long tranNo) {
+        TransactionDTO resultDTO = transactionRepository.findById(tranNo)
                 .map(this::entityToDto)
                 .orElse(null);
 
@@ -116,7 +112,7 @@ public class TransactionService {
                                 .payBalanceSnap(0)
                                 .transitBalanceSnap(userCard.getTransitBalance())
                                 .member(Member.builder()
-                                        .id(member.getId())
+                                        .no(member.getNo())
                                         .build())
                                 .userCard(userCard)
                                 .build()
@@ -217,7 +213,7 @@ public class TransactionService {
 
     public Transaction dtoToEntity(TransactionDTO transactionDTO) {
         return Transaction.builder()
-                .id(transactionDTO.getTranNo())
+                .no(transactionDTO.getTranNo())
                 .tranType(transactionDTO.getTranType())
                 .tranDate(transactionDTO.getTranDate())
                 .transferType(transactionDTO.getTransferType())
@@ -226,14 +222,14 @@ public class TransactionService {
                 .krwAmount(transactionDTO.getKrwAmount())
                 .foreignAmount(transactionDTO.getForeignAmount())
                 .currencyType(transactionDTO.getCurrencyType())
-                .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
-                .member(Member.builder().id(transactionDTO.getMemberNo()).build())
+                .userCard(UserCard.builder().no(transactionDTO.getUserCardNo()).build())
+                .member(Member.builder().no(transactionDTO.getMemberNo()).build())
                 .build();
     }
 
     public TransactionDTO entityToDto(Transaction transaction) {
         return TransactionDTO.builder()
-                .tranNo(transaction.getId())
+                .tranNo(transaction.getNo())
                 .tranType(transaction.getTranType())
                 .tranDate(transaction.getTranDate())
                 .transferType(transaction.getTransferType())
@@ -242,8 +238,8 @@ public class TransactionService {
                 .krwAmount(transaction.getKrwAmount())
                 .foreignAmount(transaction.getForeignAmount())
                 .currencyType(transaction.getCurrencyType())
-                .userCardNo(transaction.getUserCard().getId())
-                .memberNo(transaction.getMember().getId())
+                .userCardNo(transaction.getUserCard().getNo())
+                .memberNo(transaction.getMember().getNo())
                 .build();
     }
 }

@@ -21,11 +21,10 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    @GetMapping("/{tranId}")
-    public ResponseEntity<TransactionDTO> getTransaction(@PathVariable("tranId") Long tranId) {
-        log.info("tranId: " + tranId);
+    @GetMapping("/{tranNo}")
+    public ResponseEntity<TransactionDTO> getTransaction(@PathVariable("tranNo") Long tranNo) {
         try {
-            return new ResponseEntity<>(transactionService.getTransactionById(tranId), HttpStatus.OK);
+            return new ResponseEntity<>(transactionService.getTransactionByNo(tranNo), HttpStatus.OK);
         }catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

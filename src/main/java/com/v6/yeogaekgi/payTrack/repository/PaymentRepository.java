@@ -9,22 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    Optional<Payment> findById(Long id);
-
     @Query("""
     select p from Payment p
-    where p.member.id = :memberId
+    where p.member.no = :memberNo
     and p.services is not null
 """)
-    List<Payment> findAllPaymentsByMemberIdWithNonNullService(@Param("memberId") Long memberId);
+    List<Payment> findAllPaymentsByMemberNoWithNonNullService(@Param("memberId") Long memberId);
 
 
     @Query("""
     select p from Payment p
-    where p.member.id = :memberId
-    and p.serviceName LIKE %:serviceName%
-    and p.id = :payNo
+    where p.member.no = :memberNo
+    and p.serviceName LIKE %:servicesName%
+    and p.no = :payNo
 """)
-    Optional<Payment> findByMemberIdAndServiceName(@Param("memberId") Long memberId,
-                                                   @Param("serviceName") String serviceName, Long payNo);
+    Optional<Payment> findByMemberNoAndServiceNameAndPayNo(@Param("memberNo") Long memberNo,
+                                                   @Param("servicesName") String servicesName, Long payNo);
 }

@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Entity
 @Builder
@@ -14,16 +13,16 @@ import org.springframework.stereotype.Service;
 @NoArgsConstructor
 @Getter
 @Table(name = "services_like")
-public class ServiceLike {
+public class ServicesLike {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "services_like_no")
-    private Long id;
+    private Long no;
 
     @ManyToOne
     @JoinColumn(name ="service_no", nullable = false)
-    private Services service;
+    private Services services;
 
     @ManyToOne
     @JoinColumn(name = "member_no", nullable = false)

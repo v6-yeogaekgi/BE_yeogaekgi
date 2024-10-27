@@ -2,19 +2,17 @@ package com.v6.yeogaekgi.services.dto;
 
 import lombok.*;
 
-import java.sql.Timestamp;
-
 @ToString
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ServicesLikeDTO {
-    private Long servicesLikeId;
+    private Long servicesLikeNo;
 
-    private Long memberId;
+    private Long memberNo;
 
-    private Long servicesId;
+    private Long servicesNo;
 
     private String address;
 

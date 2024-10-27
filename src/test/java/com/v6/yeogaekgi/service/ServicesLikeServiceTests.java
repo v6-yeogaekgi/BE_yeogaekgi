@@ -16,7 +16,7 @@ public class ServicesLikeServiceTests extends CommonTests {
 
     @Test
     public void getLikeList(){
-        List<ServicesLikeDTO> list = servicesLikeService.findAllServiceLike(1645L);
+        List<ServicesLikeDTO> list = servicesLikeService.findAllServiceLike(1L);
         for (ServicesLikeDTO servicesLikeDTO : list) {
             System.out.println(servicesLikeDTO);
         }

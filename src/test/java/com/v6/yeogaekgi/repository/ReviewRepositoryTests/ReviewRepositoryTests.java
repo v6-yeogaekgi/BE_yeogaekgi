@@ -27,10 +27,10 @@ public class ReviewRepositoryTests {
                     .images("test입니다" +i +" test이미지입니다" + " test이미지입니다")
                     .score(4)
                     .status(0)
-                    .member(Member.builder().id(i-2).build())
-                    .services(Services.builder().id(i%2==0?1L:2L).build())
+                    .member(Member.builder().no(i-2).build())
+                    .services(Services.builder().no(i%2==0?1L:2L).build())
                     .thumbnails("s-test입니다" +i +" s-test이미지입니다" + " s-test이미지입니다")
-                    .payment(Payment.builder().id(i).build())
+                    .payment(Payment.builder().no(i).build())
                     .build();
             reviewRepository.save(review);
         });
@@ -38,7 +38,7 @@ public class ReviewRepositoryTests {
 
     @Test
     void getUserReview() {
-        List<Review> result = reviewRepository.findByMemberId(1000L);
+        List<Review> result = reviewRepository.findByMemberNo(1000L);
         System.out.println(result);
     }
 }

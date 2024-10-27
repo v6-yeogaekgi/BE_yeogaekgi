@@ -3,8 +3,6 @@ package com.v6.yeogaekgi.services.controller;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import com.v6.yeogaekgi.services.dto.ServicesLikeDTO;
 import com.v6.yeogaekgi.services.service.ServicesLikeService;
-import com.v6.yeogaekgi.services.service.Servicesservice;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -12,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Enumeration;
 import java.util.List;
 
 @CrossOrigin(origins = {"*"})
@@ -25,13 +22,13 @@ public class ServicesLikeController {
 
     @GetMapping("/list")
     public ResponseEntity<List<ServicesLikeDTO>> userLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        return new ResponseEntity<>(servicesLikeService.findAllServiceLike(memberDetails.getMember().getId()), HttpStatus.OK);
+        return new ResponseEntity<>(servicesLikeService.findAllServiceLike(memberDetails.getMember().getNo()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{servicesLikeId}")
-    public ResponseEntity<String> deleteUserLike(@PathVariable Long servicesLikeId) {
+    @DeleteMapping("/delete/{servicesLikeNo}")
+    public ResponseEntity<String> deleteUserLike(@PathVariable Long servicesLikeNo) {
         try {
-            servicesLikeService.deleteById(servicesLikeId);
+            servicesLikeService.deleteByNo(servicesLikeNo);
             return new ResponseEntity<>("success", HttpStatus.OK);
         } catch (Exception e) {
             // 로그 기록

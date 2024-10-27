@@ -13,37 +13,28 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review,Long>,ReviewListRepository {
+public interface ReviewRepository extends JpaRepository<Review,Long> {
     @EntityGraph(attributePaths = {"services"})
     @Query("""
     select r from Review r
-    where r.services.id = :servicesId
+    where r.services.no = :servicesNo
     and r.status != 1
     order by r.regDate desc
 """)
-    List<Review> findImageMatchByServicesId(Long servicesId);
+    List<Review> findImageMatchByServicesNo(Long servicesNo);
 
-    @Query("SELECT r FROM Review r WHERE r.member.id = :memberId AND r.payment IS NOT NULL")
-    List<Review> findByMemberIdNotNull(@Param("memberId") Long memberId);
+    @Query("SELECT r FROM Review r WHERE r.member.no = :memberNo AND r.payment IS NOT NULL")
+    List<Review> findByMemberNoNotNull(@Param("memberNo") Long memberNo);
 
+    Optional<Review> findByServicesNoAndNo(Long servicesNo, Long reviewNo);
 
-    @EntityGraph(attributePaths = {"services"})
-    List<Review> findAllByServicesId(Long servicesId);
+    Optional<Review> findByServicesNoAndNoAndMemberNo(Long servicesNo, Long reviewNo, Long memberNo);
 
-    Optional<Review> findByServicesIdAndId(Long servicesId, Long reviewId);
+    List<Review> findByMemberNo(Long memberNo);
 
-    Optional<Review> findByServicesIdAndIdAndMemberId(Long servicesId, Long reviewId, Long memberId);
+    Boolean existsByPaymentNo(Long paymentNo);
 
-//    @EntityGraph(attributePaths = {"member"})
-    List<Review> findByMemberId(Long memberId);
-
-    @Modifying
-    @Query("UPDATE Review r SET r.payment = :payment WHERE r.id = :reviewId")
-    void updatePaymentById(@Param("reviewId") Long reviewId, @Param("payment") Payment payment);
-
-    Boolean existsByPaymentId(Long paymentId);
-
-    Boolean existsByServicesIdAndMemberId(Long servicesId, Long member_id);
+    Boolean existsByServicesNoAndMemberNo(Long servicesNo, Long memberNo);
 
 
 

@@ -8,8 +8,8 @@ import lombok.Getter;
 import java.math.BigDecimal;
 @Getter
 @Builder
-public class ServiceResponseDTO {
-    private Long id;
+public class ServicesDTO {
+    private Long no;
 
     private ServicesType serviceType;
 

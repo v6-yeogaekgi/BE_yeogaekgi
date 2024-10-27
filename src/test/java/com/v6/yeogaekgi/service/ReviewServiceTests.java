@@ -1,7 +1,7 @@
 package com.v6.yeogaekgi.service;
 
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.review.dto.ReviewResponseDTO;
+import com.v6.yeogaekgi.review.dto.ReviewDTO;
 import com.v6.yeogaekgi.review.service.ReviewService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +16,9 @@ public class ReviewServiceTests {
 
     @Test
     public void testGetUserReview() {
-        Member member = Member.builder().id(1396L).build();
-        List<ReviewResponseDTO> result = reviewService.getUserReviewList(member);
-        for(ReviewResponseDTO review : result) {
+        Member member = Member.builder().no(1396L).build();
+        List<ReviewDTO> result = reviewService.getUserReviewList(member);
+        for(ReviewDTO review : result) {
             System.out.println(review);
         }
     }
