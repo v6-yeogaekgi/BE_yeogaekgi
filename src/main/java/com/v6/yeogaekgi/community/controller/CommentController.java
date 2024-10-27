@@ -2,8 +2,6 @@ package com.v6.yeogaekgi.community.controller;
 
 import com.v6.yeogaekgi.community.dto.CommentDTO;
 import com.v6.yeogaekgi.community.service.CommentService;
-import com.v6.yeogaekgi.kiosk.dto.KioskRequestDTO;
-import com.v6.yeogaekgi.kiosk.dto.KioskResponseDTO;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -26,58 +24,58 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    @GetMapping("all/{postId}")
-    public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("postId") Long postId,@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    @GetMapping("all/{postNo}")
+    public ResponseEntity<List<CommentDTO>> getCommentList(@PathVariable("postNo") Long postNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------list--------");
-        log.info("postNo : "+postId);
+        log.info("postNo : "+ postNo);
 
-        List<CommentDTO> commentDTOList = commentService.getListOfComment(postId,memberDetails.getMember());
+        List<CommentDTO> commentDTOList = commentService.getListOfComment(postNo,memberDetails.getMember());
         return new ResponseEntity<>(commentDTOList, HttpStatus.OK);
     }
 
-    @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentId") Long commentId,@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    @GetMapping("/{commentNo}")
+    public ResponseEntity<CommentDTO> getComment(@PathVariable("commentNo") Long commentNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("--------one comment--------");
-        log.info("commentNo : "+commentId);
+        log.info("commentNo : "+ commentNo);
 
-        CommentDTO commentDTO = commentService.getComment(commentId,memberDetails.getMember());
+        CommentDTO commentDTO = commentService.getComment(commentNo,memberDetails.getMember());
         return new ResponseEntity<>(commentDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/{postId}")
-    public ResponseEntity<Long> registerComment(@PathVariable("postId") Long postId, @RequestBody CommentDTO commentDTO,@AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        commentDTO.setPostId(postId);
-        log.info("----------------register commnet-------------------");
+    @PostMapping("/{postNo}")
+    public ResponseEntity<Long> registerComment(@PathVariable("postNo") Long postNo, @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
+        commentDTO.setPostId(postNo);
+        log.info("----------------register comment-------------------");
         log.info("commentDTO : "+commentDTO);
-        Long commentId = commentService.register(commentDTO,memberDetails.getMember());
-        return new ResponseEntity<>(commentId,HttpStatus.OK);
+        Long commentNo = commentService.register(commentDTO,memberDetails.getMember());
+        return new ResponseEntity<>(commentNo,HttpStatus.OK);
 
     }
 
-    @PutMapping("/{commentId}")
-    public ResponseEntity<Long> modifyComment(@PathVariable("commentId") Long commentId,
+    @PutMapping("/{commentNo}")
+    public ResponseEntity<Long> modifyComment(@PathVariable("commentNo") Long commentNo,
                                              @RequestBody CommentDTO commentDTO){
-        commentDTO.setCommentId(commentId);
-        log.info("---------------modify Comment--------------" + commentId);
+        commentDTO.setCommentId(commentNo);
+        log.info("---------------modify Comment--------------" + commentNo);
         log.info("commentDTO: " + commentDTO);
 
         commentService.modify(commentDTO);
 
-        return new ResponseEntity<>(commentId, HttpStatus.OK);
+        return new ResponseEntity<>(commentNo, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/{postId}/{commentId}")
-    public ResponseEntity<Long> removeComment( @PathVariable Long commentId, @PathVariable Long postId){
+    @DeleteMapping("/{postNo}/{commentNo}")
+    public ResponseEntity<Long> removeComment(@PathVariable Long commentNo, @PathVariable Long postNo){
         log.info("---------------remove comment--------------");
-        log.info("commentId: " + commentId);
-        log.info("postId: " + postId);
+        log.info("commentNo: " + commentNo);
+        log.info("postNo: " + postNo);
 
 
 
-        commentService.remove(commentId,postId);
+        commentService.remove(commentNo, postNo);
 
 
-        return new ResponseEntity<>(commentId, HttpStatus.OK);
+        return new ResponseEntity<>(commentNo, HttpStatus.OK);
     }
 }
