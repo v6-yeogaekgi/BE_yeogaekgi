@@ -34,7 +34,7 @@ public class QnaService {
     // Qna List
     public PageResultDTO<QnaDTO> getQnaList(PageRequestDTO pageRequestDTO, Member member) {
         Pageable pageable = PageRequest.of(pageRequestDTO.getPage(), 10, Sort.by(Sort.Direction.DESC, "no"));
-        Slice<Qna> result = repository.findByMember_Id(member.getNo(), pageable);
+        Slice<Qna> result = repository.findByMember_No(member.getNo(), pageable);
         if(result != null){
             List<QnaDTO> content = result.getContent().stream()
                     .map(Qna -> entityToDto(Qna))
