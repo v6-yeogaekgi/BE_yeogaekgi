@@ -6,12 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.OptionalInt;
 
 public interface ServicesLikeRepository extends JpaRepository<ServiceLike,Long> {
-    Optional<ServiceLike> findByServiceIdAndMemberId(Long serviceId, Long memberId);
+    Optional<ServiceLike> findByServiceNoAndMemberNo(Long serviceNo, Long memberNo);
 
-    List<ServiceLike> findByMemberId(Long memberId);
+    List<ServiceLike> findByMemberNo(Long memberNo);
 
     @Query("""
     select count(sk)
