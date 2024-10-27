@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface QnaRepository extends JpaRepository<Qna, Long> {
-    Slice<Qna> findByMember_Id(Long memberNo, Pageable pageable);
+    Slice<Qna> findByMember_No(Long memberNo, Pageable pageable);
 }

@@ -1,21 +1,14 @@
 package com.v6.yeogaekgi.community.repository;
 
 
-import com.v6.yeogaekgi.community.dto.HashtagDTO;
-import com.v6.yeogaekgi.community.dto.PostDTO;
-import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
-import com.v6.yeogaekgi.member.entity.Member;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     // 해시태그 검색
@@ -32,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 해시 검색 리스트 조회
     @EntityGraph(attributePaths = {"member"})
-    Slice<Post> findByMember_Id(Long memberNo,Pageable pageable);
+    Slice<Post> findByMember_No(Long memberNo, Pageable pageable);
 
 
 
