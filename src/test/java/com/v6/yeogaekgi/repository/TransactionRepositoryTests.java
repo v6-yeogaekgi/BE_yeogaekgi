@@ -38,8 +38,8 @@ public class TransactionRepositoryTests {
                     .krwAmount(new BigDecimal("10000.00"))
                     .foreignAmount(new BigDecimal("1099.95"))
                     .currencyType(1)
-                    .userCard(UserCard.builder().id(userCardId).build())
-                    .member(Member.builder().id(memberId).build())
+                    .userCard(UserCard.builder().no(userCardId).build())
+                    .member(Member.builder().no(memberId).build())
                     .build();
 
             transactionRepository.save(transaction);

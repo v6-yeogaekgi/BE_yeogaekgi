@@ -28,10 +28,10 @@ public class PaymentRepositoryTests {
                     .status(i%2==0?0:1)
                     .serviceName(i%2==0?"가게":"교통공사")
                     .userCard(UserCard.builder().
-                            id(i).
+                            no(i).
                             build())
                     .member(Member.builder().
-                            id(i).
+                            no(i).
                             build())
                     .build();
             paymentRepository.save(payment);

@@ -27,8 +27,8 @@ public class UserCardRepositoryTests {
                     .starred(1)
                     .status(1)
                     .transitBalance(0)
-                    .card(Card.builder().id(1L).build())
-                    .member(Member.builder().id(5L).build())
+                    .card(Card.builder().no(1L).build())
+                    .member(Member.builder().no(5L).build())
                     .build();
             userCardRepository.save(userCard);
     }

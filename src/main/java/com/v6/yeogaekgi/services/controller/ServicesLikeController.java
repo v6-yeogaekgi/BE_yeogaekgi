@@ -25,10 +25,10 @@ public class ServicesLikeController {
         return new ResponseEntity<>(servicesLikeService.findAllServiceLike(memberDetails.getMember().getNo()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{servicesLikeId}")
-    public ResponseEntity<String> deleteUserLike(@PathVariable Long servicesLikeId) {
+    @DeleteMapping("/delete/{servicesLikeNo}")
+    public ResponseEntity<String> deleteUserLike(@PathVariable Long servicesLikeNo) {
         try {
-            servicesLikeService.deleteById(servicesLikeId);
+            servicesLikeService.deleteByNo(servicesLikeNo);
             return new ResponseEntity<>("success", HttpStatus.OK);
         } catch (Exception e) {
             // 로그 기록

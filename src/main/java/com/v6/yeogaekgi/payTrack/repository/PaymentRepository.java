@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
-    Optional<Payment> findById(Long no);
 
     @Query("""
     select p from Payment p

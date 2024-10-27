@@ -21,11 +21,11 @@ public class ServicesLikeService {
     private final ServicesLikeRepository servicesLikeRepository;
 
     public List<ServicesLikeDTO> findAllServiceLike(Long memberNo) {
-        List<ServiceLike> serviceLikeListByMemberNo = servicesLikeRepository.findByMemberId(memberNo);
+        List<ServiceLike> serviceLikeListByMemberNo = servicesLikeRepository.findByMemberNo(memberNo);
         return serviceLikeListByMemberNo.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public void deleteById(Long id) {
+    public void deleteByNo(Long id) {
         servicesLikeRepository.deleteById(id);
     }
 
@@ -37,9 +37,9 @@ public class ServicesLikeService {
         Services services = byId.get();
 
         return ServicesLikeDTO.builder()
-                .servicesLikeId(serviceLike.getId())
-                .memberId(serviceLike.getMember().getNo())
-                .servicesId(serviceLike.getService().getId())
+                .servicesLikeNo(serviceLike.getNo())
+                .memberNo(serviceLike.getMember().getNo())
+                .servicesNo(serviceLike.getService().getId())
                 .address(services.getAddress())
                 .content(services.getContent())
                 .likeCnt(services.getLikeCnt())
