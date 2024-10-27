@@ -33,8 +33,8 @@ public class QnaService {
 
     // Qna List
     public PageResultDTO<QnaDTO> getQnaList(PageRequestDTO pageRequestDTO, Member member) {
-        Pageable pageable = PageRequest.of(pageRequestDTO.getPage(), 10, Sort.by(Sort.Direction.DESC, "id"));
-        Slice<Qna> result = repository.findByMember_Id(member.getId(), pageable);
+        Pageable pageable = PageRequest.of(pageRequestDTO.getPage(), 10, Sort.by(Sort.Direction.DESC, "no"));
+        Slice<Qna> result = repository.findByMember_Id(member.getNo(), pageable);
         if(result != null){
             List<QnaDTO> content = result.getContent().stream()
                     .map(Qna -> entityToDto(Qna))
@@ -47,8 +47,8 @@ public class QnaService {
     }
 
     // Qna Detial
-    public QnaDTO getQna(Long qnaId) {
-        Optional<Qna> qna = repository.findById(qnaId);
+    public QnaDTO getQna(Long qnaNo) {
+        Optional<Qna> qna = repository.findById(qnaNo);
         QnaDTO dto = null;
         if(qna.isPresent()){
             dto = entityToDto(qna.get());
@@ -59,28 +59,28 @@ public class QnaService {
     // Qna Register
     public Long register(Qna qna) {
         repository.save(qna);
-        return qna.getId();
+        return qna.getNo();
     }
 
     // Qna modify
     public void modify(Qna qna) {
-        Optional<Qna> result = repository.findById(qna.getId());
+        Optional<Qna> result = repository.findById(qna.getNo());
         if(result.isPresent()){
             repository.save(qna);
         }
     }
 
     // Qna remove
-    public void remove(Long postId) {
-        Optional<Qna> result = repository.findById(postId);
+    public void remove(Long postNo) {
+        Optional<Qna> result = repository.findById(postNo);
         if(result.isPresent()){
-            repository.deleteById(postId);
+            repository.deleteById(postNo);
         }
     }
 
     public Qna dtoToEntity(QnaDTO dto, Member member) {
         Qna entity = Qna.builder()
-                .id(dto.getQnaId())
+                .no(dto.getQnaNo())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .images(s3Service.convertListToString2(dto.getImages()))
@@ -95,14 +95,14 @@ public class QnaService {
 
     public QnaDTO entityToDto(Qna entity) {
         QnaDTO dto = QnaDTO.builder()
-                .qnaId(entity.getId())
+                .qnaNo(entity.getNo())
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .images(s3Service.convertStringToList(entity.getImages()))
                 .qnaDate(entity.getQnaDate())
                 .reply(entity.getReply())
                 .replyDate(entity.getReplyDate())
-                .memberId(entity.getMember().getId())
+                .memberNo(entity.getMember().getNo())
                 .code(entity.getMember().getCountry().getCode())
                 .status(entity.isStatus())
                 .build();

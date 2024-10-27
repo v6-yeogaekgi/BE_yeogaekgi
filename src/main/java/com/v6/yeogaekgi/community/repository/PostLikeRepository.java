@@ -13,11 +13,11 @@ import java.util.Optional;
 
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
 
-    @Query("SELECT pl.post.id FROM PostLike pl WHERE pl.member.id = :memberId")
-    List<Long> findPost_IdByMember_Id(@Param("memberId") Long memberId);
+    @Query("SELECT pl.post.no FROM PostLike pl WHERE pl.member.no = :memberNo")
+    List<Long> findPost_IdByMember_Id(@Param("memberNo") Long memberNo);
 
     @EntityGraph(attributePaths = {"member"})
-    boolean existsByPost_IdAndMember_Id(Long postId, Long member_Id); // member가 post에 좋아요를 누른건지 확인
+    boolean existsByPost_IdAndMember_Id(Long postNo, Long memberNo); // member가 post에 좋아요를 누른건지 확인
 
-    void deleteByPost_IdAndMember_Id(Long postId, Long memberId);
+    void deleteByPost_IdAndMember_Id(Long postNo, Long memberNo);
 }

@@ -28,14 +28,14 @@ public class CommentService {
     private final PostRepository postRepository;
 
     public List<CommentDTO> getListOfComment(Long postNo, Member member) {
-        Post post = Post.builder().id(postNo).build();
+        Post post = Post.builder().no(postNo).build();
         List<Comment> result = repository.findByPost(post);
         return result.stream().map(Comment -> entityToDto(Comment,member)).collect(Collectors.toList());
 
     }
 
-    public CommentDTO getComment(Long commentId, Member member) {
-        Optional<Comment> optionalComment = repository.findById(commentId);
+    public CommentDTO getComment(Long commentNo, Member member) {
+        Optional<Comment> optionalComment = repository.findById(commentNo);
 
         if (optionalComment.isPresent()) {
             Comment comment = optionalComment.get();
@@ -48,19 +48,19 @@ public class CommentService {
     public Long register(CommentDTO commentDTO, Member member) {
         Comment comment = dtoToEntity(commentDTO, member);
         // commentCnt + 1
-        Optional<Post> result = postRepository.findById(comment.getPost().getId());
+        Optional<Post> result = postRepository.findById(comment.getPost().getNo());
         if (result.isPresent()) {
             Post post = result.get();
             post.changeCommentCnt(post.getCommentCnt()+1);
             postRepository.save(post);
         }
         repository.save(comment);
-        return comment.getId();
+        return comment.getNo();
     }
 
     @Transactional
     public void modify(CommentDTO commentDTO) {
-        Optional<Comment> result = repository.findById(commentDTO.getCommentId());
+        Optional<Comment> result = repository.findById(commentDTO.getCommentNo());
         if (result.isPresent()) {
             Comment comment = result.get();
             comment.changeComment(commentDTO.getContent());
@@ -87,9 +87,9 @@ public class CommentService {
     public Comment dtoToEntity(CommentDTO commentDTO, Member member) {
 
         Comment comment = Comment.builder()
-                .id(commentDTO.getCommentId())
+                .no(commentDTO.getCommentNo())
                 .content(commentDTO.getContent())
-                .post(Post.builder().id(commentDTO.getPostId()).build())
+                .post(Post.builder().no(commentDTO.getPostNo()).build())
                 .member(member)
                 .build();
 
@@ -99,15 +99,15 @@ public class CommentService {
     public CommentDTO entityToDto(Comment comment, Member member) {
 
         CommentDTO commentDTO = CommentDTO.builder()
-                .commentId(comment.getId())
+                .commentNo(comment.getNo())
                 .content(comment.getContent())
                 .regDate(comment.getRegDate())
                 .modDate(comment.getModDate())
-                .postId(comment.getPost().getId())
-                .memberId(comment.getMember().getId())
+                .postNo(comment.getPost().getNo())
+                .memberNo(comment.getMember().getNo())
                 .nickname(comment.getMember().getNickname())
                 .code(comment.getMember().getCountry().getCode())
-                .currentMemberId(member.getId())
+                .currentMemberNo(member.getNo())
                 .currentMemberCode(member.getCountry().getCode())
                 .build();
 
