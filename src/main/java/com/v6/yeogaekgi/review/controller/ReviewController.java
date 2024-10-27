@@ -35,8 +35,6 @@ public class ReviewController {
                                              @ModelAttribute("reviewDTO") ReviewDTO reviewDTO,
                                              @AuthenticationPrincipal MemberDetailsImpl memberDetails,
                                              @PathVariable Long servicesNo){
-        log.info("----------------register Review-------------------");
-        log.info("ReviewDTO : "+reviewDTO);
         Long id = reviewService.register(multipartFile,servicesNo,reviewDTO,memberDetails.getMember());
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
@@ -44,7 +42,6 @@ public class ReviewController {
     //이미지만 있는 리스트들 (맵에 이미지들만 있는 부분)
     @GetMapping("/{servicesNo}/ImgList")
     public ResponseEntity<List<ReviewDTO>> Imglist (@PathVariable("servicesNo") Long servicesNo){
-        log.info("-------------list review---------------");
          return new ResponseEntity<>(reviewService.ImageList(servicesNo),HttpStatus.OK);
     }
 
@@ -70,7 +67,6 @@ public class ReviewController {
             @PathVariable Long servicesNo,
             @PathVariable Long reviewNo,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        log.info("-------------detail review---------------");
         return new ResponseEntity<>(reviewService.Detail(servicesNo, reviewNo, memberDetails.getMember()), HttpStatus.OK);
     }
 
