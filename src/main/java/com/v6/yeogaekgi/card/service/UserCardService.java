@@ -5,16 +5,17 @@ import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.member.entity.Member;
-import io.jsonwebtoken.io.IOException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,87 +27,95 @@ public class UserCardService {
 
     public List<UserCardDTO> getUserCardByUserNo(Long userNo) {
         List<UserCard> result = userCardRepository.findByMemberNo(userNo);
-        return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
+        if (result.isEmpty()) {
+            throw new NoSuchElementException("사용자의 카드를 찾을 수 없습니다.");
+        }
+        return result.stream()
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
     }
 
     public UserCardDTO getUserCardByUserCardNo(Long userCardNo, Long memberNo) {
         if (!isUserCardOwner(memberNo, userCardNo)) {
-            throw new AccessDeniedException("You don't have permission to access this card's data");
+            throw new AccessDeniedException("해당 카드에 대한 접근 권한이 없습니다.");
         }
         return userCardRepository.findById(userCardNo)
                 .map(this::entityToDto)
-                .orElseThrow(() -> new EntityNotFoundException("UserCard not found with id: " + userCardNo));
+                .orElseThrow(() -> new EntityNotFoundException("카드를 찾을 수 없습니다. ID: " + userCardNo));
     }
 
-    @Transactional
-    public void updateBalance(UserCardDTO userCardDTO) {
-        try {
-            UserCard userCard = dtoToEntity(userCardDTO);
-            userCardRepository.save(userCard);
-        } catch (IOException e) {
-            throw new RuntimeException("error", e);
-        }
-    }
+//    @Transactional
+//    public void updateBalance(UserCardDTO userCardDTO) {
+//        UserCard userCard = dtoToEntity(userCardDTO);
+//        userCardRepository.save(userCard);
+//    }
 
     @Transactional
-    public boolean changesUserCardStarred(UserCardDTO userCardDTO, Long memberNo){
-        // parameter userCardDTO ->
-        // userCardNo = 주카드 타겟
-        // memberId = 주카드 갱신 사용자
-
-        UserCardDTO prevUserCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
-        UserCardDTO nextUserCard = null;
-
-        try{
-            List<UserCardDTO> all = getAllByMemberNo(prevUserCard.getMemberNo());
-            for (UserCardDTO cardDTO : all) {
-                if(cardDTO.getStatus() == 1){
-                    if(cardDTO.getStarred()==1){
-                        cardDTO.updateStarred(0);
-                        userCardRepository.save(dtoToEntity(cardDTO));
-                    }
-                    if(cardDTO.getUserCardNo().equals(userCardDTO.getUserCardNo())){ // use userCardNo
-                        cardDTO.updateStarred(1);;
-                        UserCard saved = userCardRepository.save(dtoToEntity(cardDTO));
-                        nextUserCard = entityToDto(saved);
-                    }
-                }
-            }
-            if (nextUserCard != null && nextUserCard.getStarred() != prevUserCard.getStarred()) return true;
-
-            return false;
-        }catch (Exception e){
-            throw new RuntimeException("error", e);
+    public boolean changeUserCardStarred(UserCardDTO userCardDTO, Long memberNo){
+        if (!isUserCardOwner(memberNo, userCardDTO.getUserCardNo())) {
+            throw new AccessDeniedException("해당 카드에 대한 접근 권한이 없습니다.");
         }
+
+        List<UserCardDTO> allCards = getAllByMemberNo(memberNo);
+
+        // 현재 starred 상태인 카드들의 starred를 0으로 변경
+        allCards.stream()
+                .filter(card -> card.getStatus() == 1 && card.getStarred() == 1)
+                .forEach(card -> {
+                    card.updateStarred(0);
+                    userCardRepository.save(dtoToEntity(card));
+                });
+
+        // 대상 카드를 starred로 변경
+        return allCards.stream()
+                .filter(card -> card.getStatus() == 1 && card.getUserCardNo().equals(userCardDTO.getUserCardNo()))
+                .findFirst()
+                .map(card -> {
+                    card.updateStarred(1);
+                    userCardRepository.save(dtoToEntity(card));
+                    return true;
+                })
+                .orElseThrow(() -> new NoSuchElementException("대상 카드를 찾을 수 없습니다."));
     }
 
     public boolean deleteUserCardStarred(UserCardDTO userCardDTO, Long memberNo){
-
-        try {
-            UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
-            int prevStarred = userCard.getStarred();
-            userCard.updateStarred(0);
-            UserCard save = userCardRepository.save(dtoToEntity(userCard));
-
-            if(save.getStarred() != prevStarred) return true;
-        }catch (Exception e){
-            throw new RuntimeException("error", e);
+        if (!isUserCardOwner(memberNo, userCardDTO.getUserCardNo())) {
+            throw new AccessDeniedException("해당 카드에 대한 접근 권한이 없습니다.");
         }
-        return false;
+
+        UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
+        if (userCard.getStarred() == 0) {
+            throw new HttpMessageNotWritableException("이미 주카드가 아닙니다.");
+        }
+
+        userCard.updateStarred(0);
+        UserCard savedCard = userCardRepository.save(dtoToEntity(userCard));
+        if(savedCard.getStarred() != 0) {
+            throw new RuntimeException("주카드 해제에 실패했습니다.");
+        }
+
+        return true;
     }
 
     public boolean deleteUserCard(UserCardDTO userCardDTO, Long memberNo){
-        try {
-            UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
-            userCard.updateStatus(2);
-            // 삭제 대상 카드가 주카드일때 주카드 상태 해제 이후 save
-            if(userCard.getStarred()==1) userCard.setStarred(0);
-            UserCard save = userCardRepository.save(dtoToEntity(userCard));
-            if(save.getStatus() == 2) return true;
-        }catch (Exception e){
-            throw new RuntimeException("error", e);
+        if (!isUserCardOwner(memberNo, userCardDTO.getUserCardNo())) {
+            throw new AccessDeniedException("해당 카드에 대한 접근 권한이 없습니다.");
         }
-        return false;
+
+        UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
+        if (userCard.getStatus() == 2) {
+            throw new HttpMessageNotWritableException("이미 삭제된 카드입니다.");
+        }
+        userCard.updateStatus(2);
+        // 주카드였다면 해제
+        if (userCard.getStarred()==1) userCard.setStarred(0);
+
+        UserCard savedCard = userCardRepository.save(dtoToEntity(userCard));
+        if (savedCard.getStatus() != 2) {
+            throw new RuntimeException("카드 삭제 처리에 실패했습니다.");
+        }
+
+        return true;
     }
 
     public List<UserCardDTO> getAllByMemberNo(Long memberNo) {
@@ -115,25 +124,18 @@ public class UserCardService {
     }
 
     public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberNo, String area) {
-        log.info("----getHomeCardByMemberAndArea----");
-
-        List<UserCard> find = userCardRepository.findByMemberNo(memberNo);
-        List<UserCardDTO> result = new ArrayList<>();
-
-        for(UserCard userCard : find) {
-//            log.info(userCard.toString());
-            String userCardArea = userCard.getCard().getArea();
-            if(userCardArea != null && area != null){
-                if(userCardArea.equals(area)) {
-                    result.add(entityToDto(userCard));
-                } else {
-                    log.info(userCard.getCard().getArea());
-                }
-            } else {
-                log.info("null error");
-            }
+        if (area == null) {
+            throw new IllegalArgumentException("지역 정보가 없습니다.");
         }
-        log.info("result: " + result);
+
+        List<UserCard> userCards = userCardRepository.findByMemberNo(memberNo);
+        List<UserCardDTO> result = userCards.stream()
+                .filter(userCard -> userCard.getCard().getArea() != null)
+                .filter(userCard -> userCard.getCard().getArea().equals(area))
+                .map(this::entityToDto)
+                .collect(Collectors.toList());
+
+        // TODO - 빈 리스트라면 프론트에서 처리하기
         return result;
     }
 

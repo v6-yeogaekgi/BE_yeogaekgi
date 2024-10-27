@@ -34,7 +34,7 @@ public class UserCardServiceTests extends CommonTests {
                 .userCardNo(userCardNo)
                 .memberNo(member_no)
                 .build();
-        userCardService.changesUserCardStarred(cardDTO, member_no);
+        userCardService.changeUserCardStarred(cardDTO, member_no);
     }
 
     @Test

@@ -26,87 +26,39 @@ public class UserCardController {
     @GetMapping("/list")
     public ResponseEntity<List<UserCardDTO>> list(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
         log.info("get mapping user card list");
-        try{
-            return new ResponseEntity<>(userCardService.getUserCardByUserNo(memberDetails.getMember().getNo()), HttpStatus.OK);
-        } catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(userCardService.getUserCardByUserNo(memberDetails.getMember().getNo()));
     }
 
     @GetMapping("/{userCardId}")
     public ResponseEntity<UserCardDTO> getDetail(@PathVariable Long userCardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails, HttpServletRequest request) { // 카드번호로 카드 상세 조회
-        try{
-            return new ResponseEntity<>(userCardService.getUserCardByUserCardNo(userCardId, memberDetails.getMember().getNo()), HttpStatus.OK);
-        } catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return ResponseEntity.ok(userCardService.getUserCardByUserCardNo(userCardId, memberDetails.getMember().getNo()));
     }
 
     @PutMapping("/modify/star")
     public ResponseEntity<String> modifyStar(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        // 프론트에서 받을 정보 userCardNo
-        // security 에서 받을 정보 -> member
-        // Long id = memberDetails.getMember().getId();
-        try {
-            boolean result = userCardService.changesUserCardStarred(userCardDTO, memberDetails.getMember().getNo());
-            if(result){
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        boolean result = userCardService.changeUserCardStarred(userCardDTO, memberDetails.getMember().getNo());
+        return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
     @PutMapping("/delete/star")
     public ResponseEntity<String> deleteStar(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        // 프론트에서 받을 정보 userCardNo
-        // security 에서 받을 정보 -> member
-        // Long id = memberDetails.getMember().getId();
-        try {
-            boolean result = userCardService.deleteUserCardStarred(userCardDTO, memberDetails.getMember().getNo());
-
-            if(result){
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        boolean result = userCardService.deleteUserCardStarred(userCardDTO, memberDetails.getMember().getNo());
+        return result ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
     }
 
     @PutMapping("/delete/card")
     public ResponseEntity<String> deleteCard(@RequestBody UserCardDTO userCardDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        try{
-            boolean result = userCardService.deleteUserCard(userCardDTO, memberDetails.getMember().getNo());
-            if(result){
-                return new ResponseEntity<>("success", HttpStatus.OK);
-            }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        boolean result = userCardService.deleteUserCard(userCardDTO, memberDetails.getMember().getNo());
+        return result ? ResponseEntity.ok("success") : ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/area")
     public ResponseEntity<?> getCardAreas(@AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        log.info("-----------getCardAreas-----------");
-        try {
-            return new ResponseEntity<>(cardService.getCardAreas(), HttpStatus.OK);
-        } catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.ok(cardService.getCardAreas());
     }
 
     @PostMapping("/area")
     public ResponseEntity<?> getHomeCards(@RequestBody String area, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        log.info("-----------getHomeCards-----------");
-        log.info("-----------print area: " + area);
-        try {
-            List<UserCardDTO> result = userCardService.getHomeCardByMemberAndArea(memberDetails.getMember().getNo(), area);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (RuntimeException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.ok(userCardService.getHomeCardByMemberAndArea(memberDetails.getMember().getNo(), area));
     }
 }
