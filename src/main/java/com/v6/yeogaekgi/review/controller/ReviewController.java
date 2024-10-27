@@ -3,16 +3,13 @@ package com.v6.yeogaekgi.review.controller;
 
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.review.dto.*;
-import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
-import jakarta.servlet.http.HttpServletRequest;
+import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import com.v6.yeogaekgi.review.dto.ReviewRequestDTO;
-import com.v6.yeogaekgi.review.dto.SliceResponse;
 import com.v6.yeogaekgi.review.service.ReviewService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -33,20 +30,20 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    @PostMapping("/{servicesId}/register")
+    @PostMapping("/{servicesNo}/register")
     public ResponseEntity<Long> registerPost(@RequestParam (value = "files", required = false)  List<MultipartFile> multipartFile,
-                                             @ModelAttribute("reviewRequestDTO") ReviewRequestDTO reviewRequestDTO,
+                                             @ModelAttribute("reviewDTO") ReviewDTO reviewDTO,
                                              @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-                                             @PathVariable Long servicesId){
+                                             @PathVariable Long servicesNo){
         log.info("----------------register Review-------------------");
-        log.info("ReviewDTO : "+reviewRequestDTO);
-        Long id = reviewService.register(multipartFile,servicesId,reviewRequestDTO,memberDetails.getMember());
+        log.info("ReviewDTO : "+reviewDTO);
+        Long id = reviewService.register(multipartFile,servicesNo,reviewDTO,memberDetails.getMember());
         return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     //이미지만 있는 리스트들 (맵에 이미지들만 있는 부분)
     @GetMapping("/{servicesId}/ImgList")
-    public ResponseEntity<List<ReviewResponseDTO>> Imglist (@PathVariable("servicesId") Long servicesId){
+    public ResponseEntity<List<ReviewDTO>> Imglist (@PathVariable("servicesId") Long servicesId){
         log.info("-------------list review---------------");
          return new ResponseEntity<>(reviewService.ImageList(servicesId),HttpStatus.OK);
     }
@@ -54,7 +51,7 @@ public class ReviewController {
 
 //     리뷰 무한스크롤 구현을 위한(리뷰 리스트들)
     @GetMapping("/{servicesId}/reviewList")
-    public ResponseEntity<SliceResponse<ReviewResponseDTO>> reviewList(
+    public ResponseEntity<PageResultDTO<ReviewDTO>> reviewList(
             @PathVariable Long servicesId,
             Pageable pageable,
             @RequestParam(required = false) Integer payStatus
@@ -63,13 +60,13 @@ public class ReviewController {
     }
 
     @PostMapping("/list")
-    public ResponseEntity<List<ReviewResponseDTO>> getUserReviews(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    public ResponseEntity<List<ReviewDTO>> getUserReviews(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         Member member = memberDetails.getMember();
         return new ResponseEntity<>(reviewService.getUserReviewList(member), HttpStatus.OK);
     }
 
     @GetMapping("/{servicesId}/{reviewId}/detail")
-    public ResponseEntity<ReviewResponseDTO> getReviewDetail(
+    public ResponseEntity<ReviewDTO> getReviewDetail(
             @PathVariable Long servicesId,
             @PathVariable Long reviewId,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {

@@ -13,18 +13,19 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReviewResponseDTO {
-    private Long reviewId;
+public class ReviewDTO {
+    private Long reviewNo;
     private List<String> images;
     private List<String> thumbnail;
     private int score;
     private String content;
     private int status;
-    private Long serviceId;  // 서비스 no
+    private Long serviceNo;  // 서비스 no
     private String serviceName; // 서비스 이름
     private String nickname;
     private Country country;
     private Timestamp regDate;
     private Timestamp modDate;
     private Long paymentId;
+    private Long payNo;
 }

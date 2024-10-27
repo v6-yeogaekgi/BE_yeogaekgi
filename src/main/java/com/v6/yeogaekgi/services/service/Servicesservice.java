@@ -1,9 +1,7 @@
 package com.v6.yeogaekgi.services.service;
 
-import com.amazonaws.services.ec2.model.ServiceType;
 import com.v6.yeogaekgi.member.entity.Member;
-import com.v6.yeogaekgi.review.entity.Review;
-import com.v6.yeogaekgi.services.dto.ServiceResponseDTO;
+import com.v6.yeogaekgi.services.dto.ServicesDTO;
 import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.entity.ServicesType;
@@ -25,8 +23,8 @@ public class Servicesservice {
     private final ServicesRepository servicesRepository;
     private final ServicesLikeRepository servicesLikeRepository;
 
-    public ServiceResponseDTO entityToDto(Services service) {
-        return ServiceResponseDTO.builder()
+    public ServicesDTO entityToDto(Services service) {
+        return ServicesDTO.builder()
                 .id(service.getId())
                 .serviceType(service.getType())
                 .name(service.getName())
@@ -38,38 +36,40 @@ public class Servicesservice {
                 .build();
     }
 
-    public List<Services> findAllServices(String area) {
-        return servicesRepository.findAllServices(area);
+    public List<ServicesDTO> findAllServices(String area) {
+        return servicesRepository.findAllServices(area).stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<Services> findServicesWithFilters(List<ServicesType> type, String area, Boolean myLike, Boolean myReview, Long memberId) {
+    public List<ServicesDTO> findServicesWithFilters(List<ServicesType> type, String area, Boolean myLike, Boolean myReview, Long memberId) {
         // myLike와 myReview가 모두 true인 경우
-        if (Boolean.TRUE.equals(myLike) && Boolean.TRUE.equals(myReview)) {
-            return (type == null || type.isEmpty())
+        List<Services> result = null;
+        if (myLike && myReview) {
+            result= (type == null || type.isEmpty())
                     ? servicesRepository.findServicesByAreaAndMyReviewANDmyLike(area, memberId)
                     : servicesRepository.findServicesByTypesAndAreaAndMyReviewANDmyLike(type, area, memberId);
         }
 
         // myLike만 true인 경우
-        if (Boolean.TRUE.equals(myLike)) {
-            return (type == null || type.isEmpty())
+        if (myLike) {
+            result= (type == null || type.isEmpty())
                     ? servicesRepository.findServicesByAreaAndMyLike(area, memberId)
                     : servicesRepository.findServicesByTypesAndAreaAndMyLike(type, area, memberId);
         }
 
         // myReview만 true인 경우
-        if (Boolean.TRUE.equals(myReview)) {
-            return (type == null || type.isEmpty())
+        if (myReview) {
+            result= (type == null || type.isEmpty())
                     ? servicesRepository.findServicesByAreaAndMyReview(area, memberId)
                     : servicesRepository.findServicesByTypesAndAreaAndMyReview(type, area, memberId);
         }
 
         // 기본적으로 타입 필터만 적용된 서비스 조회
-        return servicesRepository.findServicesByTypesAndArea(type, area);
+        result= servicesRepository.findServicesByTypesAndArea(type, area);
+        return result.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
     @Transactional
-    public Boolean servicesLike (Long servicesId,Long memberId){
+    public boolean servicesLike (Long servicesId,Long memberId){
         Optional<ServiceLike> serviceLikeCheck = servicesLikeRepository.findByServiceIdAndMemberId(servicesId,memberId);
         Services services = servicesRepository.findById(servicesId)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
@@ -83,7 +83,7 @@ public class Servicesservice {
             servicesRepository.save(services);
             return true;
         }else{
-            Long servicesLikeId = serviceLikeCheck.get().getId();
+            Long servicesLikeId = serviceLikeCheck.get().getNo();
             servicesLikeRepository.deleteById(servicesLikeId);
             services.decreaseLikeCnt();
             servicesRepository.save(services);

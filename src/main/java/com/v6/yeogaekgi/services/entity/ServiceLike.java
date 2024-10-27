@@ -19,7 +19,7 @@ public class ServiceLike {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "services_like_no")
-    private Long id;
+    private Long no;
 
     @ManyToOne
     @JoinColumn(name ="service_no", nullable = false)
