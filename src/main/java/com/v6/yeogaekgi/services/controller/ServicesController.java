@@ -2,6 +2,7 @@ package com.v6.yeogaekgi.services.controller;
 
 
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
+import com.v6.yeogaekgi.services.dto.ServicesDTO;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.entity.ServicesType;
 import com.v6.yeogaekgi.services.service.Servicesservice;
@@ -23,14 +24,14 @@ public class ServicesController {
     private final Servicesservice servicesservice;
 
     @GetMapping("/servicesList/{area}")
-    public ResponseEntity<List<Services>> getAllServices(
+    public ResponseEntity<List<ServicesDTO>> getAllServices(
             @PathVariable String area,
             @RequestParam(required = false) List<ServicesType> type,
             @RequestParam(required = false) Boolean myLike,
             @RequestParam(required = false) Boolean myReview,
             @AuthenticationPrincipal MemberDetailsImpl memberDetails
     ) {
-        List<Services> services;
+        List<ServicesDTO> services;
         Long memberId = memberDetails.getMember().getNo();
         // 기본 필터링 조건 설정
         if ((type == null || type.isEmpty()) && (myLike == null || !myLike) && (myReview == null || !myReview)) {

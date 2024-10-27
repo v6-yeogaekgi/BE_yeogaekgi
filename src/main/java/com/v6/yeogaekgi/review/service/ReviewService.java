@@ -2,12 +2,16 @@ package com.v6.yeogaekgi.review.service;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
+import com.v6.yeogaekgi.payTrack.service.PaymentService;
 import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.review.entity.Review;
+import com.v6.yeogaekgi.review.repository.ReviewListRepository;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
+import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -15,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -27,57 +32,53 @@ public class ReviewService {
     private final PaymentRepository paymentRepository;
     private final ServicesRepository servicesRepository;
 
-    public Review dtoToEntity(ReviewRequestDTO reviewRequestDTO,Member member,Long servicesId) {
-        //url들을 프론트에서 배열로 보내줄 예정
-        Review review = Review.builder()
-                .score(reviewRequestDTO.getScore())
-                .content(reviewRequestDTO.getContent())
+    public Review dtoToEntity(ReviewDTO reviewDTO,Member member,Long servicesNo) {
+        return Review.builder()
+                .score(reviewDTO.getScore())
+                .content(reviewDTO.getContent())
                 .member(member)
-//                .payment(Payment.builder().id(reviewRequestDTO.getPayNo()).build())
-                .services(Services.builder().id(servicesId).build())
+                .services(Services.builder().no(servicesNo).build())
                 .build();
-        return review;
     }
 
-    public ReviewResponseDTO entityToDto(Review review) {
+
+    public ReviewDTO entityToDto(Review review) {
         List<String> images = review.getImages();
         List<String> thumbnails = review.getThumbnails();
 
-        ReviewResponseDTO responseDTO = ReviewResponseDTO.builder()
-                   .reviewId(review.getId())
-                   .score(review.getScore())
+        ReviewDTO responseDTO = ReviewDTO.builder()
+                   .reviewNo(review.getNo())
                    .images(images)
                    .thumbnail(thumbnails)
+                   .score(review.getScore())
                    .content(review.getContent())
                    .regDate(review.getRegDate())
                    .modDate(review.getModDate())
-                   .serviceId(review.getServices().getId())
+                   .servicesNo(review.getServices().getNo())
                    .country(review.getMember().getCountry())
                    .nickname(review.getMember().getNickname())
                    .build();
               if(review.getPayment()!= null){
-                  responseDTO.setPaymentId(review.getPayment().getId());
+                  responseDTO.setPaymentId(review.getPayment().getNo());
               }
            return responseDTO;
     }
 
     @Transactional
-    public Long register(List<MultipartFile> multipartFile, Long servicesId,ReviewRequestDTO reviewRequestDTO, Member member) {
-        String service = servicesRepository.findServiceNameById(servicesId);
+    public Long register(List<MultipartFile> multipartFile, Long servicesNo,ReviewDTO reviewDTO, Member member) {
+        String serviceName = servicesRepository.findServiceNameByNo(servicesNo);
         Boolean reviewExist = null;
-
-        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getNo(),service, reviewRequestDTO.getPayNo());
+        Optional<Payment> payment = paymentRepository.findByMemberNoAndServiceNameAndPayNo(member.getNo(),serviceName, reviewDTO.getPayNo());
         if(!payment.isPresent()) {
-            reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getNo());
+            reviewExist = reviewRepository.existsByServicesNoAndMemberNo(servicesNo,member.getNo());
         } else {
-            reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
+            reviewExist = reviewRepository.existsByPaymentNo(reviewDTO.getPayNo());
         }
-
         if(reviewExist){
             return -1L;
         }
 
-        Review review = dtoToEntity(reviewRequestDTO,member,servicesId);
+        Review review = dtoToEntity(reviewDTO,member,servicesNo);
 
         if (multipartFile != null){
             List<Map<String, String>> uploadImage = s3Service.uploadImage(multipartFile);
@@ -94,85 +95,53 @@ public class ReviewService {
         }
 
         Review savedReview = reviewRepository.save(review);
-        if(payment.isPresent()){
+        if(payment.isPresent()) {
             savedReview.setPayment(payment.get());
         }
 
-        System.out.println(savedReview);
-
-        return savedReview.getId();
+        return savedReview.getNo();
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewResponseDTO> ImageList (Long serviceId) {
-        List<Review> reviews = reviewRepository.findImageMatchByServicesId(serviceId);
-        List<ReviewResponseDTO> result = new ArrayList<>();
+    public List<ReviewDTO> ImageList (Long serviceNo) {
+        List<Review> reviews = reviewRepository.findImageMatchByServicesNo(serviceNo);
+        List<ReviewDTO> result = new ArrayList<>();
         for (Review review : reviews) {
-            ReviewResponseDTO dto = ReviewResponseDTO.builder()
-                    .images(review.getImages())
-                    .nickname(review.getMember().getNickname())
-                    .country(review.getMember().getCountry())
-                    .score(review.getScore())
-                    .build();
+            ReviewDTO dto = entityToDto(review);
             result.add(dto);
         }
         return result;
     }
 
     @Transactional(readOnly = true)
-    public ReviewResponseDTO Detail (Long servicesId,Long reviewId,Member member){
-        Review review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getNo()).orElseThrow(
-                () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
-        );
-         System.out.println("images" + review.getImages());
-         System.out.println("review" + review);
-         System.out.println("member" + member);
-         System.out.println("reviewId" + reviewId);
-         System.out.println("serviceId" + servicesId);
-         return entityToDto(review);
+    public ReviewDTO Detail (Long servicesNo,Long reviewNo,Member member){
+        Optional<Review> review = reviewRepository.findByServicesNoAndNoAndMemberNo(servicesNo, reviewNo,member.getNo());
+        return review.map(this::entityToDto).orElseThrow(()-> new IllegalArgumentException("이미지를 찾을 수 없습니다"));
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<ReviewResponseDTO> reviewList(Long servicesId, Pageable pageable) {
-        // ReviewRepository의 listPage 메서드를 호출하여 페이징된 리뷰 목록을 가져옴
-        Slice<Review> result = reviewRepository.listPage(servicesId, pageable);
-        // Review 엔터티를 ReviewResponseDTO로 변환
-        List<ReviewResponseDTO> dtoList = result.getContent().stream()
-                .map(review -> entityToDto(review))
+    public PageResultDTO<ReviewDTO> reviewList(Long servicesNo, Pageable pageable) {
+        Slice<Review> result = new ReviewListRepository().listPage(servicesNo,pageable);
+        List<ReviewDTO> dtoList = result.getContent().stream()
+                .map(this::entityToDto)
                 .collect(Collectors.toList());
-        // SliceResponse 객체 생성
-        System.out.println("dtoList" + dtoList);
-        System.out.println("result" + result);
-        return new SliceResponse<>(dtoList, pageable, result.hasNext());
+        return new PageResultDTO<>(dtoList, pageable, result.hasNext());
     }
 
     @Transactional
-    public List<ReviewResponseDTO> getUserReviewList(Member member) {
-        List<Review> result = reviewRepository.findByMemberId(member.getNo());
-        ArrayList<ReviewResponseDTO> dtoList = new ArrayList<>();
+    public List<ReviewDTO> getUserReviewList(Member member) {
+        List<Review> result = reviewRepository.findByMemberNo(member.getNo());
+        ArrayList<ReviewDTO> dtoList = new ArrayList<>();
         for(Review review : result) {
-            ReviewResponseDTO dto = ReviewResponseDTO.builder()
-                    .reviewId(review.getId())
-                    .images(review.getImages())
-                    .thumbnail(review.getThumbnails())
-                    .score(review.getScore())
-                    .content(review.getContent())
-                    .status(review.getStatus())
-                    .nickname(review.getMember().getNickname())
-                    .country(review.getMember().getCountry())
-                    .serviceId(review.getServices().getId())
-                    .serviceName(review.getServices().getName())
-                    .regDate(review.getRegDate())
-                    .modDate(review.getModDate())
-                    .build();
+            ReviewDTO dto = entityToDto(review);
             dtoList.add(dto);
         }
         return dtoList;
     }
 
     @Transactional
-    public ReviewUpdateResponseDTO updateReview(List<MultipartFile> images, Long servicesId, Long reviewId, ReviewUpdateDTO reviewUpdateDTO, Member member) {
-        Review review = reviewRepository.findByServicesIdAndId(servicesId, reviewId).orElseThrow(
+    public ReviewUpdateResponseDTO updateReview(List<MultipartFile> images, Long servicesNo, Long reviewNo, ReviewUpdateDTO reviewUpdateDTO, Member member) {
+        Review review = reviewRepository.findByServicesNoAndNo(servicesNo, reviewNo).orElseThrow(
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
         );
 
@@ -218,8 +187,8 @@ public class ReviewService {
     }
 
     @Transactional
-    public void deleteReview(Long servicesId, Long reviewId, Member member) {
-        Review review = reviewRepository.findByServicesIdAndId(servicesId,reviewId)
+    public void deleteReview(Long servicesNo, Long reviewNo, Member member) {
+        Review review = reviewRepository.findByServicesNoAndNo(servicesNo,reviewNo)
                 .orElseThrow(()->new IllegalArgumentException("리뷰가 존재하지 않습니다."));
 
         if (!review.getMember().getNo().equals(member.getNo())) {

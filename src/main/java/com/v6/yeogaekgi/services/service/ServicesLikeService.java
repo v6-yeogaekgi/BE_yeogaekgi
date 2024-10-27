@@ -1,8 +1,8 @@
 package com.v6.yeogaekgi.services.service;
 
 import com.v6.yeogaekgi.services.dto.ServicesLikeDTO;
-import com.v6.yeogaekgi.services.entity.ServiceLike;
 import com.v6.yeogaekgi.services.entity.Services;
+import com.v6.yeogaekgi.services.entity.ServicesLike;
 import com.v6.yeogaekgi.services.repository.ServicesLikeRepository;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,25 +21,25 @@ public class ServicesLikeService {
     private final ServicesLikeRepository servicesLikeRepository;
 
     public List<ServicesLikeDTO> findAllServiceLike(Long memberNo) {
-        List<ServiceLike> serviceLikeListByMemberNo = servicesLikeRepository.findByMemberNo(memberNo);
+        List<ServicesLike> serviceLikeListByMemberNo = servicesLikeRepository.findByMemberNo(memberNo);
         return serviceLikeListByMemberNo.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public void deleteByNo(Long id) {
+    public void deleteById(Long id) {
         servicesLikeRepository.deleteById(id);
     }
 
-    private ServicesLikeDTO entityToDto(ServiceLike serviceLike) {
-        Optional<Services> byId = servicesRepository.findById(serviceLike.getService().getId());
+    private ServicesLikeDTO entityToDto(ServicesLike servicesLike) {
+        Optional<Services> byId = servicesRepository.findById(servicesLike.getServices().getNo());
         if(!byId.isPresent()){
             return null;
         }
         Services services = byId.get();
 
         return ServicesLikeDTO.builder()
-                .servicesLikeNo(serviceLike.getNo())
-                .memberNo(serviceLike.getMember().getNo())
-                .servicesNo(serviceLike.getService().getId())
+                .servicesLikeId(servicesLike.getNo())
+                .memberId(servicesLike.getMember().getNo())
+                .servicesId(servicesLike.getServices().getNo())
                 .address(services.getAddress())
                 .content(services.getContent())
                 .likeCnt(services.getLikeCnt())

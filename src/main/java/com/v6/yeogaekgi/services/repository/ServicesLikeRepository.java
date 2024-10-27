@@ -1,21 +1,22 @@
 package com.v6.yeogaekgi.services.repository;
 
-import com.v6.yeogaekgi.services.entity.ServiceLike;
+import com.v6.yeogaekgi.services.entity.ServicesLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ServicesLikeRepository extends JpaRepository<ServiceLike,Long> {
-    Optional<ServiceLike> findByServiceNoAndMemberNo(Long serviceNo, Long memberNo);
+public interface ServicesLikeRepository extends JpaRepository<ServicesLike,Long> {
+//    Optional<ServiceLike> findByServiceIdAndMemberId(Long serviceId, Long memberId);
+    Optional<ServicesLike> findByServiceNoAndMemberNo(Long serviceNo, Long memberNo);
 
-    List<ServiceLike> findByMemberNo(Long memberNo);
+    List<ServicesLike> findByMemberNo(Long memberNo);
 
     @Query("""
     select count(sk)
-    from ServiceLike sk
-    where sk.service.id = :servicesId
+    from ServicesLike sk
+    where sk.services.no = :servicesNo
 """)
-    Optional<Long> servicesLikeCount(Long servicesId);
+    Optional<Long> servicesLikeCount(Long servicesNo);
 }
