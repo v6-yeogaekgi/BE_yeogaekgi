@@ -87,7 +87,7 @@ public class CommentService {
     public Comment dtoToEntity(CommentDTO commentDTO, Member member) {
 
         Comment comment = Comment.builder()
-                .id(commentDTO.getCommentNo())
+                .no(commentDTO.getCommentNo())
                 .content(commentDTO.getContent())
                 .post(Post.builder().no(commentDTO.getPostNo()).build())
                 .member(member)
