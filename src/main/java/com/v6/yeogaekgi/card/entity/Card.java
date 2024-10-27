@@ -17,7 +17,7 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="card_no")
-    private Long id;
+    private Long no;
 
     @Column
     private String design;

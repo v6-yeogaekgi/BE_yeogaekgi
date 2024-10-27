@@ -18,7 +18,7 @@ public class Qna {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name ="qna_no")
-    private Long id;
+    private Long no;
 
     @Column(nullable=false)
     private String title;

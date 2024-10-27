@@ -27,7 +27,7 @@ public class UserCardController {
     public ResponseEntity<List<UserCardDTO>> list(@AuthenticationPrincipal MemberDetailsImpl memberDetails) { // 사용자카드 리스트 가져오기
         log.info("get mapping user card list");
         try{
-            return new ResponseEntity<>(userCardService.getUserCardByUserId(memberDetails.getMember().getNo()), HttpStatus.OK);
+            return new ResponseEntity<>(userCardService.getUserCardByUserNo(memberDetails.getMember().getNo()), HttpStatus.OK);
         } catch (RuntimeException e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -36,7 +36,7 @@ public class UserCardController {
     @GetMapping("/{userCardId}")
     public ResponseEntity<UserCardDTO> getDetail(@PathVariable Long userCardId, @AuthenticationPrincipal MemberDetailsImpl memberDetails, HttpServletRequest request) { // 카드번호로 카드 상세 조회
         try{
-            return new ResponseEntity<>(userCardService.getUserCardByUserCardId(userCardId, memberDetails.getMember().getNo()), HttpStatus.OK);
+            return new ResponseEntity<>(userCardService.getUserCardByUserCardNo(userCardId, memberDetails.getMember().getNo()), HttpStatus.OK);
         } catch (RuntimeException e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
