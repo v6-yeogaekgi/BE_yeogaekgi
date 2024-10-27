@@ -1,13 +1,8 @@
 package com.v6.yeogaekgi.repository;
 
-import com.v6.yeogaekgi.community.dto.HashtagDTO;
-import com.v6.yeogaekgi.community.entity.Comment;
 import com.v6.yeogaekgi.community.entity.Post;
-import com.v6.yeogaekgi.community.entity.PostLike;
-import com.v6.yeogaekgi.community.repository.CommentRepository;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
-import com.v6.yeogaekgi.member.entity.Member;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.IntStream;
 
 @SpringBootTest
 public class PostRepositoryTests {
@@ -65,7 +56,7 @@ public class PostRepositoryTests {
 
     @Test
     public void GetAllList(){
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "id"));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "no"));
 
         Page<Post> resultPage = postRepository.findAll(pageable);
         for (Post row : resultPage.getContent()) {
@@ -103,7 +94,7 @@ public class PostRepositoryTests {
     public void GetMyPostlist(){
         Pageable pageable = PageRequest.of(0, 10);
 
-        Page<Post> resultPage = postRepository.findByMember_Id(1L ,pageable);
+        Page<Post> resultPage = postRepository.findByMember_No(1L ,pageable);
         for (Post row : resultPage.getContent()) {
             log.info("ㄴRow data: {}", row.toString());
         }
@@ -112,7 +103,7 @@ public class PostRepositoryTests {
     }
     @Test
     public void GetMyLikelist(){
-        List<Long> result = postLikeRepository.findPost_IdByMember_Id(1L );
+        List<Long> result = postLikeRepository.findPost_NoByMember_No(1L );
         log.info(result.toString());
     }
 

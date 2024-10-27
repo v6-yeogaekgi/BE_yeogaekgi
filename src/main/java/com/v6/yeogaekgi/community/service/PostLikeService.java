@@ -1,7 +1,5 @@
 package com.v6.yeogaekgi.community.service;
 
-import com.v6.yeogaekgi.community.dto.PostDTO;
-import com.v6.yeogaekgi.community.dto.PostLikeDTO;
 import com.v6.yeogaekgi.community.entity.Post;
 import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
@@ -31,7 +29,7 @@ public class PostLikeService {
     // 내가 좋아요한 POST의 ID list
     public List<Long> getLikeList(MemberDetailsImpl memberDetails) {
         Long memberNo= memberDetails == null ? 0L : memberDetails.getMember().getNo();
-        return plRepository.findPost_IdByMember_Id(memberNo);
+        return plRepository.findPost_NoByMember_No(memberNo);
     }
 
 
@@ -49,8 +47,8 @@ public class PostLikeService {
             Post post = temp.get();
             likeCnt = post.getLikeCnt();
 
-            if (plRepository.existsByPost_IdAndMember_Id(postNo, memberNo)) { // 테이블에 값이 있으면 delete
-                plRepository.deleteByPost_IdAndMember_Id(postNo, memberNo);
+            if (plRepository.existsByPost_NoAndMember_No(postNo, memberNo)) { // 테이블에 값이 있으면 delete
+                plRepository.deleteByPost_NoAndMember_No(postNo, memberNo);
                 post.changeLikeCnt(--likeCnt); // Post table LikeCnt update
                 likeState = false;
 

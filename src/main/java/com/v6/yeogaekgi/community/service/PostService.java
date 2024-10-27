@@ -1,28 +1,20 @@
 package com.v6.yeogaekgi.community.service;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v6.yeogaekgi.community.dto.HashtagDTO;
 import com.v6.yeogaekgi.community.dto.PostDTO;
 import com.v6.yeogaekgi.community.dto.SearchDTO;
 import com.v6.yeogaekgi.community.entity.Post;
-import com.v6.yeogaekgi.community.entity.PostLike;
 import com.v6.yeogaekgi.community.repository.PostLikeRepository;
 import com.v6.yeogaekgi.community.repository.PostRepository;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.util.InputStreamMultipartFile;
-import com.v6.yeogaekgi.util.PageDTO.PageRequestDTO;
 import com.v6.yeogaekgi.util.PageDTO.PageResultDTO;
 import com.v6.yeogaekgi.util.S3.S3Service;
-import com.v6.yeogaekgi.security.MemberDetailsImpl;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 
 import java.util.zip.ZipFile;
-
-import org.springframework.data.domain.*;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,9 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
@@ -59,7 +49,7 @@ public class PostService {
             result = repository.findByHashtag(search.getKeyword(), pageable);
         }
         if (search.getMyPost()) { // 내가 작성한 게시글
-            result = repository.findByMember_Id(member.getNo(), pageable);
+            result = repository.findByMember_No(member.getNo(), pageable);
         }
 
         if (result != null) {
@@ -80,7 +70,7 @@ public class PostService {
         PostDTO postDto = null;
         if (post.isPresent()) {
             postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_IdAndMember_Id(postNo, memberNo));
+            postDto.setLikeState(plRepository.existsByPost_NoAndMember_No(postNo, memberNo));
         }
         return postDto;
     }
