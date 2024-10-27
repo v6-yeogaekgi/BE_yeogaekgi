@@ -14,7 +14,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     where p.member.no = :memberNo
     and p.services is not null
 """)
-    List<Payment> findAllPaymentsByMemberNoWithNonNullService(@Param("memberId") Long memberId);
+    List<Payment> findAllPaymentsByMemberNoWithNonNullService(@Param("memberNo") Long memberNo);
 
 
     @Query("""
