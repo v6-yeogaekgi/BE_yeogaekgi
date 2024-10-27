@@ -14,7 +14,7 @@ import java.util.List;
 public class PostDTO {
 
     // post
-    private Long postId;
+    private Long postNo;
     private String content;
     private List<String> images;
     private String hashtag;
@@ -24,13 +24,13 @@ public class PostDTO {
 
 
     // member
-    private Long memberId;
+    private Long memberNo;
     private String nickname;
     private String code;
 
     // service
     private boolean likeState; // 현재 접속한 유저가 좋아요한 게시글인지. 아니면0, 맞으면1
-    private Long currentMemberId;
+    private Long currentMemberNo;
     private String currentMemberCode;
     private MultipartFile zip;
     private List<String> existingImages;

@@ -30,34 +30,34 @@ public class PostLikeService {
 
     // 내가 좋아요한 POST의 ID list
     public List<Long> getLikeList(MemberDetailsImpl memberDetails) {
-        Long memberId= memberDetails == null ? 0L : memberDetails.getMember().getId();
-        return plRepository.findPost_IdByMember_Id(memberId);
+        Long memberNo= memberDetails == null ? 0L : memberDetails.getMember().getNo();
+        return plRepository.findPost_IdByMember_Id(memberNo);
     }
 
 
     // Like 버튼 눌렀을 때
     @Transactional
-    public Map<String, Object> postLikeActive(Long postId, Member member){
+    public Map<String, Object> postLikeActive(Long postNo, Member member){
         Map<String, Object> data = new HashMap<>();
 
-        Long memberId =  member.getId();
+        Long memberNo =  member.getNo();
         boolean likeState = false;
         int likeCnt = 0;
 
-        Optional<Post> temp = postRepository.findById(postId);
+        Optional<Post> temp = postRepository.findById(postNo);
         if(temp.isPresent()) {
             Post post = temp.get();
             likeCnt = post.getLikeCnt();
 
-            if (plRepository.existsByPost_IdAndMember_Id(postId, memberId)) { // 테이블에 값이 있으면 delete
-                plRepository.deleteByPost_IdAndMember_Id(postId, memberId);
+            if (plRepository.existsByPost_IdAndMember_Id(postNo, memberNo)) { // 테이블에 값이 있으면 delete
+                plRepository.deleteByPost_IdAndMember_Id(postNo, memberNo);
                 post.changeLikeCnt(--likeCnt); // Post table LikeCnt update
                 likeState = false;
 
             } else { // 테이블에 값이 없으면 insert
                 plRepository.save(PostLike.builder()
-                        .post(Post.builder().id(postId).build())
-                        .member(Member.builder().id(memberId).build())
+                        .post(Post.builder().no(postNo).build())
+                        .member(Member.builder().no(memberNo).build())
                         .build());
                 post.changeLikeCnt(++likeCnt); // Post table LikeCnt update
                 likeState = true;
