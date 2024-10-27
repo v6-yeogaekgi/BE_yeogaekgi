@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ServicesLikeRepository extends JpaRepository<ServicesLike,Long> {
-//    Optional<ServiceLike> findByServiceIdAndMemberId(Long serviceId, Long memberId);
-    Optional<ServicesLike> findByServiceNoAndMemberNo(Long serviceNo, Long memberNo);
+    Optional<ServicesLike> findByServicesNoAndMemberNo(Long servicesNo, Long memberNo);
 
     List<ServicesLike> findByMemberNo(Long memberNo);
 
