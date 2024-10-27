@@ -31,7 +31,7 @@ public class ServicesController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails
     ) {
         List<Services> services;
-        Long memberId = memberDetails.getMember().getId();
+        Long memberId = memberDetails.getMember().getNo();
         // 기본 필터링 조건 설정
         if ((type == null || type.isEmpty()) && (myLike == null || !myLike) && (myReview == null || !myReview)) {
             services = servicesservice.findAllServices(area);
@@ -44,14 +44,14 @@ public class ServicesController {
 
     @GetMapping("/like/{servicesId}/check")
     public ResponseEntity<?> servicesLikeCheck(@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        Long memberId = memberDetails.getMember().getId();
+        Long memberId = memberDetails.getMember().getNo();
         return new ResponseEntity<>(servicesservice.servicesLikeCheck(servicesId,memberId),HttpStatus.OK);
     }
 
 
     @PostMapping("/like/{servicesId}")
     public ResponseEntity<String> servicesLike (@PathVariable Long servicesId, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        Long memberId = memberDetails.getMember().getId();
+        Long memberId = memberDetails.getMember().getNo();
         if(servicesservice.servicesLike(servicesId,memberId)){
             return new ResponseEntity<>("like add",HttpStatus.OK);
         }

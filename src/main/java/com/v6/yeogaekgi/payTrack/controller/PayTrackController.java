@@ -1,7 +1,6 @@
 package com.v6.yeogaekgi.payTrack.controller;
 
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
-import com.v6.yeogaekgi.payTrack.dto.PayTrackRequestDTO;
 import com.v6.yeogaekgi.payTrack.service.PayTrackService;
 import com.v6.yeogaekgi.security.MemberDetailsImpl;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class PayTrackController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         try {
             List<PayTrackDTO> payTracks = payTrackService.findPayTrackByUserCardNo(
-                    memberDetails.getMember().getId(), userCardNo, year, month);
+                    memberDetails.getMember().getNo(), userCardNo, year, month);
 
             return ResponseEntity.ok(payTracks);
         } catch (RuntimeException e){

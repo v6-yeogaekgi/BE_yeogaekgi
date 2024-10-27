@@ -38,7 +38,7 @@ public class ServicesLikeService {
 
         return ServicesLikeDTO.builder()
                 .servicesLikeId(serviceLike.getId())
-                .memberId(serviceLike.getMember().getId())
+                .memberId(serviceLike.getMember().getNo())
                 .servicesId(serviceLike.getService().getId())
                 .address(services.getAddress())
                 .content(services.getContent())

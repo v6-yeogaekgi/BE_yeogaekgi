@@ -19,7 +19,7 @@ public class PayTrackServiceTests extends CommonTests {
     void selectHistories(){
         long uno = 17L;
 
-        List<PayTrackDTO> listByUserCardNo = payTrackService.findPayTrackByUserCardNo(member.getId() ,uno, 2024, 8);
+        List<PayTrackDTO> listByUserCardNo = payTrackService.findPayTrackByUserCardNo(member.getNo() ,uno, 2024, 8);
 
         for (PayTrackDTO payTrackDTO : listByUserCardNo) {
             System.out.println(payTrackDTO);

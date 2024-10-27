@@ -2,14 +2,12 @@ package com.v6.yeogaekgi.review.service;
 import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.payTrack.entity.Payment;
 import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
-import com.v6.yeogaekgi.payTrack.service.PaymentService;
 import com.v6.yeogaekgi.review.dto.*;
 import com.v6.yeogaekgi.review.entity.Review;
 import com.v6.yeogaekgi.review.repository.ReviewRepository;
 import com.v6.yeogaekgi.services.entity.Services;
 import com.v6.yeogaekgi.services.repository.ServicesRepository;
 import com.v6.yeogaekgi.util.S3.S3Service;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,9 +66,9 @@ public class ReviewService {
         String service = servicesRepository.findServiceNameById(servicesId);
         Boolean reviewExist = null;
 
-        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getId(),service, reviewRequestDTO.getPayNo());
+        Optional<Payment> payment = paymentRepository.findByMemberIdAndServiceName(member.getNo(),service, reviewRequestDTO.getPayNo());
         if(!payment.isPresent()) {
-            reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getId());
+            reviewExist = reviewRepository.existsByServicesIdAndMemberId(servicesId,member.getNo());
         } else {
             reviewExist = reviewRepository.existsByPaymentId(reviewRequestDTO.getPayNo());
         }
@@ -124,7 +121,7 @@ public class ReviewService {
 
     @Transactional(readOnly = true)
     public ReviewResponseDTO Detail (Long servicesId,Long reviewId,Member member){
-        Review review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getId()).orElseThrow(
+        Review review = reviewRepository.findByServicesIdAndIdAndMemberId(servicesId, reviewId,member.getNo()).orElseThrow(
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
         );
          System.out.println("images" + review.getImages());
@@ -151,7 +148,7 @@ public class ReviewService {
 
     @Transactional
     public List<ReviewResponseDTO> getUserReviewList(Member member) {
-        List<Review> result = reviewRepository.findByMemberId(member.getId());
+        List<Review> result = reviewRepository.findByMemberId(member.getNo());
         ArrayList<ReviewResponseDTO> dtoList = new ArrayList<>();
         for(Review review : result) {
             ReviewResponseDTO dto = ReviewResponseDTO.builder()
@@ -179,7 +176,7 @@ public class ReviewService {
                 () -> new IllegalArgumentException("리뷰를 찾을 수 없습니다.")
         );
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMember().getNo().equals(member.getNo())) {
             throw new SecurityException("리뷰를 수정할 권한이 없습니다.");
         }
 
@@ -225,7 +222,7 @@ public class ReviewService {
         Review review = reviewRepository.findByServicesIdAndId(servicesId,reviewId)
                 .orElseThrow(()->new IllegalArgumentException("리뷰가 존재하지 않습니다."));
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMember().getNo().equals(member.getNo())) {
             throw new SecurityException("리뷰를 삭제할 권한이 없습니다.");
         }
 

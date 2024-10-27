@@ -13,7 +13,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("""
     select p from Payment p
-    where p.member.id = :memberId
+    where p.member.no = :memberId
     and p.services is not null
 """)
     List<Payment> findAllPaymentsByMemberIdWithNonNullService(@Param("memberId") Long memberId);
@@ -21,7 +21,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("""
     select p from Payment p
-    where p.member.id = :memberId
+    where p.member.no = :memberId
     and p.serviceName LIKE %:serviceName%
     and p.id = :payNo
 """)

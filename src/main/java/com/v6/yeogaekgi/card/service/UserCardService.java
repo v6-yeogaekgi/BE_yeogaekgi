@@ -1,6 +1,5 @@
 package com.v6.yeogaekgi.card.service;
 
-import com.v6.yeogaekgi.card.dto.CardDTO;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,7 +150,7 @@ public class UserCardService {
                 .starred(userCardDTO.getStarred())
                 .status(userCardDTO.getStatus())
                 .card(Card.builder().id(userCardDTO.getCardId()).build())
-                .member(Member.builder().id(userCardDTO.getMemberId()).build())
+                .member(Member.builder().no(userCardDTO.getMemberId()).build())
                 .build();
         return userCard;
     };
@@ -166,7 +164,7 @@ public class UserCardService {
                 .starred(userCard.getStarred())
                 .status(userCard.getStatus())
                 .cardId(userCard.getCard().getId())
-                .memberId(userCard.getMember().getId())
+                .memberId(userCard.getMember().getNo())
                 .design(userCard.getCard().getDesign())
                 .area(userCard.getCard().getArea())
                 .cardName(userCard.getCard().getCardName())
