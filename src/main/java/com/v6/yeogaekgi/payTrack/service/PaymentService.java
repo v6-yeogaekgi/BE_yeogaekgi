@@ -68,24 +68,24 @@ public class PaymentService {
         return true;
     }
 
-    public List<PaymentDTO> findPaymentsWithoutReviews(Long memberId) {
-        List<Payment> payments = paymentRepository.findAllPaymentsByMemberIdWithNonNullService(memberId);
+    public List<PaymentDTO> findPaymentsWithoutReviews(Long memberNo) {
+        List<Payment> payments = paymentRepository.findAllPaymentsByMemberNoWithNonNullService(memberNo);
 
-        Set<Long> paymentIdsWithReviews = reviewRepository.findByMemberIdNotNull(memberId)
+        Set<Long> paymentNosWithReviews = reviewRepository.findByMemberNoNotNull(memberNo)
                 .stream()
-                .map(review -> review.getPayment().getId())
+                .map(review -> review.getPayment().getNo())
                 .collect(Collectors.toSet());
 
         return payments.stream()
-                .filter(payment -> !paymentIdsWithReviews.contains(payment.getId()))
+                .filter(payment -> !paymentNosWithReviews.contains(payment.getNo()))
                 .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
 
 
 
-    public PaymentDTO findById(Long id, Long memberNo) {
-        Payment payment = paymentRepository.findById(id)
+    public PaymentDTO findById(Long no, Long memberNo) {
+        Payment payment = paymentRepository.findById(no)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
 
         if (!payment.getMember().getNo().equals(memberNo)) {
@@ -97,7 +97,7 @@ public class PaymentService {
 
     private Payment dtoToEntity(PaymentDTO dto) {
         Payment.PaymentBuilder paymentBuilder = Payment.builder()
-                .id(dto.getPayNo())
+                .no(dto.getPayNo())
                 .payType(dto.getPayType())
                 .payPrice(dto.getPayPrice())
                 .payBalanceSnap(dto.getPayBalanceSnap())
@@ -105,7 +105,7 @@ public class PaymentService {
                 .payDate(dto.getPayDate())
                 .status(dto.getStatus())
                 .serviceName(dto.getServiceName())
-                .userCard(UserCard.builder().id(dto.getUserCardNo()).build())
+                .userCard(UserCard.builder().no(dto.getUserCardNo()).build())
                 .member(Member.builder().no(dto.getMemberNo()).build());
 
         if(dto.getServiceNo() != null) {
@@ -120,7 +120,7 @@ public class PaymentService {
     private PaymentDTO entityToDto(Payment payment) {
 
         PaymentDTO.PaymentDTOBuilder dtoBuilder = PaymentDTO.builder()
-                .payNo(payment.getId())
+                .payNo(payment.getNo())
                 .payType(payment.getPayType())
                 .payPrice(payment.getPayPrice())
                 .payBalanceSnap(payment.getPayBalanceSnap())
@@ -128,11 +128,11 @@ public class PaymentService {
                 .payDate(payment.getPayDate())
                 .status(payment.getStatus())
                 .serviceName(payment.getServiceName())
-                .userCardNo(payment.getUserCard().getId())
+                .userCardNo(payment.getUserCard().getNo())
                 .memberNo(payment.getMember().getNo());
 
         if (payment.getServices() != null) {
-            dtoBuilder.serviceNo(payment.getServices().getId());
+            dtoBuilder.serviceNo(payment.getServices().getNo());
         }
 
         return dtoBuilder.build();

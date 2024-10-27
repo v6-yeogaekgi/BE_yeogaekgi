@@ -22,7 +22,7 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "pay_no")
-    private Long id;
+    private Long no;
 
     @Column(name = "pay_type", nullable = false)
     private int payType; // COMMENT '충전, 환급, 결제, 전환,'

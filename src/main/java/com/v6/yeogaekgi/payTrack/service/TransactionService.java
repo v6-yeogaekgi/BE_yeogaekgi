@@ -25,8 +25,8 @@ public class TransactionService {
 
     private final UserCardRepository userCardRepository;
 
-    public TransactionDTO getTransactionById(Long tranId) {
-        TransactionDTO resultDTO = transactionRepository.findById(tranId)
+    public TransactionDTO getTransactionByNo(Long tranNo) {
+        TransactionDTO resultDTO = transactionRepository.findById(tranNo)
                 .map(this::entityToDto)
                 .orElse(null);
 
@@ -213,7 +213,7 @@ public class TransactionService {
 
     public Transaction dtoToEntity(TransactionDTO transactionDTO) {
         return Transaction.builder()
-                .id(transactionDTO.getTranNo())
+                .no(transactionDTO.getTranNo())
                 .tranType(transactionDTO.getTranType())
                 .tranDate(transactionDTO.getTranDate())
                 .transferType(transactionDTO.getTransferType())
@@ -222,14 +222,14 @@ public class TransactionService {
                 .krwAmount(transactionDTO.getKrwAmount())
                 .foreignAmount(transactionDTO.getForeignAmount())
                 .currencyType(transactionDTO.getCurrencyType())
-                .userCard(UserCard.builder().id(transactionDTO.getUserCardNo()).build())
+                .userCard(UserCard.builder().no(transactionDTO.getUserCardNo()).build())
                 .member(Member.builder().no(transactionDTO.getMemberNo()).build())
                 .build();
     }
 
     public TransactionDTO entityToDto(Transaction transaction) {
         return TransactionDTO.builder()
-                .tranNo(transaction.getId())
+                .tranNo(transaction.getNo())
                 .tranType(transaction.getTranType())
                 .tranDate(transaction.getTranDate())
                 .transferType(transaction.getTransferType())
@@ -238,7 +238,7 @@ public class TransactionService {
                 .krwAmount(transaction.getKrwAmount())
                 .foreignAmount(transaction.getForeignAmount())
                 .currencyType(transaction.getCurrencyType())
-                .userCardNo(transaction.getUserCard().getId())
+                .userCardNo(transaction.getUserCard().getNo())
                 .memberNo(transaction.getMember().getNo())
                 .build();
     }

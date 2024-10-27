@@ -20,9 +20,9 @@ public class PayTrackService {
 
     private final UserCardRepository userCardRepository;
 
-    public List<PayTrackDTO> findPayTrackByUserCardNo(long memberId, long userCardNo, int year, int month) {
+    public List<PayTrackDTO> findPayTrackByUserCardNo(long memberNo, long userCardNo, int year, int month) {
 
-        if (!isUserCardOwner(memberId, userCardNo)) {
+        if (!isUserCardOwner(memberNo, userCardNo)) {
             throw new AccessDeniedException("You don't have permission to access this card's data");
         }
 
@@ -56,7 +56,8 @@ public class PayTrackService {
         return payTrackDTOList;
     }
 
-    private boolean isUserCardOwner(Long memberId, Long userCardNo) {
-        return userCardRepository.existsByNoAndMemberNo(userCardNo, memberId);
+    private boolean isUserCardOwner(Long memberNo, Long userCardNo) {
+        return userCardRepository.existsByIdAndMemberNo(userCardNo, memberNo);
+
     }
 }
