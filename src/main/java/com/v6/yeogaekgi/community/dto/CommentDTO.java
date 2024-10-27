@@ -15,22 +15,22 @@ import java.time.LocalDateTime;
 public class CommentDTO {
 
     // comment
-    private Long commentId;
+    private Long commentNo;
     private String content;
     private Timestamp regDate,modDate;
 
     // post
-    private Long postId;
+    private Long postNo;
 
     // member
-    private Long memberId;
+    private Long memberNo;
     private String nickname;
 
     // country
     private String code;
 
     // service
-    private Long currentMemberId;
+    private Long currentMemberNo;
     private String currentMemberCode;
 
 
