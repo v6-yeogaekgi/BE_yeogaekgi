@@ -21,10 +21,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     @Query("""
     select p from Payment p
-    where p.member.no = :memberId
+    where p.member.no = :memberNo
     and p.serviceName LIKE %:servicesName%
     and p.no = :payNo
 """)
-    Optional<Payment> findByMemberNoAndServiceNameAndPayNo(@Param("memberNo") Long memberNo,
+    Optional<Payment> findByMemberNoAndServiceName(@Param("memberNo") Long memberNo,
                                                    @Param("servicesName") String servicesName, Long payNo);
 }
