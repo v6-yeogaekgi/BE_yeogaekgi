@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserCardRepository extends JpaRepository<UserCard, Long> {
-    List<UserCard> findByMember_Id(Long memberId);
+    List<UserCard> findByMember(Long memberNo);
 
-    boolean existsByIdAndMember_Id(Long id, Long memberId);
+    boolean existsByNoAndMember(Long No, Long memberNo);
 }

@@ -13,19 +13,19 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCardDTO {
-    private Long userCardId;
+    private Long userCardNo;
     private Timestamp expiryDate;
     private int payBalance;
     private int transitBalance;
     private int starred;
     private int status;
     // Card
-    private Long cardId;
+    private Long cardNo;
     private String design;
     private String area;
     private String cardName;
     // Member
-    private Long memberId;
+    private Long memberNo;
 
     public void updateStarred(int starred) {
         this.starred = starred;

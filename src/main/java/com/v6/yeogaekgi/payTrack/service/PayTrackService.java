@@ -3,8 +3,6 @@ package com.v6.yeogaekgi.payTrack.service;
 import com.v6.yeogaekgi.card.repository.UserCardRepository;
 import com.v6.yeogaekgi.payTrack.dto.PayTrackDTO;
 import com.v6.yeogaekgi.payTrack.repository.PayTrackQueryRepository;
-import com.v6.yeogaekgi.payTrack.repository.PaymentRepository;
-import com.v6.yeogaekgi.payTrack.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -59,6 +57,6 @@ public class PayTrackService {
     }
 
     private boolean isUserCardOwner(Long memberId, Long userCardNo) {
-        return userCardRepository.existsByIdAndMember_Id(userCardNo, memberId);
+        return userCardRepository.existsByNoAndMember(userCardNo, memberId);
     }
 }

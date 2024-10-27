@@ -1,6 +1,5 @@
 package com.v6.yeogaekgi.card.service;
 
-import com.v6.yeogaekgi.card.dto.CardDTO;
 import com.v6.yeogaekgi.card.dto.UserCardDTO;
 import com.v6.yeogaekgi.card.entity.Card;
 import com.v6.yeogaekgi.card.entity.UserCard;
@@ -16,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,18 +24,18 @@ import java.util.stream.Collectors;
 public class UserCardService {
     private final UserCardRepository userCardRepository;
 
-    public List<UserCardDTO> getUserCardByUserId(Long userId) {
-        List<UserCard> result = userCardRepository.findByMember_Id(userId);
+    public List<UserCardDTO> getUserCardByUserNo(Long userNo) {
+        List<UserCard> result = userCardRepository.findByMember(userNo);
         return result.stream().map(UserCard -> entityToDto(UserCard)).collect(Collectors.toList());
     }
 
-    public UserCardDTO getUserCardByUserCardId(Long userCardId, Long memberId) {
-        if (!isUserCardOwner(memberId, userCardId)) {
+    public UserCardDTO getUserCardByUserCardNo(Long userCardNo, Long memberNo) {
+        if (!isUserCardOwner(memberNo, userCardNo)) {
             throw new AccessDeniedException("You don't have permission to access this card's data");
         }
-        return userCardRepository.findById(userCardId)
+        return userCardRepository.findById(userCardNo)
                 .map(this::entityToDto)
-                .orElseThrow(() -> new EntityNotFoundException("UserCard not found with id: " + userCardId));
+                .orElseThrow(() -> new EntityNotFoundException("UserCard not found with id: " + userCardNo));
     }
 
     @Transactional
@@ -51,23 +49,23 @@ public class UserCardService {
     }
 
     @Transactional
-    public boolean changesUserCardStarred(UserCardDTO userCardDTO, Long memberId){
+    public boolean changesUserCardStarred(UserCardDTO userCardDTO, Long memberNo){
         // parameter userCardDTO ->
         // userCardNo = 주카드 타겟
         // memberId = 주카드 갱신 사용자
 
-        UserCardDTO prevUserCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
+        UserCardDTO prevUserCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
         UserCardDTO nextUserCard = null;
 
         try{
-            List<UserCardDTO> all = getAllByMemberId(prevUserCard.getMemberId());
+            List<UserCardDTO> all = getAllByMemberNo(prevUserCard.getMemberNo());
             for (UserCardDTO cardDTO : all) {
                 if(cardDTO.getStatus() == 1){
                     if(cardDTO.getStarred()==1){
                         cardDTO.updateStarred(0);
                         userCardRepository.save(dtoToEntity(cardDTO));
                     }
-                    if(cardDTO.getUserCardId().equals(userCardDTO.getUserCardId())){ // use userCardNo
+                    if(cardDTO.getUserCardNo().equals(userCardDTO.getUserCardNo())){ // use userCardNo
                         cardDTO.updateStarred(1);;
                         UserCard saved = userCardRepository.save(dtoToEntity(cardDTO));
                         nextUserCard = entityToDto(saved);
@@ -82,10 +80,10 @@ public class UserCardService {
         }
     }
 
-    public boolean deleteUserCardStarred(UserCardDTO userCardDTO, Long memberId){
+    public boolean deleteUserCardStarred(UserCardDTO userCardDTO, Long memberNo){
 
         try {
-            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
+            UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
             int prevStarred = userCard.getStarred();
             userCard.updateStarred(0);
             UserCard save = userCardRepository.save(dtoToEntity(userCard));
@@ -97,9 +95,9 @@ public class UserCardService {
         return false;
     }
 
-    public boolean deleteUserCard(UserCardDTO userCardDTO, Long memberId){
+    public boolean deleteUserCard(UserCardDTO userCardDTO, Long memberNo){
         try {
-            UserCardDTO userCard = getUserCardByUserCardId(userCardDTO.getUserCardId(), memberId);
+            UserCardDTO userCard = getUserCardByUserCardNo(userCardDTO.getUserCardNo(), memberNo);
             userCard.updateStatus(2);
             // 삭제 대상 카드가 주카드일때 주카드 상태 해제 이후 save
             if(userCard.getStarred()==1) userCard.setStarred(0);
@@ -111,15 +109,15 @@ public class UserCardService {
         return false;
     }
 
-    public List<UserCardDTO> getAllByMemberId(Long memberId) {
-        List<UserCard> find = userCardRepository.findByMember_Id(memberId);
+    public List<UserCardDTO> getAllByMemberNo(Long memberNo) {
+        List<UserCard> find = userCardRepository.findByMember(memberNo);
         return find.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberId, String area) {
+    public List<UserCardDTO> getHomeCardByMemberAndArea(Long memberNo, String area) {
         log.info("----getHomeCardByMemberAndArea----");
 
-        List<UserCard> find = userCardRepository.findByMember_Id(memberId);
+        List<UserCard> find = userCardRepository.findByMember(memberNo);
         List<UserCardDTO> result = new ArrayList<>();
 
         for(UserCard userCard : find) {
@@ -139,34 +137,34 @@ public class UserCardService {
         return result;
     }
 
-    private boolean isUserCardOwner(Long memberId, Long userCardId) {
-        return userCardRepository.existsByIdAndMember_Id(userCardId, memberId);
+    private boolean isUserCardOwner(Long memberNo, Long userCardNo) {
+        return userCardRepository.existsByNoAndMember(userCardNo, memberNo);
     }
 
     public UserCard dtoToEntity(UserCardDTO userCardDTO) {
         UserCard userCard = UserCard.builder()
-                .id(userCardDTO.getUserCardId())
+                .no(userCardDTO.getUserCardNo())
                 .expDate(userCardDTO.getExpiryDate())
                 .payBalance(userCardDTO.getPayBalance())
                 .transitBalance(userCardDTO.getTransitBalance())
                 .starred(userCardDTO.getStarred())
                 .status(userCardDTO.getStatus())
-                .card(Card.builder().id(userCardDTO.getCardId()).build())
-                .member(Member.builder().id(userCardDTO.getMemberId()).build())
+                .card(Card.builder().no(userCardDTO.getCardNo()).build())
+                .member(Member.builder().no(userCardDTO.getMemberNo()).build())
                 .build();
         return userCard;
     };
 
     public UserCardDTO entityToDto(UserCard userCard) {
         UserCardDTO userCardDTO = UserCardDTO.builder()
-                .userCardId(userCard.getId())
+                .userCardNo(userCard.getNo())
                 .expiryDate(userCard.getExpDate())
                 .payBalance(userCard.getPayBalance())
                 .transitBalance(userCard.getTransitBalance())
                 .starred(userCard.getStarred())
                 .status(userCard.getStatus())
-                .cardId(userCard.getCard().getId())
-                .memberId(userCard.getMember().getId())
+                .cardNo(userCard.getCard().getNo())
+                .memberNo(userCard.getMember().getNo())
                 .design(userCard.getCard().getDesign())
                 .area(userCard.getCard().getArea())
                 .cardName(userCard.getCard().getCardName())
