@@ -13,7 +13,7 @@ import java.util.List;
 public class QnaDTO {
 
     // post
-    private Long qnaId;
+    private Long qnaNo;
     private String title;
     private String content;
     private List<String> images;
@@ -22,6 +22,6 @@ public class QnaDTO {
     private Boolean status;
 
     // member
-    private Long memberId;
+    private Long memberNo;
     private String code;
 }
