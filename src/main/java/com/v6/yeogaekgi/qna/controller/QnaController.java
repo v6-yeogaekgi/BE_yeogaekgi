@@ -31,10 +31,8 @@ public class QnaController {
     private final S3Service s3Service;
 
     @GetMapping("/list")
-    public ResponseEntity<PageResultDTO<QnaDTO>> getPostList(
-            @AuthenticationPrincipal MemberDetailsImpl memberDetails,
-            PageRequestDTO pageRequestDTO) {
-        log.info("-------- get qna list --------[" + pageRequestDTO.toString() + "]");
+    public ResponseEntity<PageResultDTO<QnaDTO>> getPostList( @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+                                                              PageRequestDTO pageRequestDTO) {
         if(memberDetails == null){
             new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
@@ -48,14 +46,15 @@ public class QnaController {
         return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/{qnaId}")
-    public ResponseEntity<QnaDTO> getPost(@PathVariable Long qnaId, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+    @GetMapping("/{qnaNo}")
+    public ResponseEntity<QnaDTO> getPost(@PathVariable Long qnaNo,
+                                          @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
         log.info("-------------- get qna --------------");
         if(memberDetails == null){
             new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }
-        log.info("postId: " + qnaId);
-        return new ResponseEntity<>(service.getQna(qnaId), HttpStatus.OK);
+        log.info("postNo: " + qnaNo);
+        return new ResponseEntity<>(service.getQna(qnaNo), HttpStatus.OK);
     }
 
 
@@ -74,13 +73,13 @@ public class QnaController {
         }
 
         Qna qna = Qna.builder().images(imageUrl).title(title).content(content).member(memberDetails.getMember()).build();
-        Long id = service.register(qna);
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        Long no = service.register(qna);
+        return new ResponseEntity<>(no, HttpStatus.OK);
     }
 
 
-    @PutMapping("/{qnaId}")
-    public ResponseEntity<Long> modifyPost(@PathVariable Long qnaId,
+    @PutMapping("/{qnaNo}")
+    public ResponseEntity<Long> modifyPost(@PathVariable Long qnaNo,
                                            @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
                                            @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
                                            @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
@@ -117,25 +116,25 @@ public class QnaController {
             log.error("Error converting image URLs to JSON string", e);
         }
 
-        Qna qna = Qna.builder().images(imageUrls).title(title).content(content).member(memberDetails.getMember()).id(qnaId).build();
+        Qna qna = Qna.builder().images(imageUrls).title(title).content(content).member(memberDetails.getMember()).no(qnaNo).build();
 
 
-        log.info("---------------modify post--------------" + qna.getId());
+        log.info("---------------modify post--------------" + qna.getNo());
 
         service.modify(qna);
 
-        return new ResponseEntity<>(qna.getId(), HttpStatus.OK);
+        return new ResponseEntity<>(qna.getNo(), HttpStatus.OK);
     }
 
 
 
-    @DeleteMapping("/{qnaId}")
-    public ResponseEntity<Long> removePost(@PathVariable Long qnaId) {
+    @DeleteMapping("/{qnaNo}")
+    public ResponseEntity<Long> removePost(@PathVariable Long qnaNo) {
         log.info("---------------remove post--------------");
-        log.info("postId: " + qnaId);
+        log.info("postNo: " + qnaNo);
 
-        service.remove(qnaId);
+        service.remove(qnaNo);
 
-        return new ResponseEntity<>(qnaId, HttpStatus.OK);
+        return new ResponseEntity<>(qnaNo, HttpStatus.OK);
     }
 }
