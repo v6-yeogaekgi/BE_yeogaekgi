@@ -75,7 +75,7 @@ public class Servicesservice {
 
     @Transactional
     public boolean servicesLike (Long servicesNo,Long memberNo){
-        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServiceNoAndMemberNo(servicesNo,memberNo);
+        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServicesNoAndMemberNo(servicesNo,memberNo);
         Services services = servicesRepository.findById(servicesNo)
                 .orElseThrow(() -> new EntityNotFoundException("Service not found"));
         if (!serviceLikeCheck.isPresent()) {
@@ -99,7 +99,7 @@ public class Servicesservice {
     @Transactional
     public Map<String,Object> servicesLikeCheck(Long servicesNo,Long memberNo){
         Map<String,Object> result = new HashMap<>();
-        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServiceNoAndMemberNo(servicesNo,memberNo);
+        Optional<ServicesLike> serviceLikeCheck = servicesLikeRepository.findByServicesNoAndMemberNo(servicesNo,memberNo);
         Optional<Long> servicesLikeCount =servicesLikeRepository.servicesLikeCount(servicesNo);
         if(serviceLikeCheck.isPresent()){
             result.put("status",true);
