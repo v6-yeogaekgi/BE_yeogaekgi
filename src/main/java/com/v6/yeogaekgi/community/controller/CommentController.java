@@ -44,7 +44,7 @@ public class CommentController {
 
     @PostMapping("/{postNo}")
     public ResponseEntity<Long> registerComment(@PathVariable("postNo") Long postNo, @RequestBody CommentDTO commentDTO, @AuthenticationPrincipal MemberDetailsImpl memberDetails){
-        commentDTO.setPostId(postNo);
+        commentDTO.setPostNo(postNo);
         log.info("----------------register comment-------------------");
         log.info("commentDTO : "+commentDTO);
         Long commentNo = commentService.register(commentDTO,memberDetails.getMember());
@@ -55,7 +55,7 @@ public class CommentController {
     @PutMapping("/{commentNo}")
     public ResponseEntity<Long> modifyComment(@PathVariable("commentNo") Long commentNo,
                                              @RequestBody CommentDTO commentDTO){
-        commentDTO.setCommentId(commentNo);
+        commentDTO.setCommentNo(commentNo);
         log.info("---------------modify Comment--------------" + commentNo);
         log.info("commentDTO: " + commentDTO);
 
