@@ -27,6 +27,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @EntityGraph(attributePaths = {"member"})
     Slice<Post> findByMember_No(Long memberNo, Pageable pageable);
 
+    boolean existsByNoAndMemberNo(Long postNo, Long memberNo);
 
 
 }

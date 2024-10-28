@@ -40,13 +40,7 @@ public class PostController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails,
             SearchDTO search) {
         PageResultDTO<PostDTO> result = postService.getPostList(search, memberDetails.getMember());
-        if (result != null) {
-            if (result.getContent().size() == 0) {
-                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
@@ -59,8 +53,7 @@ public class PostController {
 
         PostDTO postDTO = PostDTO.builder().zip(multipartFile).hashtag(hashtag).content(content).build();
 
-        log.info("\n----------------register Post-------------------");
-        log.info("postDTO : " + postDTO);
+        log.info("register post : post = "+postDTO.toString());
         Long postNo = postService.register(postDTO, memberDetails.getMember());
         return new ResponseEntity<>(postNo, HttpStatus.OK);
     }
@@ -76,18 +69,16 @@ public class PostController {
                                            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         PostDTO postDTO = PostDTO.builder().postNo(postNo).zip(multipartFile).existingImages(existingImages).deleteImages(deleteImages).hashtag(hashtag).content(content).build();
-        log.info("---------------modify post--------------");
-        log.info("postDTO: " + postDTO);
-        Long modifiedPostNo = postService.modify(postDTO,memberDetails.getMember());
+        log.info("modify post : post="+postDTO.toString());
+        Long modifiedPostNo = postService.modify(postDTO, memberDetails== null? null: memberDetails.getMember());
         return new ResponseEntity<>(modifiedPostNo, HttpStatus.OK);
     }
 
 
     @DeleteMapping("/{postNo}")
-    public ResponseEntity<Long> removePost(@PathVariable Long postNo) {
-        log.info("---------------remove post--------------");
-        log.info("postNo: " + postNo);
-        postService.remove(postNo);
+    public ResponseEntity<Long> removePost(@PathVariable Long postNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        log.info("remove post: postNo="+postNo);
+        postService.remove(postNo, memberDetails== null? null: memberDetails.getMember());
         return new ResponseEntity<>(postNo, HttpStatus.OK);
     }
 
@@ -104,22 +95,14 @@ public class PostController {
 
     @GetMapping("/likeList")
     public ResponseEntity<?> getLikeList(@AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        try {
-            return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+        return new ResponseEntity<>(postLikeService.getLikeList(memberDetails), HttpStatus.OK);
     }
 
     @PostMapping("/like/{postNo}")
     public ResponseEntity<?> postLikeActive(@PathVariable Long postNo,
                                             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        log.info("-------------- post like on/off --------------");
-        try {
-            Member member = memberDetails.getMember();
-            return new ResponseEntity<>(postLikeService.postLikeActive(postNo, member), HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
+        log.info("post like on/off : postNo: " + postNo + "member" + (memberDetails==null ? null: memberDetails.getMember()));
+        Member member = memberDetails==null ? null: memberDetails.getMember();
+        return new ResponseEntity<>(postLikeService.postLikeActive(postNo, member), HttpStatus.OK);
     }
 }

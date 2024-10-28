@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,46 +52,50 @@ public class PostService {
         if (search.getMyPost()) { // 내가 작성한 게시글
             result = repository.findByMember_No(member.getNo(), pageable);
         }
-
-        if (result != null) {
-            List<PostDTO> content = result.getContent().stream()
-                    .map(Post -> entityToDto(Post, member))
-                    .collect(Collectors.toList());
-            PageResultDTO<PostDTO> pageResultDTO = new PageResultDTO<>(content, pageable, result.hasNext());
-            return pageResultDTO;
+        if (result == null || result.getContent().isEmpty()) {
+            throw new NoSuchElementException("게시글 리스트를 찾을 수 없습니다.");
         }
-
-        return null;
+        List<PostDTO> content = result.getContent().stream()
+                .map(Post -> entityToDto(Post, member))
+                .collect(Collectors.toList());
+        PageResultDTO<PostDTO> pageResultDTO = new PageResultDTO<>(content, pageable, result.hasNext());
+        return pageResultDTO;
     }
+
 
     // 게시글 상세
     public PostDTO getPost(Long postNo, Member member) {
         Long memberNo = member == null ? 0L : member.getNo(); // memberNo 가져옴
-        Optional<Post> post = repository.findById(postNo);
-        PostDTO postDto = null;
-        if (post.isPresent()) {
-            postDto = entityToDto(post.get(), member);
-            postDto.setLikeState(plRepository.existsByPost_NoAndMember_No(postNo, memberNo));
-        }
+        Post post = repository.findById(postNo)
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다. "));
+        PostDTO postDto = entityToDto(post, member);
+        postDto.setLikeState(plRepository.existsByPost_NoAndMember_No(postNo, memberNo));
         return postDto;
     }
 
     // 게시글 등록
     public Long register(PostDTO postDTO, Member member) {
-
+        if(member == null || member.getNo() == 0L){
+            throw new AccessDeniedException("게시글 작성 권한이 없습니다.");
+        }
         MultipartFile multipartFile = postDTO.getZip();
         postDTO.setImages(uploadZipFile(multipartFile));
         Post post = dtoToEntity(postDTO, member);
-        repository.save(post);
-        return post.getNo();
+        Post result = repository.save(post);
+        if(result == null){
+            throw new IllegalStateException("게시글 작성에 실패했습니다.");
+        }
+        return result.getNo();
     }
 
     // 게시글 수정
     public Long modify(PostDTO postDTO, Member member) {
-
+        if(member == null || ! repository.existsByNoAndMemberNo(postDTO.getPostNo(), member.getNo())){
+            throw new AccessDeniedException("해당 게시글 접근 권한이 없습니다.");
+        }
         // 게시글 조회
         Post post = repository.findById(postDTO.getPostNo())
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다. "));
         List<String> newImageUrls = new ArrayList<>();
         MultipartFile multipartFile = postDTO.getZip();
 
@@ -121,18 +126,22 @@ public class PostService {
         post.changeImages(s3Service.convertListToString2(postDTO.getImages()));
         post.changeHashtag(postDTO.getHashtag());
 
-        repository.save(post);
+        Post result = repository.save(post);
+        if(result == null ){
+            throw new IllegalStateException("게시글 수정에 실패했습니다.");
+        }
         return post.getNo();
     }
 
 
     // 게시글 삭제
-    public void remove(Long postNo) {
-
-
+    public void remove(Long postNo, Member member) {
+        if(member == null || ! repository.existsByNoAndMemberNo(postNo, member.getNo())){
+            throw new AccessDeniedException("해당 게시글 접근 권한이 없습니다.");
+        }
         // 게시글 조회
         Post post = repository.findById(postNo)
-                .orElseThrow(() -> new RuntimeException("Post not found"));
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다. "));
 
         // S3 삭제할 이미지 처리
         if (post.getImages() != null) {
@@ -142,15 +151,16 @@ public class PostService {
                 s3Service.deleteImage(imageUrl); // S3 서비스에서 이미지 삭제
             }
         }
-
         repository.deleteById(postNo);
     }
 
     // 해시태그 검색 list
     public List<HashtagDTO> searchHashtag(String keyword) {
         List<Object[]> results = repository.getHashtag(keyword);
+        if(results == null){
+            throw new IllegalStateException("해시태그를 찾을 수 없습니다. Hashtag = "+keyword);
+        }
         List<HashtagDTO> hashtags = new ArrayList<>();
-
         for (Object[] result : results) {
             String hashtag = (String) result[0];
             int count = ((Number) result[1]).intValue();

@@ -12,10 +12,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Log4j2
@@ -42,27 +39,32 @@ public class PostLikeService {
         boolean likeState = false;
         int likeCnt = 0;
 
-        Optional<Post> temp = postRepository.findById(postNo);
-        if(temp.isPresent()) {
-            Post post = temp.get();
-            likeCnt = post.getLikeCnt();
+        Post post = postRepository.findById(postNo)
+                .orElseThrow(() -> new NoSuchElementException("해당 게시글을 찾을 수 없습니다. "));
 
-            if (plRepository.existsByPost_NoAndMember_No(postNo, memberNo)) { // 테이블에 값이 있으면 delete
-                plRepository.deleteByPost_NoAndMember_No(postNo, memberNo);
-                post.changeLikeCnt(--likeCnt); // Post table LikeCnt update
-                likeState = false;
-
-            } else { // 테이블에 값이 없으면 insert
-                plRepository.save(PostLike.builder()
-                        .post(Post.builder().no(postNo).build())
-                        .member(Member.builder().no(memberNo).build())
-                        .build());
-                post.changeLikeCnt(++likeCnt); // Post table LikeCnt update
-                likeState = true;
+        likeCnt = post.getLikeCnt();
+        if (plRepository.existsByPost_NoAndMember_No(postNo, memberNo)) { // 테이블에 값이 있으면 delete
+            plRepository.deleteByPost_NoAndMember_No(postNo, memberNo);
+            if(plRepository.existsByPost_NoAndMember_No(postNo, memberNo)){
+                throw new IllegalStateException("게시글 like 삭제에 실패했습니다.");
             }
-            postRepository.save(post);
+            post.changeLikeCnt(--likeCnt); // Post table LikeCnt update
+            likeState = false;
+        } else { // 테이블에 값이 없으면 insert
+            PostLike pl = plRepository.save(PostLike.builder()
+                    .post(Post.builder().no(postNo).build())
+                    .member(Member.builder().no(memberNo).build())
+                    .build());
+            if(pl == null){
+                throw new IllegalStateException("게시글 like 등록에 실패했습니다.");
+            }
+            post.changeLikeCnt(++likeCnt); // Post table LikeCnt update
+            likeState = true;
         }
-
+        Post p = postRepository.save(post);
+        if(p == null){
+            throw new IllegalStateException("게시글 like 등록에 실패했습니다.");
+        }
         // 데이터 추가
         data.put("likeCnt", likeCnt);
         data.put("state", likeState);
