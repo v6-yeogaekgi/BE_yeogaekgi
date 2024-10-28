@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface QnaRepository extends JpaRepository<Qna, Long> {
     Slice<Qna> findByMember_No(Long memberNo, Pageable pageable);
+    boolean existsByNoAndMemberNo(Long QnaNo, Long memberNo);
 }
