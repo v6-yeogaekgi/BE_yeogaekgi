@@ -1,6 +1,7 @@
 package com.v6.yeogaekgi.qna.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.v6.yeogaekgi.member.entity.Member;
 import com.v6.yeogaekgi.qna.dto.QnaDTO;
 import com.v6.yeogaekgi.qna.entity.Qna;
 import com.v6.yeogaekgi.qna.repository.QnaRepository;
@@ -31,30 +32,18 @@ public class QnaController {
     private final S3Service s3Service;
 
     @GetMapping("/list")
-    public ResponseEntity<PageResultDTO<QnaDTO>> getPostList( @AuthenticationPrincipal MemberDetailsImpl memberDetails,
+    public ResponseEntity<PageResultDTO<QnaDTO>> getQnaList( @AuthenticationPrincipal MemberDetailsImpl memberDetails,
                                                               PageRequestDTO pageRequestDTO) {
-        if(memberDetails == null){
-            new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        }
-        PageResultDTO<QnaDTO> result = service.getQnaList(pageRequestDTO, memberDetails.getMember());
-        if(result != null){
-            if(result.getContent().size() == 0){
-                return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
-            }
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        Member member = memberDetails == null? null :memberDetails.getMember();
+        PageResultDTO<QnaDTO> result = service.getQnaList(pageRequestDTO, member);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/{qnaNo}")
-    public ResponseEntity<QnaDTO> getPost(@PathVariable Long qnaNo,
+    public ResponseEntity<QnaDTO> getQna(@PathVariable Long qnaNo,
                                           @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-        log.info("-------------- get qna --------------");
-        if(memberDetails == null){
-            new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        }
-        log.info("postNo: " + qnaNo);
-        return new ResponseEntity<>(service.getQna(qnaNo), HttpStatus.OK);
+        Member member = memberDetails == null? null :memberDetails.getMember();
+        return new ResponseEntity<>(service.getQna(qnaNo, member), HttpStatus.OK);
     }
 
 
@@ -66,27 +55,26 @@ public class QnaController {
             @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
 
         // 이미지 업로드 -> url 리스트로 반환 -> List<String>을 JSON 문자열로 변환
-        log.info("\n----------------qna Post-------------------");
         String imageUrl = null;
         if(multipartFiles != null && multipartFiles.size() > 0) {
             imageUrl = s3Service.convertListToString(s3Service.uploadImage(multipartFiles));
         }
-
-        Qna qna = Qna.builder().images(imageUrl).title(title).content(content).member(memberDetails.getMember()).build();
+        Member member = memberDetails == null? null :memberDetails.getMember();
+        Qna qna = Qna.builder().images(imageUrl).title(title).content(content).member(member).build();
+        log.info("register QnA : "+qna.toString());
         Long no = service.register(qna);
         return new ResponseEntity<>(no, HttpStatus.OK);
     }
 
 
     @PutMapping("/{qnaNo}")
-    public ResponseEntity<Long> modifyPost(@PathVariable Long qnaNo,
+    public ResponseEntity<Long> modifyQna(@PathVariable Long qnaNo,
                                            @RequestPart(value = "multipartFile", required = false) List<MultipartFile> multipartFiles,
                                            @RequestParam(value = "existingImages", required = false) List<String> existingImages,  // 기존 이미지 URL 목록
                                            @RequestParam(value = "deleteImages", required = false) List<String> deleteImages,  // 삭제할 이미지 URL 목록
                                            @RequestParam(value = "title", required = false) String title,
                                            @RequestParam("content") String content,
                                            @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
-
         // 새 이미지 업로드 -> url 리스트로 반환
         List<String> newImageUrls = new ArrayList<>();
         if (multipartFiles != null && !multipartFiles.isEmpty()) {
@@ -116,25 +104,20 @@ public class QnaController {
             log.error("Error converting image URLs to JSON string", e);
         }
 
-        Qna qna = Qna.builder().images(imageUrls).title(title).content(content).member(memberDetails.getMember()).no(qnaNo).build();
-
-
-        log.info("---------------modify post--------------" + qna.getNo());
-
+        Member member = memberDetails == null? null :memberDetails.getMember();
+        Qna qna = Qna.builder().images(imageUrls).title(title).content(content).member(member).no(qnaNo).build();
+        log.info("modify QnA : " + qna.toString());
         service.modify(qna);
-
         return new ResponseEntity<>(qna.getNo(), HttpStatus.OK);
     }
 
 
 
     @DeleteMapping("/{qnaNo}")
-    public ResponseEntity<Long> removePost(@PathVariable Long qnaNo) {
-        log.info("---------------remove post--------------");
-        log.info("postNo: " + qnaNo);
-
-        service.remove(qnaNo);
-
+    public ResponseEntity<Long> removePost(@PathVariable Long qnaNo, @AuthenticationPrincipal MemberDetailsImpl memberDetails) {
+        Member member = memberDetails == null? null :memberDetails.getMember();
+        log.info("remove QnA: \nqnaNo = "+qnaNo+"\nmember = "+(member==null?"null":member.toString()));
+        service.remove(qnaNo, member);
         return new ResponseEntity<>(qnaNo, HttpStatus.OK);
     }
 }
